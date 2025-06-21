@@ -162,25 +162,6 @@
             color: white;
             font-weight: bold;
         }
-        /* Style for spike palette item */
-        .palette-color.spike {
-            background-color: #808080;
-            border-color: #696969;
-            color: white;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2em; /* Bigger caret */
-            position: relative;
-        }
-        .palette-color.spike::after {
-            content: "▲";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
 
 
         .color-picker-container {
@@ -372,7 +353,7 @@
                     <span>Bloc Sol (1)</span>
                 </div>
                 <div class="palette-item" data-tile-type="2" data-color="#808080">
-                    <div class="palette-color spike"></div>
+                    <div class="palette-color" style="background-color: #808080;">▲</div>
                     <span>Pics (2)</span>
                 </div>
                 <div class="palette-item" data-tile-type="3" data-color="#FF4500">
@@ -516,7 +497,6 @@
         let JUMP_POWER_MEDIUM;
         let JUMP_POWER_HIGH;
 
-        const TILE_SPIKE = 2; // Constante pour le type de tuile Pics
         const TILE_TNT_SOLID = 5;
         const TILE_TNT_NON_SOLID = 7;
         const TNT_EXPLOSION_DELAY = 1000;
@@ -526,7 +506,7 @@
         const TILE_JUMP_PAD_SMALL = 8;
         const TILE_JUMP_PAD_MEDIUM = 9;
         const TILE_JUMP_PAD_HIGH = 10;
-        // Orb Tile Types
+        // New Orb Tile Types
         const TILE_ORB_SMALL_JUMP = 11;
         const TILE_ORB_MEDIUM_JUMP = 12;
         const TILE_ORB_HIGH_JUMP = 13;
@@ -615,15 +595,15 @@
             } else {
                  // S'assurer que les points d'apparition et de fin sont à jour avec la nouvelle taille si l'utilisateur a changé la taille
                  // et que ces points ne sont pas devenus invalides. Si invalides, les réinitialiser.
-                 if (spawnPoint.row >= GRID_ROWS || spawnPoint.col >= GRID_COLS || (typeof editorGrid[spawnPoint.row][spawnPoint.col] === 'object' ? editorGrid[spawnPoint.row][spawnPoint.col].type : editorGrid[spawnPoint.row][spawnPoint.col]) !== 4) {
+                 if (spawnPoint.row >= GRID_ROWS || spawnPoint.col >= GRID_COLS || editorGrid[spawnPoint.row][spawnPoint.col] !== 4) {
                     spawnPoint = { row: GRID_ROWS - 3, col: 2 };
-                    if ((typeof editorGrid[spawnPoint.row][spawnPoint.col] === 'object' ? editorGrid[spawnPoint.row][spawnPoint.col].type : editorGrid[spawnPoint.row][spawnPoint.col]) === 0) { // Ne pas écraser un bloc existant si déjà un bloc
+                    if (editorGrid[spawnPoint.row][spawnPoint.col] === 0) { // Ne pas écraser un bloc existant si déjà un bloc
                          editorGrid[spawnPoint.row][spawnPoint.col] = 4;
                     }
                  }
-                 if (endPoint.row >= GRID_ROWS || endPoint.col >= GRID_COLS || (typeof editorGrid[endPoint.row][endPoint.col] === 'object' ? editorGrid[endPoint.row][endPoint.col].type : editorGrid[endPoint.row][endPoint.col]) !== TILE_END) {
+                 if (endPoint.row >= GRID_ROWS || endPoint.col >= GRID_COLS || editorGrid[endPoint.row][endPoint.col] !== TILE_END) {
                     endPoint = { row: GRID_ROWS - 3, col: GRID_COLS - 3 };
-                     if ((typeof editorGrid[endPoint.row][endPoint.col] === 'object' ? editorGrid[endPoint.row][endPoint.col].type : editorGrid[endPoint.row][endPoint.col]) === 0) { // Ne pas écraser un bloc existant si déjà un bloc
+                     if (editorGrid[endPoint.row][endPoint.col] === 0) { // Ne pas écraser un bloc existant si déjà un bloc
                         editorGrid[endPoint.row][endPoint.col] = TILE_END;
                     }
                  }
@@ -650,14 +630,11 @@
 
                     let tileType;
                     let tileColor = '#444'; // Couleur par défaut pour le vide en mode éditeur
-                    let tileRotation = 0; // Default rotation for spikes
 
                     if (typeof tile === 'object' && tile !== null) {
                         tileType = tile.type;
                         if (tile.type === 1) {
                             tileColor = tile.color;
-                        } else if (tile.type === TILE_SPIKE) {
-                            tileRotation = tile.rotation || 0; // Get rotation for spikes
                         }
                     } else {
                         tileType = tile;
@@ -669,21 +646,17 @@
                         ctx.strokeStyle = tileColor;
                         ctx.lineWidth = 2;
                         ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                    } else if (tileType === TILE_SPIKE) {
-                        ctx.save();
-                        ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2); // Move origin to center of tile
-                        ctx.rotate(tileRotation * Math.PI / 180); // Rotate by the specified angle
+                    } else if (tileType === 2) {
                         ctx.fillStyle = '#808080';
                         ctx.beginPath();
-                        ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2); // Bottom-left relative to center
-                        ctx.lineTo(0, -TILE_SIZE / 2);           // Top-middle relative to center
-                        ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2); // Bottom-right relative to center
+                        ctx.moveTo(x, y + TILE_SIZE);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE);
                         ctx.closePath();
                         ctx.fill();
                         ctx.strokeStyle = '#696969';
                         ctx.lineWidth = 2;
                         ctx.stroke();
-                        ctx.restore(); // Restore previous canvas state (translation and rotation)
                     } else if (tileType === 3) {
                         ctx.fillStyle = '#FF4500';
                         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -844,8 +817,6 @@
                     if (typeof tile === 'object' && tile !== null) {
                         if (tile.type === 1 && tile.color !== DEFAULT_SOLID_BLOCK_COLOR) {
                             return `{"type":1,"color":"${tile.color}"}`;
-                        } else if (tile.type === TILE_SPIKE) {
-                            return `{"type":${TILE_SPIKE},"rotation":${tile.rotation || 0}}`;
                         }
                         return tile.type; // Should not happen for other types, but for safety
                     } else {
@@ -874,9 +845,13 @@
 
             try {
                 let parsedArray;
+                // Tenter d'abord JSON.parse, puis eval pour les cas avec guillemets simples ou non-stringifiés
                 try {
                     parsedArray = JSON.parse(cleanCodeText);
                 } catch (jsonError) {
+                    // Fallback pour les objets non-JSON standard (e.g., sans guillemets autour des clés)
+                    // Cette approche est moins sûre et ne devrait être utilisée qu'en dernier recours.
+                    // Pour cet usage spécifique d'un tableau de nombres/objets simples, c'est acceptable.
                     parsedArray = eval(`(${cleanCodeText})`); 
                 }
 
@@ -898,21 +873,18 @@
                         let tileData = row[c];
                         let tileType;
                         let tileColor = DEFAULT_SOLID_BLOCK_COLOR;
-                        let tileRotation = 0;
 
                         if (typeof tileData === 'object' && tileData !== null) {
                             if (tileData.type === 1 && typeof tileData.color === 'string') {
                                 tileType = 1;
                                 tileColor = tileData.color;
-                            } else if (tileData.type === TILE_SPIKE && typeof tileData.rotation === 'number') {
-                                tileType = TILE_SPIKE;
-                                tileRotation = tileData.rotation;
                             } else {
                                 throw new Error(`Objet de tuile invalide à [${r}, ${c}].`);
                             }
                         } else {
                             tileType = parseInt(tileData);
-                            const validTileTypes = [0, 1, TILE_SPIKE, 3, 4, TILE_TNT_SOLID, TILE_END, TILE_TNT_NON_SOLID, TILE_JUMP_PAD_SMALL, TILE_JUMP_PAD_MEDIUM, TILE_JUMP_PAD_HIGH, TILE_ORB_SMALL_JUMP, TILE_ORB_MEDIUM_JUMP, TILE_ORB_HIGH_JUMP];
+                            // Vérifie si le type de tuile est un nombre valide et non en dehors des types définis
+                            const validTileTypes = [0, 1, 2, 3, 4, TILE_TNT_SOLID, TILE_END, TILE_TNT_NON_SOLID, TILE_JUMP_PAD_SMALL, TILE_JUMP_PAD_MEDIUM, TILE_JUMP_PAD_HIGH, TILE_ORB_SMALL_JUMP, TILE_ORB_MEDIUM_JUMP, TILE_ORB_HIGH_JUMP];
                             if (isNaN(tileType) || !validTileTypes.includes(tileType)) {
                                 throw new Error(`Valeur de tuile invalide (${tileData}) à [${r}, ${c}].`);
                             }
@@ -930,13 +902,7 @@
                             newEndPoint = { row: r, col: c };
                         }
                         
-                        if (tileType === 1) {
-                            newGrid[r][c] = { type: 1, color: tileColor };
-                        } else if (tileType === TILE_SPIKE) {
-                            newGrid[r][c] = { type: TILE_SPIKE, rotation: tileRotation };
-                        } else {
-                            newGrid[r][c] = tileType;
-                        }
+                        newGrid[r][c] = (tileType === 1) ? { type: 1, color: tileColor } : tileType;
                     }
                 }
 
@@ -963,7 +929,7 @@
                 grid: editorGrid,
                 spawnPoint: spawnPoint,
                 endPoint: endPoint,
-                mapSize: { rows: GRID_ROWS, cols: GRID_COLS, tileSize: TILE_SIZE }
+                mapSize: { rows: GRID_ROWS, cols: GRID_COLS, tileSize: TILE_SIZE } // Inclure les infos de taille
             };
             const jsonString = JSON.stringify(levelData, null, 2);
 
@@ -999,21 +965,14 @@
 
                 if (selectedTileType === 1) {
                     tileToPlace = { type: 1, color: currentSolidBlockColor };
+                    // Avoid redrawing if the tile is already the same solid block with the same color
                     if (typeof currentTile === 'object' && currentTile !== null &&
                         currentTile.type === 1 && currentTile.color === currentSolidBlockColor) {
                         return;
                     }
-                } else if (selectedTileType === TILE_SPIKE) {
-                    // When placing a spike, initialize its rotation to 0
-                    tileToPlace = { type: TILE_SPIKE, rotation: 0 };
-                    // Avoid redrawing if the tile is already a spike with 0 rotation
-                    if (typeof currentTile === 'object' && currentTile !== null &&
-                        currentTile.type === TILE_SPIKE && (currentTile.rotation || 0) === 0) {
-                        return;
-                    }
-                }
-                else {
+                } else {
                     tileToPlace = selectedTileType;
+                    // Avoid redrawing if the tile is already the same non-object tile type
                     if (typeof currentTile !== 'object' && currentTile === selectedTileType) {
                         return;
                     }
@@ -1076,27 +1035,6 @@
             }
         }
 
-        // New function to rotate a spike
-        function rotateSpike(e) {
-            if (gameRunning || selectedTileType !== TILE_SPIKE) return; // Only rotate if in editor and spike is selected
-
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const col = Math.floor(x / TILE_SIZE);
-            const row = Math.floor(y / TILE_SIZE);
-
-            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
-                const tile = editorGrid[row][col];
-                if (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) {
-                    // Rotate by 90 degrees clockwise
-                    tile.rotation = ((tile.rotation || 0) + 90) % 360;
-                    drawEditorGrid();
-                    generateLevelCode();
-                }
-            }
-        }
  
         function updateSwipeModeIndicator() {
             if (isSwipeMode) {
@@ -1187,10 +1125,7 @@
             if (spawnPoint.row !== -1 && spawnPoint.col !== -1) {
                 playerSpawnX = spawnPoint.col * TILE_SIZE + (TILE_SIZE - player.width) / 2;
                 playerSpawnY = spawnPoint.row * TILE_SIZE + (TILE_SIZE - player.height) - 2; // -2 pour éviter la collision directe avec la tuile
-                // Ensure spawn point is cleared in gameGrid if it was a block in editorGrid
-                if (typeof gameGrid[spawnPoint.row][spawnPoint.col] !== 'number' || gameGrid[spawnPoint.row][spawnPoint.col] !== 0) {
-                    gameGrid[spawnPoint.row][spawnPoint.col] = 0; 
-                }
+                gameGrid[spawnPoint.row][spawnPoint.col] = 0; // The spawn point is not a visible block in game
             } else {
                 console.warn("Aucun point d'apparition défini. Le joueur démarrera à une position par défaut.");
             }
@@ -1249,13 +1184,6 @@
                     let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
                     const x = col * TILE_SIZE;
                     const y = row * TILE_SIZE;
-                    let tileRotation = 0; // Default for non-spike tiles
-
-                    if (typeof tile === 'object' && tile !== null) {
-                        if (tile.type === TILE_SPIKE) {
-                            tileRotation = tile.rotation || 0;
-                        }
-                    }
 
                     if (tileType === 1) {
                         ctx.fillStyle = (typeof tile === 'object' && tile !== null) ? tile.color : DEFAULT_SOLID_BLOCK_COLOR;
@@ -1263,21 +1191,17 @@
                         ctx.strokeStyle = ctx.fillStyle;
                         ctx.lineWidth = 2;
                         ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                    } else if (tileType === TILE_SPIKE) {
-                        ctx.save();
-                        ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                        ctx.rotate(tileRotation * Math.PI / 180);
+                    } else if (tileType === 2) {
                         ctx.fillStyle = '#808080';
                         ctx.beginPath();
-                        ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2);
-                        ctx.lineTo(0, -TILE_SIZE / 2);
-                        ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2);
+                        ctx.moveTo(x, y + TILE_SIZE);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE);
                         ctx.closePath();
                         ctx.fill();
                         ctx.strokeStyle = '#696969';
                         ctx.lineWidth = 2;
                         ctx.stroke();
-                        ctx.restore();
                     } else if (tileType === 3) {
                         ctx.fillStyle = '#FF4500';
                         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -1303,14 +1227,16 @@
                             const timeLeft = TNT_EXPLOSION_DELAY - elapsed;
 
                             if (timeLeft > 0) {
-                                const flashInterval = 100;
+                                // Flashing animation
+                                const flashInterval = 100; // Flash every 100ms
                                 if (Math.floor(elapsed / flashInterval) % 2 === 0) {
-                                    ctx.strokeStyle = '#FFFF00';
+                                    ctx.strokeStyle = '#FFFF00'; // Yellow flash border
                                     ctx.lineWidth = 4;
                                     ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
                                 }
+                                // Countdown text
                                 const secondsLeft = Math.ceil(timeLeft / 1000);
-                                ctx.fillStyle = 'black';
+                                ctx.fillStyle = 'black'; // Countdown text color
                                 ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
                                 ctx.fillText(secondsLeft.toString(), x + TILE_SIZE / 2, y + TILE_SIZE * 0.25);
                             }
@@ -1378,7 +1304,7 @@
                         } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
                             orbColor = '#FFD700'; // Gold
                             textColor = 'black';
-                        } else { // TILE_ORB_HIGH_JRB
+                        } else { // TILE_ORB_HIGH_JUMP
                             orbColor = '#DC143C'; // Crimson
                         }
                         ctx.fillStyle = orbColor;
@@ -1421,115 +1347,6 @@
                    obj1.y < obj2.y + obj2.height &&
                    obj1.y + obj1.height > obj2.y;
         }
-
-        // Function to check collision between a player AABB and a rotated triangle (spike)
-        function checkSpikeCollision(playerRect, spikeTriangle, spikeRotation) {
-            // Player's corners
-            const px1 = playerRect.x;
-            const py1 = playerRect.y;
-            const px2 = playerRect.x + playerRect.width;
-            const py2 = playerRect.y + playerRect.height;
-
-            // Spike triangle vertices (relative to tile top-left)
-            let v1, v2, v3;
-            // Base vertices for a spike pointing upwards (rotation 0)
-            const baseV1 = { x: 0, y: TILE_SIZE };
-            const baseV2 = { x: TILE_SIZE / 2, y: 0 };
-            const baseV3 = { x: TILE_SIZE, y: TILE_SIZE };
-
-            // Rotate and translate spike vertices to world coordinates
-            const centerX = spikeTriangle.tileX + TILE_SIZE / 2;
-            const centerY = spikeTriangle.tileY + TILE_SIZE / 2;
-
-            function rotatePoint(point, angleInRadians, cx, cy) {
-                const cos = Math.cos(angleInRadians);
-                const sin = Math.sin(angleInRadians);
-                const nx = (point.x - cx) * cos - (point.y - cy) * sin + cx;
-                const ny = (point.x - cx) * sin + (point.y - cy) * cos + cy;
-                return { x: nx, y: ny };
-            }
-
-            const angleRad = spikeRotation * Math.PI / 180;
-
-            v1 = rotatePoint({ x: spikeTriangle.tileX + baseV1.x, y: spikeTriangle.tileY + baseV1.y }, angleRad, centerX, centerY);
-            v2 = rotatePoint({ x: spikeTriangle.tileX + baseV2.x, y: spikeTriangle.tileY + baseV2.y }, angleRad, centerX, centerY);
-            v3 = rotatePoint({ x: spikeTriangle.tileX + baseV3.x, y: spikeTriangle.tileY + baseV3.y }, angleRad, centerX, centerY);
-            
-            // Check for AABB-triangle collision
-            // A simple way is to check if any of the player's corners are inside the triangle,
-            // or if any of the triangle's edges intersect the player's AABB.
-            // For simplicity, we'll implement a basic check that covers most common cases:
-            // Check if player's AABB overlaps with the bounding box of the triangle,
-            // then a more precise (but still simplified) point-in-triangle check
-            // or edge-intersection for the player's bottom/top edge if spike is pointing up/down.
-
-            // Get the bounding box of the rotated triangle
-            const minX = Math.min(v1.x, v2.x, v3.x);
-            const maxX = Math.max(v1.x, v2.x, v3.x);
-            const minY = Math.min(v1.y, v2.y, v3.y);
-            const maxY = Math.max(v1.y, v2.y, v3.y);
-
-            const triangleBBox = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
-
-            if (!checkCollision(playerRect, triangleBBox)) {
-                return false; // No collision with bounding box, so no collision with triangle
-            }
-
-            // More detailed collision check (Point in Triangle for Player corners)
-            // This is simplified and might not catch all edge cases,
-            // but is a good start for typical spike interactions.
-            // Using barycentric coordinates or cross products for point-in-triangle test.
-            
-            function pointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
-                // Calculate barycentric coordinates
-                const s = ax * cy - ay * cx + (cy - ay) * px + (ax - cx) * py;
-                const t = ay * bx - ax * by + (ax - bx) * py + (by - ay) * px;
-
-                if ((s < 0) != (t < 0) && (s < 0) != (s + t > 0)) {
-                    return false;
-                }
-                return true;
-            }
-
-            // Check player's bottom-center point for upward spikes (rotation 0)
-            if (spikeRotation === 0) { // Spike points upwards, player hits from top
-                const playerBottomCenter = { x: playerRect.x + playerRect.width / 2, y: playerRect.y + playerRect.height };
-                if (playerRect.y + playerRect.height > spikeTriangle.tileY + TILE_SIZE / 2 && // Player lower than spike mid-y
-                    pointInTriangle(playerBottomCenter.x, playerBottomCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
-                    return true;
-                }
-            } 
-            // Check player's top-center point for downward spikes (rotation 180)
-            else if (spikeRotation === 180) { // Spike points downwards, player hits from bottom
-                const playerTopCenter = { x: playerRect.x + playerRect.width / 2, y: playerRect.y };
-                 if (playerRect.y < spikeTriangle.tileY + TILE_SIZE / 2 && // Player higher than spike mid-y
-                     pointInTriangle(playerTopCenter.x, playerTopCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
-                    return true;
-                }
-            }
-            // Check player's right-center point for leftward spikes (rotation 270)
-            else if (spikeRotation === 270) { // Spike points left, player hits from right
-                const playerRightCenter = { x: playerRect.x + playerRect.width, y: playerRect.y + playerRect.height / 2 };
-                if (playerRect.x + playerRect.width > spikeTriangle.tileX + TILE_SIZE / 2 && // Player further right than spike mid-x
-                    pointInTriangle(playerRightCenter.x, playerRightCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
-                    return true;
-                }
-            }
-            // Check player's left-center point for rightward spikes (rotation 90)
-            else if (spikeRotation === 90) { // Spike points right, player hits from left
-                const playerLeftCenter = { x: playerRect.x, y: playerRect.y + playerRect.height / 2 };
-                if (playerRect.x < spikeTriangle.tileX + TILE_SIZE / 2 && // Player further left than spike mid-x
-                    pointInTriangle(playerLeftCenter.x, playerLeftCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
-                    return true;
-                }
-            }
-            // Fallback for general AABB intersection if more precise check isn't applicable
-            // For now, this handles the main directions. A more robust solution involves
-            // checking all player corners against the triangle and all triangle edges against the player AABB.
-            
-            return false;
-        }
-
 
         function activateTnt(row, col, type) {
             if (!activeTnts.some(t => t.row === row && t.col === col)) {
@@ -1586,14 +1403,13 @@
             player.y += player.velY;
             player.onGround = false; // Reset onGround each frame
 
-            for (let row = 0; row < gameGrid.length; col++) { // Changed r,c to row,col for consistency
+            for (let row = 0; row < gameGrid.length; row++) {
                 for (let col = 0; col < gameGrid[row].length; col++) {
                     const tile = gameGrid[row][col];
                     let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
                     const tileX = col * TILE_SIZE;
                     const tileY = row * TILE_SIZE;
                     let tileObj = { x: tileX, y: tileY, width: TILE_SIZE, height: TILE_SIZE };
-                    let tileRotation = (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) ? (tile.rotation || 0) : 0;
 
                     // Adjust tileObj for orbs to have a larger hitbox
                     if (tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) {
@@ -1642,16 +1458,21 @@
                     
                     // Orb activation (player "jumps" on it and "clicks")
                     if ((tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) && isCollidingWithTile && playerClickedOrb) {
-                        if (player.velY >= 0 || player.onGround) {
+                        // Check if player is moving upwards (to simulate jumping "onto" it) or on ground
+                        // This prevents activation by just walking into it horizontally without jumping
+                        if (player.velY >= 0 || player.onGround) { // Activate if falling onto it or already on it and clicking
                             if (tileType === TILE_ORB_SMALL_JUMP) {
                                 player.velY = JUMP_POWER_SMALL;
                                 player.onGround = false;
+                                // gameGrid[row][col] = 0; // Removed: Orb is permanent
                             } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
                                 player.velY = JUMP_POWER_MEDIUM;
                                 player.onGround = false;
+                                // gameGrid[row][col] = 0; // Removed: Orb is permanent
                             } else if (tileType === TILE_ORB_HIGH_JUMP) {
                                 player.velY = JUMP_POWER_HIGH;
                                 player.onGround = false;
+                                // gameGrid[row][col] = 0; // Removed: Orb is permanent
                             }
                         }
                     }
@@ -1670,6 +1491,8 @@
             }
 
             // Reset playerClickedOrb after checking for orb activation
+            // This ensures that the orb is only activated on the initial "click" (key press)
+            // and not if the jump key is held down for multiple frames.
             if (playerClickedOrb) {
                 playerClickedOrb = false;
             }
@@ -1680,6 +1503,7 @@
                 if (Date.now() - tnt.activatedAt >= TNT_EXPLOSION_DELAY) {
                     explodeTnt(tnt.row, tnt.col);
                     activeTnts.splice(i, 1); // Remove exploded TNT
+                    // Check if game is still running after explosion (player might have died)
                     if (!gameRunning) return; 
                 }
             }
@@ -1693,18 +1517,9 @@
                     const tileY = row * TILE_SIZE;
                     const tileObj = { x: tileX, y: tileY, width: TILE_SIZE, height: TILE_SIZE };
 
-                    if (tileType === 3 && checkCollision(player, tileObj)) { // Lava
-                        gameOver("GAME OVER", "Tu as touché la lave !");
+                    if ((tileType === 2 || tileType === 3) && checkCollision(player, tileObj)) {
+                        gameOver("GAME OVER", "Tu as touché un danger !");
                         return;
-                    } else if (tileType === TILE_SPIKE) { // Spikes with rotation
-                        const spikeRotation = tile.rotation || 0;
-                        const playerRect = { x: player.x, y: player.y, width: player.width, height: player.height };
-                        const spikeTriangle = { tileX: tileX, tileY: tileY };
-
-                        if (checkSpikeCollision(playerRect, spikeTriangle, spikeRotation)) {
-                            gameOver("GAME OVER", "Tu as été empalé par un pic !");
-                            return;
-                        }
                     }
                 }
             }
@@ -1724,6 +1539,7 @@
         }
 
         function explodeTnt(tntRow, tntCol) {
+            // Remove the TNT block itself
             gameGrid[tntRow][tntCol] = 0;
 
             const startRow = Math.max(0, tntRow - TNT_EXPLOSION_RADIUS);
@@ -1731,6 +1547,7 @@
             const startCol = Math.max(0, tntCol - TNT_EXPLOSION_RADIUS);
             const endCol = Math.min(GRID_COLS - 1, tntCol + TNT_EXPLOSION_RADIUS);
 
+            // Check for player in explosion radius
             const playerTileRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
             const playerTileCol = Math.floor((player.x + player.width / 2) / TILE_SIZE);
 
@@ -1738,11 +1555,13 @@
                 playerTileCol >= startCol && playerTileCol <= endCol) {
                 
                 gameOver("KABOOM !", "Tu as été soufflé par la TNT !");
-                return;
+                return; // Game is over, stop further processing
             }
 
+            // Destroy blocks in explosion radius
             for (let r = startRow; r <= endRow; r++) {
                 for (let c = startCol; c <= endCol; c++) {
+                    // Don't destroy spawn or end points
                     if ((r === spawnPoint.row && c === spawnPoint.col) || (r === endPoint.row && c === endPoint.col)) {
                         continue; 
                     }
@@ -1750,9 +1569,11 @@
                     const tile = gameGrid[r][c];
                     let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
 
+                    // Destroy solid blocks, spikes, lava, and other TNT types within the radius
                     // IMPORTANT: Orbs are now permanent, so they are NOT destroyed by TNT
-                    if ((tileType === 1 || tileType === TILE_SPIKE || tileType === 3 || tileType === TILE_TNT_SOLID || tileType === TILE_TNT_NON_SOLID)) {
+                    if ((tileType === 1 || tileType === 2 || tileType === 3 || tileType === TILE_TNT_SOLID || tileType === TILE_TNT_NON_SOLID)) {
                         gameGrid[r][c] = 0;
+                        // Also remove any active TNTs that are destroyed by this explosion
                         const index = activeTnts.findIndex(t => t.row === r && t.col === c);
                         if (index !== -1) {
                             activeTnts.splice(index, 1);
@@ -1769,21 +1590,23 @@
             exitGameButton.style.display = isEditorMode ? 'none' : 'block';
 
             if (isEditorMode) {
+                // Re-add editor specific event listeners
                 canvas.addEventListener('mousedown', handleEditorMouseDown);
                 canvas.addEventListener('mouseup', handleEditorMouseUp);
                 canvas.addEventListener('mousemove', handleEditorMouseMove);
                 levelOutput.addEventListener('input', parseLevelCode);
                 solidBlockColorPicker.addEventListener('input', handleSolidBlockColorChange);
-                toggleMapSizeButton.style.display = 'block';
-                mapSizeDisplay.style.display = 'block';
+                toggleMapSizeButton.style.display = 'block'; // Show map size toggle button in editor mode
+                mapSizeDisplay.style.display = 'block'; // Show map size display
             } else {
+                // Remove editor specific event listeners
                 canvas.removeEventListener('mousedown', handleEditorMouseDown);
                 canvas.removeEventListener('mouseup', handleEditorMouseUp);
                 canvas.removeEventListener('mousemove', handleEditorMouseMove);
                 levelOutput.removeEventListener('input', parseLevelCode);
                 solidBlockColorPicker.removeEventListener('input', handleSolidBlockColorChange);
-                toggleMapSizeButton.style.display = 'none';
-                mapSizeDisplay.style.display = 'none';
+                toggleMapSizeButton.style.display = 'none'; // Hide button in game mode
+                mapSizeDisplay.style.display = 'none'; // Hide display in game mode
             }
         }
 
@@ -1824,37 +1647,12 @@
                         player.velY = JUMP_POWER;
                         player.onGround = false;
                     }
-                    playerClickedOrb = true;
+                    playerClickedOrb = true; // Set to true when jump key is pressed
                 }
             } else { // In editor mode
                 if (e.key === 't' || e.key === 'T') {
-                    isSwipeMode = !isSwipeMode;
-                    updateSwipeModeIndicator();
-                }
-                if (e.key === 'r' || e.key === 'R') { // New: Rotate spike
-                    if (selectedTileType === TILE_SPIKE && isMouseDown) {
-                         // Find the tile under the mouse and rotate it
-                        const rect = canvas.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-
-                        const col = Math.floor(x / TILE_SIZE);
-                        const row = Math.floor(y / TILE_SIZE);
-
-                        if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
-                            const tile = editorGrid[row][col];
-                            if (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) {
-                                tile.rotation = ((tile.rotation || 0) + 90) % 360;
-                                drawEditorGrid();
-                                generateLevelCode();
-                            }
-                        }
-                    } else if (selectedTileType === TILE_SPIKE) { // If spike is selected but not currently drawing, rotate the palette preview
-                         // This part is for visual feedback in the palette, not for changing grid
-                         // We don't have a direct visual rotation for the palette item itself.
-                         // But if user clicks and holds, then presses R, it works.
-                         // For now, no visual update on the palette item itself, only on the grid.
-                    }
+                    isSwipeMode = !isSwipeMode; // Toggle swipe mode
+                    updateSwipeModeIndicator(); // Update indicator
                 }
             }
         });
@@ -1865,7 +1663,7 @@
                 if (e.code === 'ArrowRight' || e.key === 'd') keys.right = false;
                 if (e.code === 'Space' || e.key === 'z' || e.code === 'ArrowUp') {
                     keys.up = false; 
-                    playerClickedOrb = false;
+                    playerClickedOrb = false; // Reset when jump key is released
                 }
             }
         });
@@ -1873,10 +1671,10 @@
         playLevelButton.addEventListener('click', startGame);
         exitGameButton.addEventListener('click', exitGame);
 
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent right click context menu on canvas
 
-        initializeEditor();
-        toggleUiVisibility(true);
+        initializeEditor(); // Initial setup of the editor
+        toggleUiVisibility(true); // Ensure editor UI is visible at start
     </script>
 </body>
 </html>
