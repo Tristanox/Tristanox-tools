@@ -8,8 +8,8 @@
         default-src 'self';
         script-src 'self' 'unsafe-inline';
         style-src 'self' 'unsafe-inline';
-        img-src 'self' data: https://raw.githubusercontent.com https://i.imgur.com;
-        connect-src 'self' https://*.pokeapi.co https://raw.githubusercontent.com;
+        img-src 'self' data: https://raw.githubusercontent.com https://i.imgur.com https://raw.githubusercontent.com/PokeAPI/;
+        connect-src 'self' https://pokeapi.co https://raw.githubusercontent.com;
     ">
     <style>
         :root {
@@ -886,14 +886,35 @@
 
         let activeFilters = {};
 
+        // Fonction pour récupérer l'URL du sprite via PokeAPI (pour les imports plus anciens si besoin)
+        async function getPokeAPISpriteUrl(pokemonName, isShiny = false) {
+            try {
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonName.toLowerCase()}`);
+                if (!response.ok) {
+                    console.warn(`Impossible de trouver ${pokemonName} sur PokeAPI.`);
+                    return ''; // Retourne une chaîne vide si non trouvé
+                }
+                const data = await response.json();
+                return isShiny ? data.sprites.front_shiny : data.sprites.front_default;
+            } catch (error) {
+                console.error("Erreur lors de la récupération du sprite PokeAPI pour", pokemonName, error);
+                return '';
+            }
+        }
+
+
         // --- Fonctions de chargement des noms de Pokémon ---
         async function loadPokemonNames() {
             if (isLoadingNames) return;
             isLoadingNames = true;
             const loadingMessageDiv = document.getElementById('loadingMessage');
-            loadingMessageDiv.textContent = "Chargement des noms de Pokémon...";
-            loadingMessageDiv.style.color = "gray";
-            loadingMessageDiv.style.display = 'block';
+            // Vérifiez si loadingMessageDiv existe avant de tenter d'accéder à ses propriétés
+            if (loadingMessageDiv) {
+                loadingMessageDiv.textContent = "Chargement des noms de Pokémon...";
+                loadingMessageDiv.style.color = "gray";
+                loadingMessageDiv.style.display = 'block';
+            }
+
 
             console.log('Début du chargement des noms de Pokémon depuis GitHub Pages (Raw).');
             try {
@@ -914,16 +935,20 @@
                 });
 
                 console.log(`Chargement terminé. ${pokemonNamesMap.size} Pokémon chargés.`);
-                loadingMessageDiv.textContent = "Chargement terminé !";
-                loadingMessageDiv.style.color = "green";
-                setTimeout(() => {
-                    loadingMessageDiv.style.display = 'none';
-                }, 2000); // Masquer le message après 2 secondes
+                if (loadingMessageDiv) {
+                    loadingMessageDiv.textContent = "Chargement terminé !";
+                    loadingMessageDiv.style.color = "green";
+                    setTimeout(() => {
+                        loadingMessageDiv.style.display = 'none';
+                    }, 2000); // Masquer le message après 2 secondes
+                }
 
             } catch (error) {
                 console.error("Erreur lors du chargement des noms de Pokémon:", error);
-                loadingMessageDiv.textContent = "Erreur de chargement des noms de Pokémon. Vérifiez la console.";
-                loadingMessageDiv.style.color = "red";
+                if (loadingMessageDiv) {
+                    loadingMessageDiv.textContent = "Erreur de chargement des noms de Pokémon. Vérifiez la console.";
+                    loadingMessageDiv.style.color = "red";
+                }
             } finally {
                 isLoadingNames = false;
             }
@@ -1291,18 +1316,19 @@
             URL.revokeObjectURL(url);
         }
 
-        function importFromJson(event) {
+        async function importFromJson(event) {
             const file = event.target.files[0];
             if (!file) {
                 return;
             }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) { // Rendre cette fonction asynchrone pour les appels à getPokeAPISpriteUrl
                 try {
                     const importedPokemons = JSON.parse(e.target.result);
                     if (Array.isArray(importedPokemons)) {
-                        pokemons = importedPokemons.map(p => {
+                        const processedPokemons = [];
+                        for (const p of importedPokemons) { // Utiliser for...of pour await
                             // Tenter de retrouver les données du Pokémon dans la map (pokedata-fr.json)
                             // Utilise p.nameFrench pour la recherche, si disponible, sinon p.name
                             const nameToLookup = (p.nameFrench || p.name || '').toLowerCase();
@@ -1312,16 +1338,19 @@
                             if (pokemonDataFromMap) {
                                 // Si trouvé dans la map, utiliser les sprites de la map
                                 imageUrl = p.isShiny ? pokemonDataFromMap.spriteShiny : pokemonDataFromMap.spriteNormal;
-                            } else if (p.image) {
-                                // Sinon, si le Pokémon importé a une propriété 'image', l'utiliser comme fallback
-                                imageUrl = p.image;
+                            } else if (p.name) { // Fallback pour les anciens imports si le Pokémon n'est pas dans la map locale
+                                // Tenter de récupérer le sprite via PokeAPI
+                                imageUrl = await getPokeAPISpriteUrl(p.name, p.isShiny);
                             }
-                            // Fallback pour les anciens imports si l'image est vide ou n'a pas pu être trouvée
+                            
+                            // Si l'image est toujours vide, utiliser un sprite par défaut si disponible
                             if (!imageUrl && pokemonDataFromMap) {
-                                imageUrl = pokemonDataFromMap.spriteNormal; // Utilisez le sprite normal par défaut
+                                imageUrl = pokemonDataFromMap.spriteNormal; 
+                            } else if (!imageUrl) {
+                                imageUrl = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png'; // Image par défaut si tout échoue
                             }
 
-                            return {
+                            processedPokemons.push({
                                 id: p.id || Date.now() + Math.random(), // Génère un ID si manquant
                                 name: p.name || (pokemonDataFromMap ? pokemonDataFromMap.name : ''), // Utilise le nom anglais de la map ou vide
                                 nameFrench: p.nameFrench || (pokemonDataFromMap ? pokemonDataFromMap.nameFrench : p.name || ''), // Utilise le nom français de la map ou p.name
@@ -1346,8 +1375,9 @@
                                 isLevel1: p.isLevel1 || false,
                                 isMega: p.isMega || false,
                                 timestamp: p.timestamp || new Date().toISOString()
-                            };
-                        }));
+                            });
+                        }
+                        pokemons = processedPokemons;
                         savePokemons();
                         renderPokemons();
                         alert("Données importées avec succès !");
