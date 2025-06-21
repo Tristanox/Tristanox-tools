@@ -9,7 +9,7 @@
         script-src 'self' 'unsafe-inline';
         style-src 'self' 'unsafe-inline';
         img-src 'self' data: https://raw.githubusercontent.com https://i.imgur.com;
-        connect-src 'self' https://*.pokeapi.co https://tristanox.neocities.org;
+        connect-src 'self' https://*.pokeapi.co https://tristanox.github.io;
     ">
     <style>
         :root {
@@ -936,7 +936,8 @@
 
             console.log('Début du chargement des noms de Pokémon.');
             try {
-                const response = await fetch('https://tristanox.neocities.org/pokedata-fr.json');
+                // MODIFICATION 2 : Mise à jour de l'URL de récupération du fichier JSON
+                const response = await fetch('https://tristanox.github.io/Tristanox-tools/pokedata-fr.json');
                 if (!response.ok) {
                     throw new Error(`Erreur HTTP: ${response.status} - Impossible de charger les données Pokémon.`);
                 }
