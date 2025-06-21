@@ -35,14 +35,14 @@
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px; /* Conserver ce padding pour une marge latérale */
+            padding: 20px;
             transition: background-color 0.3s ease, color 0.3s ease;
             color: var(--text-color);
             background-color: var(--bg-color); /* Fallback pour le thème sombre */
         }
 
         .container {
-            max-width: 100%; /* Pour prendre toute la largeur disponible */
+            max-width: 1200px;
             margin: 20px auto;
             background-color: var(--container-bg);
             padding: 30px;
@@ -55,7 +55,7 @@
             text-align: center;
             color: var(--green-color);
             margin-bottom: 25px;
-            font-size: 3.5rem; /* Taille du titre augmentée */
+            font-size: 3.5rem; /* MODIFICATION ICI : Taille du titre augmentée */
         }
         
         h2 {
@@ -66,15 +66,13 @@
             font-size: 1.8rem;
         }
 
-        /* ********************************************* */
-        /* DÉBUT DES MODIFICATIONS POUR LES CHAMPS DU FORMULAIRE D'AJOUT */
-        /* ********************************************* */
+
+        /* Bouton de thème supprimé */
+
         .add-pokemon-form {
             display: grid;
-            /* Permet 1 ou plusieurs colonnes, chaque colonne prenant l'espace disponible (1fr)
-               après avoir atteint un minimum de 250px. Les champs seront plus longs sur les écrans larges. */
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 10px; /* Réduit le gap entre les champs */
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
             padding: 20px;
             background-color: var(--container-bg);
@@ -85,7 +83,7 @@
 
         .add-pokemon-form input[type="text"],
         .add-pokemon-form input[type="number"] {
-            width: 100%; /* L'input remplira 100% de la largeur de sa cellule de grille */
+            width: calc(100% - 20px);
             padding: 10px;
             border: 1px solid var(--border-color);
             border-radius: 5px;
@@ -93,11 +91,7 @@
             color: var(--text-color);
             font-size: 1rem;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            box-sizing: border-box; /* IMPORTANT: Inclure padding et border dans la largeur */
         }
-        /* ********************************************* */
-        /* FIN DES MODIFICATIONS POUR LES CHAMPS DU FORMULAIRE D'AJOUT */
-        /* ********************************************* */
 
         .add-pokemon-form input[type="text"]:focus,
         .add-pokemon-form input[type="number"]:focus {
@@ -128,9 +122,9 @@
         }
 
         .checkbox-group {
-            grid-column: 1 / -1; /* Assurez-vous qu'il prend toute la largeur du formulaire */
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
             gap: 15px;
             padding-top: 15px;
             border-top: 1px solid var(--border-color);
@@ -143,7 +137,6 @@
             gap: 5px;
             color: var(--text-color);
             font-size: 0.95rem;
-            justify-content: flex-start;
         }
 
         .checkbox-container input[type="checkbox"] {
@@ -306,7 +299,7 @@
 
         .pokemon-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 25px;
             justify-content: center;
             padding-top: 20px;
@@ -316,7 +309,7 @@
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 8px;
-            padding: 20px; 
+            padding: 15px;
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -369,29 +362,29 @@
         }
 
         .pokemon-card .card-icons .icon {
-            width: 24px; 
-            height: 24px;
+            width: 16px;
+            height: 16px;
         }
 
         .pokemon-card .card-icons .icon.shiny-text {
-            font-size: 1.2rem; /* Texte Shiny un peu plus grand */
+            font-size: 1rem;
             color: gold;
             text-shadow: 0 0 3px rgba(255,255,0,0.8);
         }
 
         .pokemon-card img {
-            width: 180px; 
-            height: 180px;
-            margin-bottom: 15px;
-            background-color: transparent; 
-            border-radius: 0; 
-            border: none; 
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            background-color: var(--input-bg);
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
             object-fit: contain;
             image-rendering: pixelated;
         }
 
         .pokemon-card h3 {
-            font-size: 1.5rem; 
+            font-size: 1.2rem;
             color: var(--green-color);
             margin: 5px 0;
             white-space: nowrap;
@@ -401,43 +394,43 @@
         }
 
         .pokemon-card p {
-            font-size: 1rem; 
+            font-size: 0.9rem;
             color: var(--light-text-color);
             margin: 2px 0;
         }
 
+        /* Style pour le PC en gras et plus grand */
         .pokemon-card .cp-display {
-            font-size: 1.4rem; 
-            font-weight: bold; 
-            color: var(--text-color); 
-            margin-top: 10px; 
+            font-size: 1.2rem; /* Plus grand */
+            font-weight: bold; /* Gras */
+            color: var(--text-color); /* Couleur du texte principal */
+            margin-top: 5px;
         }
 
         /* Modal Styles */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
+            display: none; /* TRÈS IMPORTANT : Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.6); 
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
             
-            display: flex; /* For centering content */
             align-items: center;
             justify-content: center;
         }
 
         .modal-content {
             background-color: var(--container-bg);
-            margin: auto; /* Supprimer pour laisser flex gérer le centrage */
+            margin: auto;
             padding: 30px;
             border: 1px solid var(--card-border);
             border-radius: 10px;
             width: 90%;
-            max-width: 600px; /* Conserver une largeur maximale raisonnable */
+            max-width: 600px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             position: relative;
             color: var(--text-color);
@@ -469,11 +462,11 @@
         .modal-content img {
             display: block;
             margin: 0 auto 20px auto;
-            width: 200px;
-            height: 200px;
-            background-color: transparent; 
-            border-radius: 0; 
-            border: none; 
+            width: 150px;
+            height: 150px;
+            background-color: var(--input-bg);
+            border-radius: 50%;
+            border: 3px solid var(--green-color);
             object-fit: contain;
             image-rendering: pixelated;
         }
@@ -505,22 +498,11 @@
             padding-bottom: 5px;
         }
 
-        .modal-content .edit-form-fields { 
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 0; /* AUCUN ESPACE entre les cellules de la grille */
-            margin-bottom: 20px; 
-            width: 100%; 
-            padding: 0 10px; 
-            box-sizing: border-box; 
-        }
-
-        .modal-content .edit-form-fields input[type="text"],
-        .modal-content .edit-form-fields input[type="number"] {
-            width: 100%; 
-            box-sizing: border-box; 
+        .modal-content input[type="text"],
+        .modal-content input[type="number"] {
+            width: calc(100% - 20px);
             padding: 10px;
-            margin: 0; 
+            margin-bottom: 10px;
             border: 1px solid var(--border-color);
             border-radius: 5px;
             background-color: var(--input-bg);
@@ -540,12 +522,12 @@
         }
 
         .modal-content .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
             border-top: 1px solid var(--border-color);
             margin-top: 15px;
             padding-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .modal-content button {
@@ -589,10 +571,8 @@
                 padding: 20px;
             }
 
-            /* Responsive pour le formulaire d'ajout : une seule colonne sur mobile */
             .add-pokemon-form {
                 grid-template-columns: 1fr;
-                gap: 10px; /* Conserver un petit gap sur mobile si vous le souhaitez */
             }
 
             .checkbox-group {
@@ -609,29 +589,22 @@
             }
 
             .pokemon-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
                 gap: 15px;
             }
 
             .pokemon-card img {
-                width: 140px; 
-                height: 140px;
+                width: 80px;
+                height: 80px;
             }
-            .pokemon-card .card-icons .icon {
-                width: 20px; 
-                height: 20px;
-            }
+
             .pokemon-card h3 {
-                font-size: 1.3rem; 
+                font-size: 1rem;
             }
 
             .pokemon-card p {
-                font-size: 0.95rem; 
+                font-size: 0.8rem;
             }
-            .pokemon-card .cp-display {
-                font-size: 1.2rem; 
-            }
-
 
             .modal-content {
                 width: 95%;
@@ -639,8 +612,8 @@
             }
 
             .modal-content img {
-                width: 160px;
-                height: 160px;
+                width: 120px;
+                height: 120px;
             }
 
             .modal-content h2 {
@@ -649,16 +622,6 @@
 
             .modal-content p {
                 font-size: 1rem;
-            }
-
-            /* Responsive pour les champs du modal : une seule colonne sur mobile */
-            .modal-content .edit-form-fields { 
-                grid-template-columns: 1fr; 
-                padding: 0; 
-            }
-            .modal-content .edit-form-fields input[type="text"],
-            .modal-content .edit-form-fields input[type="number"] {
-                margin: 0; 
             }
         }
     </style>
@@ -783,14 +746,12 @@
 
 
             <h3>Modifier les informations</h3>
-            <div class="edit-form-fields"> 
-                <input type="text" id="editPokemonName" placeholder="Nom du Pokémon">
-                <input type="text" id="editPokemonNickname" placeholder="Surnom (optionnel)">
-                <input type="number" id="editPokemonCP" placeholder="PC" min="10">
-                <input type="number" id="editPokemonAttack" placeholder="Attaque (IV) (optionnel)" min="0" max="15">
-                <input type="number" id="editPokemonDefense" placeholder="Défense (IV) (optionnel)" min="0" max="15">
-                <input type="number" id="editPokemonStamina" placeholder="Endurance (IV) (optionnel)" min="0" max="15">
-            </div> 
+            <input type="text" id="editPokemonName" placeholder="Nom du Pokémon">
+            <input type="text" id="editPokemonNickname" placeholder="Surnom (optionnel)">
+            <input type="number" id="editPokemonCP" placeholder="PC" min="10">
+            <input type="number" id="editPokemonAttack" placeholder="Attaque (IV) (optionnel)" min="0" max="15">
+            <input type="number" id="editPokemonDefense" placeholder="Défense (IV) (optionnel)" min="0" max="15">
+            <input type="number" id="editPokemonStamina" placeholder="Endurance (IV) (optionnel)" min="0" max="15">
             <div class="checkbox-group">
                 <div class="checkbox-container">
                     <input type="checkbox" id="editPokemonFavorite">
@@ -925,7 +886,7 @@
 
         let activeFilters = {};
 
-        // --- Fonctions de chargement des noms de Pokémon (optimisée pour le JSON local) ---
+        // --- Fonctions de chargement des noms de Pokémon ---
         async function loadPokemonNames() {
             if (isLoadingNames) return;
             isLoadingNames = true;
@@ -934,18 +895,22 @@
             loadingMessageDiv.style.color = "gray";
             loadingMessageDiv.style.display = 'block';
 
-            console.log('Début du chargement des noms de Pokémon.');
+            console.log('Début du chargement des noms de Pokémon depuis GitHub Pages (Raw).');
             try {
-                // MODIFICATION : Utilisation de la nouvelle URL avec le bon nom de fichier "pokemon_data.json"
-                const response = await fetch('https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/main/pokemon_data.json');
+                // MISE À JOUR CRUCIALE ICI : Utilisation de l'URL RAW de GitHub
+                const response = await fetch('https://raw.githubusercontent.com/Tristanox/Tristanox-tools/main/pokedata-fr.json');
                 if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status} - Impossible de charger les données Pokémon.`);
+                    throw new Error(`Erreur HTTP: ${response.status} - Impossible de charger les données Pokémon depuis GitHub Raw.`);
                 }
                 const data = await response.json();
                 
                 data.forEach(p => {
-                    const key = p.nameFrench.toLowerCase();
-                    pokemonNamesMap.set(key, p);
+                    // Normalize name for lookup (lowercase, no accents if needed, but here using directly)
+                    // Assurez-vous que le champ 'nameFrench' existe et est utilisé comme clé pour la recherche
+                    const key = p.nameFrench ? p.nameFrench.toLowerCase() : (p.name ? p.name.toLowerCase() : '');
+                    if (key) {
+                        pokemonNamesMap.set(key, p);
+                    }
                 });
 
                 console.log(`Chargement terminé. ${pokemonNamesMap.size} Pokémon chargés.`);
@@ -953,7 +918,7 @@
                 loadingMessageDiv.style.color = "green";
                 setTimeout(() => {
                     loadingMessageDiv.style.display = 'none';
-                }, 2000); 
+                }, 2000); // Masquer le message après 2 secondes
 
             } catch (error) {
                 console.error("Erreur lors du chargement des noms de Pokémon:", error);
@@ -998,7 +963,8 @@
             const pokemonData = pokemonNamesMap.get(name.toLowerCase());
 
             if (!pokemonData) {
-                alert(`Le Pokémon "${name}" n'a pas été trouvé dans la base de données. Vérifiez l'orthographe.`);
+                alert(`Le Pokémon "${name}" n'a pas été trouvé dans la base de données. Vérifiez l'orthographe ou que les noms sont bien chargés.`);
+                console.error(`Nom non trouvé dans pokemonNamesMap: "${name.toLowerCase()}"`);
                 return;
             }
 
@@ -1018,12 +984,12 @@
 
 
             const newPokemon = {
-                id: Date.now(), 
-                name: pokemonData.name, 
-                nameFrench: pokemonData.nameFrench, 
+                id: Date.now(), // ID unique
+                name: pokemonData.name, // Nom anglais original
+                nameFrench: pokemonData.nameFrench, // Nom français
                 nickname: document.getElementById('pokemonNickname').value.trim(),
                 image: isShiny ? pokemonData.spriteShiny : pokemonData.spriteNormal,
-                dexNumber: pokemonData.number, 
+                dexNumber: pokemonData.number, // Utilise le numéro de Pokédex du JSON
                 cp: cp,
                 attack: parseInt(document.getElementById('pokemonAttack').value) || null,
                 defense: parseInt(document.getElementById('pokemonDefense').value) || null,
@@ -1033,7 +999,7 @@
                 isXXS: isXXS,
                 isXXL: isXXL,
                 isMighty: isMighty,
-                isLegendary: isLegendary || pokemonData.isLegendarySpecies || pokemonData.isMythicalSpecies, 
+                isLegendary: isLegendary || pokemonData.isLegendarySpecies || pokemonData.isMythicalSpecies, // Prend aussi en compte si l'espèce est légendaire/fabuleuse
                 isShadow: isShadow,
                 isPurified: isPurified,
                 isHundo: isHundo,
@@ -1041,9 +1007,7 @@
                 isGigamax: isGigamax,
                 isLevel1: isLevel1,
                 isMega: isMega,
-                normalSpriteUrl: pokemonData.spriteNormal, 
-                shinySpriteUrl: pokemonData.spriteShiny,  
-                timestamp: new Date().toISOString() 
+                timestamp: new Date().toISOString() // Date d'ajout
             };
 
             pokemons.push(newPokemon);
@@ -1072,7 +1036,7 @@
             document.getElementById('pokemonGigamax').checked = false;
             document.getElementById('pokemonLevel1').checked = false;
             document.getElementById('pokemonMega').checked = false;
-            handleHundoCheckbox(document.getElementById('pokemonHundo')); 
+            handleHundoCheckbox(document.getElementById('pokemonHundo')); // Réinitialiser le readonly
         }
 
         function savePokemons() {
@@ -1083,39 +1047,44 @@
             const pokemonDisplayArea = document.getElementById('pokemonDisplayArea');
             pokemonDisplayArea.innerHTML = '';
             
+            // Appliquer les filtres
             let filteredPokemons = pokemons.filter(pokemon => {
                 for (const key in activeFilters) {
                     if (activeFilters[key] && !pokemon[key]) {
-                        return false; 
+                        return false; // Si le filtre est actif et la caractéristique n'est pas présente
                     }
                 }
                 return true;
             });
 
+            // Appliquer le tri
             filteredPokemons.sort((a, b) => {
                 if (currentSortCriterion === 'cp') {
-                    return b.cp - a.cp; 
+                    return b.cp - a.cp; // PC décroissant
                 } else if (currentSortCriterion === 'name') {
-                    return a.nameFrench.localeCompare(b.nameFrench); 
+                    return a.nameFrench.localeCompare(b.nameFrench); // Nom français alphabétique
                 } else if (currentSortCriterion === 'dexNumber') {
+                    // Convertir en nombre pour un tri correct, puis en chaîne pour le padStart
                     return parseInt(a.dexNumber) - parseInt(b.dexNumber); 
                 } else if (currentSortCriterion === 'timestamp') {
-                    return new Date(b.timestamp) - new Date(a.timestamp); 
+                    return new Date(b.timestamp) - new Date(a.timestamp); // Date décroissante
                 } else if (currentSortCriterion === 'category') {
+                    // Trouver la première catégorie applicable pour chaque Pokémon
                     const getCategoryIndex = (p) => {
                         for (let i = 0; i < categoryPriority.length; i++) {
                             if (p[categoryPriority[i]]) {
                                 return i;
                             }
                         }
-                        return categoryPriority.length; 
+                        return categoryPriority.length; // 'other' category, lowest priority
                     };
                     const indexA = getCategoryIndex(a);
                     const indexB = getCategoryIndex(b);
 
                     if (indexA !== indexB) {
-                        return indexA - indexB; 
+                        return indexA - indexB; // Trier par priorité de catégorie
                     } else {
+                        // Si les catégories sont identiques, trier par numéro de Pokédex
                         return parseInt(a.dexNumber) - parseInt(b.dexNumber);
                     }
                 }
@@ -1142,6 +1111,7 @@
                 }
             });
             
+            // Afficher les catégories et les cartes
             for (const key of [...categoryPriority, 'other']) {
                 if (groupedPokemons[key].length > 0) {
                     const categoryTitle = categoryTitles[key];
@@ -1152,14 +1122,9 @@
                     const gridContainer = document.createElement('div');
                     gridContainer.className = 'pokemon-grid';
                     groupedPokemons[key].forEach(pokemon => {
-                        console.log('Rendering pokemon:', pokemon.nameFrench, 'Image URL:', pokemon.image);
-
                         const card = document.createElement('div');
                         card.className = 'pokemon-card';
-                        card.setAttribute('onclick', `showPokemonDetails(${pokemon.id})`); 
-                        
-                        const displayName = pokemon.nickname ? `"${pokemon.nickname}"` : pokemon.nameFrench;
-
+                        card.setAttribute('onclick', `showPokemonDetails(${pokemon.id})`); // Utiliser l'ID unique
                         card.innerHTML = `
                             <button class="delete-card-button" onclick="event.stopPropagation(); deletePokemon(${pokemon.id});">&times;</button>
                             <div class="card-icons">
@@ -1178,7 +1143,8 @@
                                 ${pokemon.isMega ? `<img src="${iconUrls.mega}" alt="Méga-évolution" class="icon">` : ''}
                             </div>
                             <img src="${pokemon.image}" alt="${pokemon.nameFrench}">
-                            <h3>${displayName}</h3>
+                            <h3>${pokemon.nameFrench}</h3>
+                            ${pokemon.nickname ? `<p class="nickname">"${pokemon.nickname}"</p>` : ''}
                             <p class="cp-display">PC: ${pokemon.cp}</p>
                         `;
                         gridContainer.appendChild(card);
@@ -1197,7 +1163,7 @@
                 pokemons = pokemons.filter(p => p.id !== idToDelete);
                 savePokemons();
                 renderPokemons();
-                closeModal(); 
+                closeModal(); // Fermer le modal si le Pokémon actuellement affiché est supprimé
             }
         }
 
@@ -1208,7 +1174,7 @@
                 return;
             }
 
-            currentPokemonIndex = pokemons.findIndex(p => p.id === id); 
+            currentPokemonIndex = pokemons.findIndex(p => p.id === id); // Mettre à jour l'index actuel
 
             document.getElementById('modalPokemonImage').src = pokemon.image;
             document.getElementById('modalPokemonName').textContent = pokemon.nameFrench;
@@ -1245,7 +1211,7 @@
             handleHundoCheckbox(document.getElementById('editPokemonHundo'), true);
 
 
-            document.getElementById('pokemonModal').style.display = 'flex'; 
+            document.getElementById('pokemonModal').style.display = 'flex'; // Utiliser flex pour centrer
         }
 
         function closeModal() {
@@ -1256,7 +1222,7 @@
         async function saveEditedPokemon() {
             if (currentPokemonIndex === -1) return;
 
-            const updatedPokemon = { ...pokemons[currentPokemonIndex] }; 
+            const updatedPokemon = { ...pokemons[currentPokemonIndex] }; // Copie du Pokémon
 
             const newName = document.getElementById('editPokemonName').value.trim();
             const newNickname = document.getElementById('editPokemonNickname').value.trim();
@@ -1273,20 +1239,23 @@
             const pokemonData = pokemonNamesMap.get(newName.toLowerCase());
 
             if (!pokemonData) {
-                alert(`Le Pokémon "${newName}" n'a pas été trouvé dans la base de données. Vérifiez l'orthographe.`);
+                alert(`Le Pokémon "${newName}" n'a pas été trouvé dans la base de données. Vérifiez l'orthographe ou que les noms sont bien chargés.`);
+                console.error(`Nom non trouvé dans pokemonNamesMap lors de la modification: "${newName.toLowerCase()}"`);
                 return;
             }
 
-            updatedPokemon.name = pokemonData.name; 
-            updatedPokemon.nameFrench = pokemonData.nameFrench; 
+            // Mise à jour des informations du Pokémon avec les nouvelles données de l'API locale
+            updatedPokemon.name = pokemonData.name; // Nom anglais original
+            updatedPokemon.nameFrench = pokemonData.nameFrench; // Nom français
             updatedPokemon.nickname = newNickname;
             updatedPokemon.cp = newCP;
             updatedPokemon.attack = newAttack;
             updatedPokemon.defense = newDefense;
             updatedPokemon.stamina = newStamina;
             updatedPokemon.image = document.getElementById('editPokemonShiny').checked ? pokemonData.spriteShiny : pokemonData.spriteNormal;
-            updatedPokemon.dexNumber = pokemonData.number; 
+            updatedPokemon.dexNumber = pokemonData.number; // Utilise le numéro de Pokédex du JSON
 
+            // Mise à jour des catégories
             updatedPokemon.isFavorite = document.getElementById('editPokemonFavorite').checked;
             updatedPokemon.isShiny = document.getElementById('editPokemonShiny').checked;
             updatedPokemon.isXXS = document.getElementById('editPokemonXXS').checked;
@@ -1301,8 +1270,6 @@
             updatedPokemon.isLevel1 = document.getElementById('editPokemonLevel1').checked;
             updatedPokemon.isMega = document.getElementById('editPokemonMega').checked;
 
-            updatedPokemon.normalSpriteUrl = pokemonData.spriteNormal; 
-            updatedPokemon.shinySpriteUrl = pokemonData.spriteShiny;  
 
             pokemons[currentPokemonIndex] = updatedPokemon;
             savePokemons();
@@ -1336,28 +1303,31 @@
                     const importedPokemons = JSON.parse(e.target.result);
                     if (Array.isArray(importedPokemons)) {
                         pokemons = importedPokemons.map(p => {
-                            const pokemonData = pokemonNamesMap.get((p.nameFrench || p.name || '').toLowerCase());
-                            
+                            // Tenter de retrouver les données du Pokémon dans la map (pokedata-fr.json)
+                            // Utilise p.nameFrench pour la recherche, si disponible, sinon p.name
+                            const nameToLookup = (p.nameFrench || p.name || '').toLowerCase();
+                            const pokemonDataFromMap = pokemonNamesMap.get(nameToLookup);
+
                             let imageUrl = '';
-                            if (p.isShiny && p.shinySpriteUrl) {
-                                imageUrl = p.shinySpriteUrl;
-                            } else if (p.normalSpriteUrl) { 
-                                imageUrl = p.normalSpriteUrl;
-                            } else if (p.image) { 
+                            if (pokemonDataFromMap) {
+                                // Si trouvé dans la map, utiliser les sprites de la map
+                                imageUrl = p.isShiny ? pokemonDataFromMap.spriteShiny : pokemonDataFromMap.spriteNormal;
+                            } else if (p.image) {
+                                // Sinon, si le Pokémon importé a une propriété 'image', l'utiliser comme fallback
                                 imageUrl = p.image;
                             }
-                            
-                            if (!imageUrl && pokemonData) {
-                                imageUrl = p.isShiny ? pokemonData.spriteShiny : pokemonData.spriteNormal;
+                            // Fallback pour les anciens imports si l'image est vide ou n'a pas pu être trouvée
+                            if (!imageUrl && pokemonDataFromMap) {
+                                imageUrl = pokemonDataFromMap.spriteNormal; // Utilisez le sprite normal par défaut
                             }
 
                             return {
-                                id: p.id || Date.now() + Math.random(), 
-                                name: p.name || (pokemonData ? pokemonData.name : ''), 
-                                nameFrench: p.nameFrench || p.name || (pokemonData ? pokemonData.nameFrench : ''), 
+                                id: p.id || Date.now() + Math.random(), // Génère un ID si manquant
+                                name: p.name || (pokemonDataFromMap ? pokemonDataFromMap.name : ''), // Utilise le nom anglais de la map ou vide
+                                nameFrench: p.nameFrench || (pokemonDataFromMap ? pokemonDataFromMap.nameFrench : p.name || ''), // Utilise le nom français de la map ou p.name
                                 nickname: p.nickname || '',
-                                image: imageUrl, 
-                                dexNumber: p.dexNumber || (pokemonData ? pokemonData.number : ''),
+                                image: imageUrl, // Utilisez l'URL déterminée
+                                dexNumber: p.dexNumber || (pokemonDataFromMap ? pokemonDataFromMap.number : ''), // Utilise le numéro de la map ou vide
                                 cp: p.cp,
                                 attack: p.attack !== undefined ? p.attack : null,
                                 defense: p.defense !== undefined ? p.defense : null,
@@ -1367,7 +1337,7 @@
                                 isXXS: p.isXXS || false,
                                 isXXL: p.isXXL || false,
                                 isMighty: p.isMighty || false,
-                                isLegendary: p.isLegendary || false, 
+                                isLegendary: p.isLegendary || (pokemonDataFromMap ? (pokemonDataFromMap.isLegendarySpecies || pokemonDataFromMap.isMythicalSpecies) : false), // Tient compte de la map
                                 isShadow: p.isShadow || false,
                                 isPurified: p.isPurified || false,
                                 isHundo: p.isHundo || false,
@@ -1375,28 +1345,11 @@
                                 isGigamax: p.isGigamax || false,
                                 isLevel1: p.isLevel1 || false,
                                 isMega: p.isMega || false,
-                                normalSpriteUrl: p.normalSpriteUrl || (pokemonData ? pokemonData.spriteNormal : ''), 
-                                shinySpriteUrl: p.shinySpriteUrl || (pokemonData ? pokemonData.spriteShiny : ''),   
                                 timestamp: p.timestamp || new Date().toISOString()
                             };
-                        }).map(p => { 
-                            const pokemonData = pokemonNamesMap.get((p.nameFrench || p.name || '').toLowerCase());
-                            if (pokemonData) {
-                                p.isLegendary = p.isLegendary || pokemonData.isLegendarySpecies || pokemonData.isMythicalSpecies;
-                                if (!p.image || p.image.includes('undefined') || p.image === '') { 
-                                    p.image = p.isShiny ? pokemonData.spriteShiny : pokemonData.spriteNormal;
-                                }
-                                if (!p.normalSpriteUrl && pokemonData.spriteNormal) p.normalSpriteUrl = pokemonData.spriteNormal;
-                                if (!p.shinySpriteUrl && pokemonData.spriteShiny) p.shinySpriteUrl = pokemonData.spriteShiny; 
-                                if (!p.name) p.name = pokemonData.name;
-                                if (!p.nameFrench) p.nameFrench = pokemonData.nameFrench;
-                                if (!p.dexNumber) p.dexNumber = pokemonData.number;
-                            }
-                            return p;
-                        });
-
+                        }));
                         savePokemons();
-                        renderPokemons(); 
+                        renderPokemons();
                         alert("Données importées avec succès !");
                     } else {
                         alert("Le fichier JSON importé n'est pas un tableau de Pokémon valide.");
@@ -1417,12 +1370,12 @@
 
         function toggleFilterDropdown() {
             document.getElementById('filterDropdown').classList.toggle('show');
-            populateFilterDropdown(); 
+            populateFilterDropdown(); // Remplir le dropdown à chaque ouverture pour s'assurer qu'il est à jour
         }
 
         function populateFilterDropdown() {
             const dropdown = document.getElementById('filterDropdown');
-            dropdown.innerHTML = ''; 
+            dropdown.innerHTML = ''; // Nettoyer le contenu existant
 
             filterCharacteristics.forEach(char => {
                 const optionDiv = document.createElement('div');
@@ -1431,7 +1384,7 @@
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = `filter-${char.key}`;
-                checkbox.checked = activeFilters[char.key] || false; 
+                checkbox.checked = activeFilters[char.key] || false; // Maintenir l'état du filtre
                 checkbox.onchange = (event) => applyFilter(char.key, event.target.checked);
 
                 const label = document.createElement('label');
@@ -1442,7 +1395,7 @@
                     if (char.key === 'isShiny') {
                         const shinyText = document.createElement('span');
                         shinyText.className = 'icon shiny-text';
-                        shinyText.textContent = char.icon; 
+                        shinyText.textContent = char.icon; // L'icône ✨ est du texte
                         optionDiv.appendChild(shinyText);
                     } else {
                         const iconImg = document.createElement('img');
@@ -1464,12 +1417,14 @@
             if (isChecked) {
                 activeFilters[key] = true;
             } else {
-                delete activeFilters[key]; 
+                delete activeFilters[key]; // Supprimer la clé si le filtre est désactivé
             }
-            renderPokemons(); 
+            renderPokemons(); // Re-rendre la liste des Pokémon avec les nouveaux filtres
         }
 
+        // Fermer le menu déroulant si on clique en dehors
         window.onclick = function(event) {
+            // S'assurer que le clic n'est ni sur le bouton "Filtrer" ni à l'intérieur du dropdown
             if (!event.target.matches('.filter-dropdown-container button.sort') && !event.target.closest('.filter-dropdown')) {
                 const dropdown = document.getElementById('filterDropdown');
                 if (dropdown.classList.contains('show')) {
@@ -1485,7 +1440,7 @@
             
             closeModal(); 
 
-            renderPokemons(); 
+            renderPokemons(); // Appel initial pour afficher les Pokémon
             console.log('Fin de DOMContentLoaded.');
         });
     </script>
