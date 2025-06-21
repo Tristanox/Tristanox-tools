@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ninja Grid Jumper - Éditeur et Jeu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
@@ -35,162 +34,219 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             text-align: left;
-            min-width: 250px;
+            position: sticky;
+            top: 20px;
+            flex-shrink: 0;
         }
 
-        #game-canvas-container {
-            border: 2px solid #555;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            overflow: hidden; /* Cache le débordement des éléments de dessin si nécessaire */
+        #editor-ui {
+            flex-grow: 0;
+            flex-shrink: 0;
+            width: 380px; /* Conserve la même largeur pour la palette à deux colonnes */
+            max-width: 380px;
         }
 
-        #gameCanvas {
-            background-color: #000;
-            display: block;
+        #output-container {
+            flex-basis: 250px;
+            flex-grow: 0;
+            flex-shrink: 0;
         }
 
-        h2, h3 {
-            color: #55FF75;
-            margin-top: 0;
-            margin-bottom: 10px;
+        #editor-ui h2, #output-container h2 {
             font-size: 1.2em;
+            margin-top: 0;
+            color: #FFD700;
+            border-bottom: 2px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: #ccc;
-        }
-
-        input[type="number"], select {
-            width: calc(100% - 10px);
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #555;
-            background-color: #444;
-            color: white;
-            border-radius: 4px;
-        }
-
-        button {
-            background-color: #72DA72; /* Couleur d'accentuation secondaire */
-            color: #1E2124;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.8em;
-            transition: background-color 0.2s ease;
-            margin-right: 5px;
-            margin-bottom: 10px;
-        }
-
-        button:hover {
-            background-color: #55FF75; /* Couleur d'accentuation principale */
-        }
-
-        button:disabled {
-            background-color: #666;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        #palette {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-            gap: 5px;
-            margin-bottom: 15px;
+        /* Styles pour la palette à deux colonnes */
+        #palette-grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
         }
 
         .palette-item {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #666;
-            border-radius: 4px;
-            cursor: pointer;
             display: flex;
-            justify-content: center;
             align-items: center;
-            transition: border-color 0.1s ease, transform 0.1s ease;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+            width: calc(50% - 5px); /* Pour deux colonnes avec un gap de 10px */
+            box-sizing: border-box;
+        }
+
+        .palette-item:hover {
             background-color: #444;
-            position: relative; /* Pour positionner le texte */
         }
 
         .palette-item.selected {
-            border-color: #55FF75;
-            transform: scale(1.05);
+            background-color: #007bff;
+            border: 1px solid #0056b3;
         }
 
-        .palette-item.color-picker {
-            border: none; /* Pas de bordure pour le color picker */
-            padding: 0;
-            overflow: hidden;
+        .palette-color {
+            width: 30px; /* Peut-être réduire si les tuiles sont très petites */
+            height: 30px; /* Peut-être réduire si les tuiles sont très petites */
+            border: 1px solid #777;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8em;
+            color: white;
+            flex-shrink: 0;
         }
-        .palette-item.color-picker input[type="color"] {
+        .palette-color.player-spawn {
+            background-color: #00BFFF;
+            border-color: #008CCF;
+            color: black;
+            font-weight: bold;
+        }
+        .palette-color.tnt-solid {
+            background-color: #FF0000;
+            border-color: #CC0000;
+            color: white;
+            font-weight: bold;
+        }
+        .palette-color.tnt-non-solid {
+            background-color: #0000FF;
+            border-color: #0000CC;
+            color: white;
+            font-weight: bold;
+        }
+        .palette-color.end-block {
+            background-color: #32CD32;
+            border-color: #228B22;
+            color: white;
+            font-weight: bold;
+        }
+        .palette-color.jump-pad-small {
+            background-color: #FFC0CB;
+            border-color: #E0B0C4;
+            color: black;
+            font-weight: bold;
+        }
+        .palette-color.jump-pad-medium {
+            background-color: #FFFF00;
+            border-color: #E0E000;
+            color: black;
+            font-weight: bold;
+        }
+        .palette-color.jump-pad-high {
+            background-color: #FF0000;
+            border-color: #CC0000;
+            color: white;
+            font-weight: bold;
+        }
+        /* Styles for Orbs */
+        .palette-color.orb-small-jump {
+            background-color: #FF69B4; /* Hot Pink */
+            border-color: #C1548E;
+            color: white;
+            font-weight: bold;
+        }
+        .palette-color.orb-medium-jump {
+            background-color: #FFD700; /* Gold */
+            border-color: #D4AF37;
+            color: black;
+            font-weight: bold;
+        }
+        .palette-color.orb-high-jump {
+            background-color: #DC143C; /* Crimson */
+            border-color: #B20C2D;
+            color: white;
+            font-weight: bold;
+        }
+        /* Style for spike palette item */
+        .palette-color.spike {
+            background-color: #808080;
+            border-color: #696969;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em; /* Bigger caret */
+            position: relative;
+        }
+        .palette-color.spike::after {
+            content: "▲";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+
+        .color-picker-container {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #444;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%; 
+            box-sizing: border-box;
+        }
+
+        .color-picker-container label {
+            font-size: 0.8em;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .color-picker-container input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
             width: 100%;
-            height: 100%;
-            padding: 0;
+            height: 30px;
+            background-color: transparent;
             border: none;
             cursor: pointer;
-            background: none;
         }
 
-        /* Styles spécifiques aux éléments de la palette */
-        .palette-item.solid-block { background-color: #555; }
-        .palette-item.lava { background-color: orange; } /* Lava (type 3) */
-        .palette-item.player-spawn { background-color: purple; } /* Player Spawn (type 4) */
-        .palette-item.tnt-solid { background-color: #CC0000; } /* TNT Solid (type 5) */
-        .palette-item.tnt-non-solid { background-color: #0000FF; } /* TNT Non-Solid (type 6) */
-        .palette-item.end-block { background-color: #AAAA00; } /* End Block (type 7) */
-        .palette-item.jump-pad-small { background-color: #008800; } /* Jump Pad Small (type 8) */
-        .palette-item.jump-pad-medium { background-color: #00AA00; } /* Jump Pad Medium (type 9) */
-        .palette-item.jump-pad-high { background-color: #00CC00; } /* Jump Pad High (type 10) */
-        .palette-item.orb-small-jump { background-color: #00FFFF; } /* Orb Small Jump (type 11) */
-        .palette-item.orb-medium-jump { background-color: #00CCFF; } /* Orb Medium Jump (type 12) */
-        .palette-item.orb-high-jump { background-color: #0099FF; } /* Orb High Jump (type 13) */
-        .palette-item.spike {
-            background-color: #555;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .color-picker-container input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
         }
-        .palette-item.spike::before {
-            content: '▲'; /* Caractère triangulaire */
-            color: #FF0000;
-            font-size: 24px;
-            line-height: 1; /* Empêche le décalage vertical */
-            transform: rotate(0deg); /* Rotation par défaut */
-            transform-origin: center;
+        .color-picker-container input[type="color"]::-webkit-color-swatch {
+            border: 1px solid #777;
+            border-radius: 3px;
+        }
+        .color-picker-container input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-picker-container input[type="color"]::-moz-color-swatch {
+            border: 1px solid #777;
+            border-radius: 3px;
+        }
+
+        #game-canvas-container {
+            flex-basis: 800px; /* 40 * 20px ou 20 * 40px */
+            flex-grow: 0;
+            flex-shrink: 0;
+            background-color: #444;
+            border: 2px solid #888;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 800px; 
+            height: 600px;
+        }
+
+        #gameCanvas {
             display: block;
-        }
-
-        /* Indicateur de mode balayage */
-        #swipe-mode-indicator {
-            background-color: #555;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.7em;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        #level-code {
-            width: calc(100% - 20px);
-            height: 100px;
-            background-color: #282B30; /* Gris foncé 2 */
-            color: #55FF75;
-            border: 1px solid #555;
-            padding: 10px;
-            font-family: monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            overflow-y: auto;
-            border-radius: 4px;
-            font-size: 0.9em;
-            margin-bottom: 10px;
+            background-color: #444;
+            /* Le canvas lui-même prendra les dimensions en JS */
         }
 
         #game-overlay {
@@ -200,233 +256,391 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
             font-size: 2em;
             text-align: center;
-            z-index: 1000;
+            z-index: 100;
         }
 
-        #game-overlay h2 {
-            font-size: 1.5em;
+        #game-overlay h1 {
+            color: #FF4500;
             margin-bottom: 20px;
         }
 
         #game-overlay p {
-            font-size: 0.8em;
+            font-size: 0.7em;
             margin-bottom: 30px;
         }
 
-        #game-overlay button {
-            font-size: 1em;
-            padding: 15px 25px;
-            border-radius: 8px;
+        #levelOutput {
+            width: 100%;
+            height: 150px;
+            background-color: #222;
+            color: #0F0;
+            border: 1px solid #555;
+            padding: 10px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            resize: vertical;
+            margin-bottom: 10px;
         }
 
-        /* Styles pour les sections cachées en mode jeu */
-        #editor-ui.hidden, #output-container.hidden, #play-level-button.hidden {
+        .action-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-button:hover {
+            background-color: #218838;
+        }
+
+        #playLevelButton {
+            background-color: #007bff;
+        }
+        #playLevelButton:hover {
+            background-color: #0056b3;
+        }
+
+        #exportJsonButton {
+            background-color: #17a2b8;
+        }
+        #exportJsonButton:hover {
+            background-color: #138496;
+        }
+
+        #exitGameButton {
+            background-color: #dc3545;
             display: none;
         }
+        #exitGameButton:hover {
+            background-color: #c82333;
+        }
+
+        #swipeModeIndicator {
+            font-size: 0.9em;
+            margin-top: 15px;
+            padding: 8px;
+            background-color: #555;
+            border-radius: 5px;
+            text-align: center;
+            color: #FFD700;
+            border: 1px solid #777;
+        }
+        #swipeModeIndicator.on {
+            background-color: #28a745;
+            color: white;
+            border-color: #218838;
+        }
+        
+        #mapSizeDisplay {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: #FFD700;
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #555;
+            background-color: #444;
+            border-radius: 5px;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="editor-ui">
-            <h2>Éditeur de Niveau</h2>
-            <div id="grid-controls">
-                <label for="grid-rows">Lignes :</label>
-                <input type="number" id="grid-rows" value="15" min="5" max="30">
-                <label for="grid-cols">Colonnes :</label>
-                <input type="number" id="grid-cols" value="20" min="5" max="40">
-                <label for="tile-size">Taille des tuiles :</label>
-                <select id="tile-size">
-                    <option value="40">40x40</option>
-                    <option value="20">20x20</option>
-                </select>
-                <button id="apply-grid-config">Appliquer</button>
+            <h2>Palette de Blocs</h2>
+            <div class="color-picker-container">
+                <label for="solidBlockColorPicker">Couleur du prochain bloc Sol :</label>
+                <input type="color" id="solidBlockColorPicker" value="#FFD700">
             </div>
 
-            <h3>Palette d'Outils</h3>
-            <div id="palette">
+            <div id="palette-grid-container">
+                <div class="palette-item selected" data-tile-type="1">
+                    <div class="palette-color" id="solidBlockPaletteColorPreview"></div>
+                    <span>Bloc Sol (1)</span>
                 </div>
-            <div id="swipe-mode-indicator">Mode Balayage: Désactivé (T)</div>
-            <button id="clear-grid-button">Effacer la grille</button>
-            <button id="import-level-button">Importer le code</button>
-            <textarea id="import-level-code" placeholder="Coller le code du niveau ici..."></textarea>
-            <button id="load-level-from-import">Charger</button>
+                <div class="palette-item" data-tile-type="2" data-color="#808080">
+                    <div class="palette-color spike"></div>
+                    <span>Pics (2)</span>
+                </div>
+                <div class="palette-item" data-tile-type="3" data-color="#FF4500">
+                    <div class="palette-color" style="background-color: #FF4500; border-color: #CC3700;"></div>
+                    <span>Lave (3)</span>
+                </div>
+                <div class="palette-item" data-tile-type="4" data-color="#00BFFF">
+                    <div class="palette-color player-spawn">P</div>
+                    <span>Point Apparition (4)</span>
+                </div>
+                <div class="palette-item" data-tile-type="5" data-color="#FF0000">
+                    <div class="palette-color tnt-solid">TNT</div>
+                    <span>TNT Solide (5)</span>
+                </div>
+                <div class="palette-item" data-tile-type="7" data-color="#0000FF">
+                    <div class="palette-color tnt-non-solid">TNT-</div>
+                    <span>TNT Non-Solide (7)</span>
+                </div>
+                <div class="palette-item" data-tile-type="8">
+                    <div class="palette-color jump-pad-small">^</div>
+                    <span>Pad Petit Saut (8)</span>
+                </div>
+                <div class="palette-item" data-tile-type="9">
+                    <div class="palette-color jump-pad-medium">^^</div>
+                    <span>Pad Saut Moyen (9)</span>
+                </div>
+                <div class="palette-item" data-tile-type="10">
+                    <div class="palette-color jump-pad-high">^^^</div>
+                    <span>Pad Grand Saut (10)</span>
+                </div>
+                <div class="palette-item" data-tile-type="11">
+                    <div class="palette-color orb-small-jump">O</div>
+                    <span>Orbe Petit Saut (11)</span>
+                </div>
+                <div class="palette-item" data-tile-type="12">
+                    <div class="palette-color orb-medium-jump">O</div>
+                    <span>Orbe Saut Moyen (12)</span>
+                </div>
+                <div class="palette-item" data-tile-type="13">
+                    <div class="palette-color orb-high-jump">O</div>
+                    <span>Orbe Grand Saut (13)</span>
+                </div>
+                <div class="palette-item" data-tile-type="6" data-color="#32CD32">
+                    <div class="palette-color end-block">FIN</div>
+                    <span>Fin (6)</div>
+                </div>
+                <div class="palette-item" data-tile-type="0" data-color="#444">
+                    <div class="palette-color" style="background-color: #444;">0</div>
+                    <span>Vide (0)</div>
+                </div>
+            </div>
         </div>
 
         <div id="game-canvas-container">
             <canvas id="gameCanvas"></canvas>
-            <div id="game-overlay" style="display: none;">
-                <h2 id="overlay-title"></h2>
+            <div id="game-overlay">
+                <h1 id="overlay-title"></h1>
                 <p id="overlay-message"></p>
-                <button id="overlay-button"></button>
             </div>
         </div>
 
         <div id="output-container">
+            <h2>Actions</h2>
+            <button id="playLevelButton" class="action-button">Jouer le Niveau</button>
+            <button id="exitGameButton" class="action-button">Retour à l'Éditeur</button>
+            
+            <hr style="border-color: #555; margin: 20px 0;">
+
+            <button id="toggleMapSizeButton" class="action-button">Basculer Taille Map</button>
+            
+            <hr style="border-color: #555; margin: 20px 0;">
+
             <h2>Code du Niveau</h2>
-            <pre id="level-code"></pre>
-            <button id="copy-code-button">Copier le code</button>
-            <button id="play-level-button">Jouer le Niveau</button>
-            <button id="exit-game-button" style="display: none;">Quitter le Jeu</button>
+            <p id="mapSizeDisplay">Taille de la carte: 15x20 (40px/tuile)</p>
+            <textarea id="levelOutput"></textarea>
+            <button id="copyButton" class="action-button">Copier le Code</button>
+            <button id="exportJsonButton" class="action-button">Exporter JSON</button>
+            <div id="swipeModeIndicator">Mode Swipe: OFF (Appuyez sur T)</div>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
-        const gridRowsInput = document.getElementById('grid-rows');
-        const gridColsInput = document.getElementById('grid-cols');
-        const tileSizeSelect = document.getElementById('tile-size');
-        const applyGridConfigButton = document.getElementById('apply-grid-config');
-        const palette = document.getElementById('palette');
-        const clearGridButton = document.getElementById('clear-grid-button');
-        const levelCodeOutput = document.getElementById('level-code');
-        const copyCodeButton = document.getElementById('copy-code-button');
-        const importLevelButton = document.getElementById('import-level-button');
-        const importLevelCodeTextarea = document.getElementById('import-level-code');
-        const loadLevelFromImportButton = document.getElementById('load-level-from-import');
-        const playLevelButton = document.getElementById('play-level-button');
-        const exitGameButton = document.getElementById('exit-game-button');
+        const levelOutput = document.getElementById('levelOutput');
+        const copyButton = document.getElementById('copyButton');
+        const exportJsonButton = document.getElementById('exportJsonButton');
+        const paletteItems = document.querySelectorAll('.palette-item');
+        const playLevelButton = document.getElementById('playLevelButton');
+        const exitGameButton = document.getElementById('exitGameButton');
         const editorUi = document.getElementById('editor-ui');
         const outputContainer = document.getElementById('output-container');
         const gameOverlay = document.getElementById('game-overlay');
         const overlayTitle = document.getElementById('overlay-title');
         const overlayMessage = document.getElementById('overlay-message');
-        const overlayButton = document.getElementById('overlay-button');
-        const swipeModeIndicator = document.getElementById('swipe-mode-indicator');
+        const swipeModeIndicator = document.getElementById('swipeModeIndicator');
+        const toggleMapSizeButton = document.getElementById('toggleMapSizeButton');
+        const mapSizeDisplay = document.getElementById('mapSizeDisplay');
 
+        const solidBlockColorPicker = document.getElementById('solidBlockColorPicker');
+        const solidBlockPaletteColorPreview = document.getElementById('solidBlockPaletteColorPreview');
 
-        let GRID_ROWS = parseInt(gridRowsInput.value);
-        let GRID_COLS = parseInt(gridColsInput.value);
-        let TILE_SIZE = parseInt(tileSizeSelect.value);
-        let editorGrid = [];
-        let gameGrid = []; // Grille utilisée pendant le jeu
+        // Configurations des cartes
+        const mapConfigs = [
+            {
+                name: "15x20 (40px/tuile)",
+                GRID_ROWS: 15,
+                GRID_COLS: 20,
+                TILE_SIZE: 40,
+                GRAVITY: 0.8,
+                PLAYER_SPEED: 5,
+                JUMP_POWER: -15,
+                JUMP_POWER_SMALL: -8,
+                JUMP_POWER_MEDIUM: -12,
+                JUMP_POWER_HIGH: -18
+            },
+            {
+                name: "30x40 (20px/tuile)",
+                GRID_ROWS: 30,
+                GRID_COLS: 40,
+                TILE_SIZE: 20,
+                GRAVITY: 0.4,
+                PLAYER_SPEED: 2.5,
+                JUMP_POWER: -7.5,
+                JUMP_POWER_SMALL: -4,
+                JUMP_POWER_MEDIUM: -6,
+                JUMP_POWER_HIGH: -9
+            }
+        ];
 
-        let currentDrawing = false; // true si le bouton de la souris est enfoncé
-        let selectedTileType = 1; // Type de tuile par défaut (bloc solide)
-        let selectedColor = '#555'; // Couleur par défaut pour les blocs solides personnalisables
-        let isSwipeMode = false; // Mode balayage activé/désactivé
-        let rotation = 0; // Rotation par défaut pour les tuiles rotatives (par exemple, pics)
+        let currentMapSizeIndex = 0; // 0 pour 15x20, 1 pour 30x40
 
-        let spawnPoint = { row: -1, col: -1 }; // Position de spawn du joueur
-        let endPoint = { row: -1, col: -1 }; // Position de fin de niveau
+        // Variables qui seront mises à jour par applyMapConfig
+        let TILE_SIZE;
+        let GRID_ROWS;
+        let GRID_COLS;
+        let GRAVITY;
+        let PLAYER_SPEED;
+        let JUMP_POWER;
+        let JUMP_POWER_SMALL;
+        let JUMP_POWER_MEDIUM;
+        let JUMP_POWER_HIGH;
 
-        // Constantes des types de tuiles
-        const TILE_EMPTY = 0;
-        const TILE_SOLID_BLOCK = 1; // Bloc solide basique ou avec couleur custom
-        const TILE_LAVA = 3;
-        const TILE_PLAYER_SPAWN = 4;
+        const TILE_SPIKE = 2; // Constante pour le type de tuile Pics
         const TILE_TNT_SOLID = 5;
-        const TILE_TNT_NON_SOLID = 6;
-        const TILE_END = 7;
+        const TILE_TNT_NON_SOLID = 7;
+        const TNT_EXPLOSION_DELAY = 1000;
+        const TNT_EXPLOSION_RADIUS = 1; // Rayon d'explosion en tuiles (1 = la TNT et les 8 tuiles autour)
+
+        const TILE_END = 6;
         const TILE_JUMP_PAD_SMALL = 8;
         const TILE_JUMP_PAD_MEDIUM = 9;
         const TILE_JUMP_PAD_HIGH = 10;
+        // Orb Tile Types
         const TILE_ORB_SMALL_JUMP = 11;
         const TILE_ORB_MEDIUM_JUMP = 12;
         const TILE_ORB_HIGH_JUMP = 13;
-        const TILE_SPIKE = 2; // Spike est le type 2
 
+        const DEFAULT_SOLID_BLOCK_COLOR = '#FFD700';
 
-        // Couleurs par défaut pour les tuiles fixes
-        const DEFAULT_SOLID_BLOCK_COLOR = '#555';
-        const DEFAULT_LAVA_COLOR = 'orange';
-        const DEFAULT_PLAYER_SPAWN_COLOR = 'purple';
-        const DEFAULT_TNT_SOLID_COLOR = '#CC0000';
-        const DEFAULT_TNT_NON_SOLID_COLOR = '#0000FF';
-        const DEFAULT_END_COLOR = '#AAAA00';
-        const DEFAULT_JUMP_PAD_SMALL_COLOR = '#008800';
-        const DEFAULT_JUMP_PAD_MEDIUM_COLOR = '#00AA00';
-        const DEFAULT_JUMP_PAD_HIGH_COLOR = '#00CC00';
-        const DEFAULT_ORB_SMALL_JUMP_COLOR = '#00FFFF';
-        const DEFAULT_ORB_MEDIUM_JUMP_COLOR = '#00CCFF';
-        const DEFAULT_ORB_HIGH_JUMP_COLOR = '#0099FF';
-        const DEFAULT_SPIKE_COLOR = '#555'; // Pour le fond du pic
+        let editorGrid = [];
+        let gameGrid = [];
 
-        // --- Game Variables ---
+        let selectedTileType = 1;
+        let currentSolidBlockColor = DEFAULT_SOLID_BLOCK_COLOR;
+        
+        let spawnPoint = { row: -1, col: -1 };
+        let endPoint = { row: -1, col: -1 };
+
         let gameRunning = false;
-        let animationFrameId = null; // Pour pouvoir annuler l'animation
-        const GRAVITY = 0.5;
-        const PLAYER_SPEED = 5;
-        const JUMP_POWER = -10;
-        const JUMP_POWER_SMALL = -8; // Plus petit saut
-        const JUMP_POWER_MEDIUM = -12; // Saut moyen
-        const JUMP_POWER_HIGH = -18; // Grand saut
-        const TNT_EXPLOSION_DELAY = 1000; // 1 second
-        const ORB_COOLDOWN = 1000; // Cooldown pour les orbes
+        let animationFrameId = null;
+        let isSwipeMode = false;
+        let isMouseDown = false;
+        let playerClickedOrb = false; // New variable to track orb click
 
-        let keys = {
+        let activeTnts = []; // { row, col, type, activatedAt }
+
+        const player = {
+            x: 0,
+            y: 0,
+            width: 0, // Sera mis à jour par applyMapConfig
+            height: 0, // Sera mis à jour par applyMapConfig
+            velX: 0,
+            velY: 0,
+            onGround: false,
+            color: 'green'
+        };
+
+        const keys = {
             left: false,
             right: false,
             up: false
         };
 
-        let player = {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-            velX: 0,
-            velY: 0,
-            onGround: false,
-            color: 'green' // Couleur du joueur
-        };
+        // --- Fonction pour appliquer la configuration de la carte ---
+        function applyMapConfig(index) {
+            const config = mapConfigs[index];
 
-        let activeTnts = []; // {row, col, type, activatedAt}
-        let playerClickedOrb = false; // Empêche les orbes de se déclencher plusieurs fois par frame
+            GRID_ROWS = config.GRID_ROWS;
+            GRID_COLS = config.GRID_COLS;
+            TILE_SIZE = config.TILE_SIZE;
+            GRAVITY = config.GRAVITY;
+            PLAYER_SPEED = config.PLAYER_SPEED;
+            JUMP_POWER = config.JUMP_POWER;
+            JUMP_POWER_SMALL = config.JUMP_POWER_SMALL;
+            JUMP_POWER_MEDIUM = config.JUMP_POWER_MEDIUM;
+            JUMP_POWER_HIGH = config.JUMP_POWER_HIGH;
 
-
-        // --- Editor Functions ---
-
-        function applyMapConfig() {
-            GRID_ROWS = parseInt(gridRowsInput.value);
-            GRID_COLS = parseInt(gridColsInput.value);
-            TILE_SIZE = parseInt(tileSizeSelect.value);
-
-            canvas.width = GRID_COLS * TILE_SIZE;
-            canvas.height = GRID_ROWS * TILE_SIZE;
+            canvas.width = GRID_COLS * TILE_SIZE; // 800px pour les deux configurations
+            canvas.height = GRID_ROWS * TILE_SIZE; // 600px pour les deux configurations
 
             player.width = TILE_SIZE * 0.7;
             player.height = TILE_SIZE * 0.9;
 
-            initializeEditor(); // Réinitialise la grille après le changement de taille
+            mapSizeDisplay.textContent = `Taille de la carte: ${config.GRID_ROWS}x${config.GRID_COLS} (${config.TILE_SIZE}px/tuile)`;
         }
 
+        // --- Initialisation de l'éditeur ---
         function initializeEditor() {
-            editorGrid = [];
-            for (let r = 0; r < GRID_ROWS; r++) {
-                editorGrid[r] = [];
-                for (let c = 0; c < GRID_COLS; c++) {
-                    editorGrid[r][c] = 0; // 0 pour vide
+            applyMapConfig(currentMapSizeIndex); // Applique la config initiale
+
+            // Si la grille est déjà initialisée pour une taille différente, ou si elle est vide
+            // on la réinitialise complètement. Sinon, on la conserve.
+            if (editorGrid.length !== GRID_ROWS || (editorGrid[0] && editorGrid[0].length !== GRID_COLS)) {
+                editorGrid = Array(GRID_ROWS).fill(0).map(() => Array(GRID_COLS).fill(0));
+
+                // Crée un sol par défaut
+                for (let row = GRID_ROWS - 2; row < GRID_ROWS; row++) {
+                    for (let col = 0; col < GRID_COLS; col++) {
+                        editorGrid[row][col] = { type: 1, color: DEFAULT_SOLID_BLOCK_COLOR };
+                    }
                 }
-            }
-            // Crée un sol par défaut
-            for (let row = GRID_ROWS - 2; row < GRID_ROWS; row++) {
-                for (let col = 0; col < GRID_COLS; col++) {
-                    editorGrid[row][col] = { type: 1, color: DEFAULT_SOLID_BLOCK_COLOR };
-                }
+                
+                // Ajuste la position du joueur et de la fin
+                spawnPoint = { row: GRID_ROWS - 3, col: 2 };
+                editorGrid[spawnPoint.row][spawnPoint.col] = 4;
+
+                endPoint = { row: GRID_ROWS - 3, col: GRID_COLS - 3 };
+                editorGrid[endPoint.row][endPoint.col] = TILE_END;
+            } else {
+                 // S'assurer que les points d'apparition et de fin sont à jour avec la nouvelle taille si l'utilisateur a changé la taille
+                 // et que ces points ne sont pas devenus invalides. Si invalides, les réinitialiser.
+                 if (spawnPoint.row >= GRID_ROWS || spawnPoint.col >= GRID_COLS || (typeof editorGrid[spawnPoint.row][spawnPoint.col] === 'object' ? editorGrid[spawnPoint.row][spawnPoint.col].type : editorGrid[spawnPoint.row][spawnPoint.col]) !== 4) {
+                    spawnPoint = { row: GRID_ROWS - 3, col: 2 };
+                    if ((typeof editorGrid[spawnPoint.row][spawnPoint.col] === 'object' ? editorGrid[spawnPoint.row][spawnPoint.col].type : editorGrid[spawnPoint.row][spawnPoint.col]) === 0) { // Ne pas écraser un bloc existant si déjà un bloc
+                         editorGrid[spawnPoint.row][spawnPoint.col] = 4;
+                    }
+                 }
+                 if (endPoint.row >= GRID_ROWS || endPoint.col >= GRID_COLS || (typeof editorGrid[endPoint.row][endPoint.col] === 'object' ? editorGrid[endPoint.row][endPoint.col].type : editorGrid[endPoint.row][endPoint.col]) !== TILE_END) {
+                    endPoint = { row: GRID_ROWS - 3, col: GRID_COLS - 3 };
+                     if ((typeof editorGrid[endPoint.row][endPoint.col] === 'object' ? editorGrid[endPoint.row][endPoint.col].type : editorGrid[endPoint.row][endPoint.col]) === 0) { // Ne pas écraser un bloc existant si déjà un bloc
+                        editorGrid[endPoint.row][endPoint.col] = TILE_END;
+                    }
+                 }
             }
 
-            // Ajuste la position du joueur et de la fin
-            spawnPoint = { row: GRID_ROWS - 3, col: 2 };
-            editorGrid[spawnPoint.row][spawnPoint.col] = 4;
 
-            endPoint = { row: GRID_ROWS - 3, col: GRID_COLS - 3 };
-            editorGrid[endPoint.row][endPoint.col] = TILE_END;
+            currentSolidBlockColor = DEFAULT_SOLID_BLOCK_COLOR;
+            updateSolidBlockPaletteColorPreview();
 
             drawEditorGrid();
             generateLevelCode();
+            updateSwipeModeIndicator();
         }
 
+        // --- Fonctions de dessin pour l'éditeur ---
         function drawEditorGrid() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Efface le canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let row = 0; row < GRID_ROWS; row++) {
                 for (let col = 0; col < GRID_COLS; col++) {
@@ -435,390 +649,898 @@
                     const y = row * TILE_SIZE;
 
                     let tileType;
-                    let tileColor;
-                    let tileRotation = 0;
-
-                    if (typeof tile === 'object' && tile !== null) {
-                        tileType = tile.type;
-                        if (tile.type === 1) { // Bloc solide personnalisable
-                            tileColor = tile.color;
-                        } else if (tile.type === TILE_SPIKE) {
-                            tileRotation = tile.rotation || 0; // Utiliser la rotation stockée
-                        }
-                    } else {
-                        tileType = tile; // Type de tuile simple (nombre)
-                    }
-
-                    // Dessiner les tuiles
-                    switch (tileType) {
-                        case TILE_SOLID_BLOCK: // Type 1: Bloc solide
-                            ctx.fillStyle = tileColor || DEFAULT_SOLID_BLOCK_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            break;
-                        case TILE_LAVA: // Type 3: Lave
-                            ctx.fillStyle = DEFAULT_LAVA_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            break;
-                        case TILE_PLAYER_SPAWN: // Type 4: Point de spawn du joueur
-                            ctx.fillStyle = DEFAULT_PLAYER_SPAWN_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            // Dessiner un petit "P"
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('P', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_TNT_SOLID: // Type 5: TNT solide
-                            ctx.fillStyle = DEFAULT_TNT_SOLID_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('TNT', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_TNT_NON_SOLID: // Type 6: TNT non solide
-                            ctx.fillStyle = DEFAULT_TNT_NON_SOLID_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('TNT', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_END: // Type 7: Fin
-                            ctx.fillStyle = DEFAULT_END_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('FIN', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_SMALL: // Type 8: Jump Pad Petit
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_SMALL_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J1', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_MEDIUM: // Type 9: Jump Pad Moyen
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_MEDIUM_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J2', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_HIGH: // Type 10: Jump Pad Haut
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_HIGH_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J3', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_SMALL_JUMP: // Type 11: Orbe Petit Saut
-                            ctx.fillStyle = DEFAULT_ORB_SMALL_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O1', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_MEDIUM_JUMP: // Type 12: Orbe Moyen Saut
-                            ctx.fillStyle = DEFAULT_ORB_MEDIUM_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O2', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_HIGH_JUMP: // Type 13: Orbe Grand Saut
-                            ctx.fillStyle = DEFAULT_ORB_HIGH_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O3', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_SPIKE: // Type 2: Pics
-                            ctx.fillStyle = DEFAULT_SPIKE_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE); // Fond du pic
-
-                            ctx.save();
-                            ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            ctx.rotate(tileRotation * Math.PI / 180); // Appliquer la rotation
-                            ctx.fillStyle = 'red';
-                            ctx.beginPath();
-                            ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2);
-                            ctx.lineTo(0, -TILE_SIZE / 2);
-                            ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2);
-                            ctx.closePath();
-                            ctx.fill();
-                            ctx.restore();
-                            break;
-                    }
-
-                    // Dessiner les lignes de la grille
-                    ctx.strokeStyle = '#333';
-                    ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
-                }
-            }
-        }
-
-        function generateLevelCode() {
-            const levelData = {
-                rows: GRID_ROWS,
-                cols: GRID_COLS,
-                tileSize: TILE_SIZE,
-                grid: editorGrid,
-                spawnPoint: spawnPoint,
-                endPoint: endPoint
-            };
-            levelCodeOutput.textContent = JSON.stringify(levelData);
-        }
-
-        function loadLevelCode(code) {
-            try {
-                const levelData = JSON.parse(code);
-                GRID_ROWS = levelData.rows;
-                GRID_COLS = levelData.cols;
-                TILE_SIZE = levelData.tileSize;
-                editorGrid = levelData.grid;
-                spawnPoint = levelData.spawnPoint;
-                endPoint = levelData.endPoint;
-
-                // Mettre à jour les inputs de l'éditeur
-                gridRowsInput.value = GRID_ROWS;
-                gridColsInput.value = GRID_COLS;
-                tileSizeSelect.value = TILE_SIZE;
-
-                applyMapConfig(); // Met à jour le canvas et redessine
-                generateLevelCode(); // Génère le code mis à jour
-                showOverlay("Succès", "Niveau importé avec succès !", "OK");
-            } catch (e) {
-                console.error("Erreur lors du chargement du niveau :", e);
-                showOverlay("Erreur", "Code de niveau invalide !", "OK");
-            }
-        }
-
-        // --- Game Functions ---
-
-        function startGame() {
-            if (spawnPoint.row === -1 || spawnPoint.col === -1) {
-                showOverlay("Erreur", "Point d'apparition du joueur non défini ! Placez le point 'P'.", "OK");
-                return;
-            }
-            gameGrid = JSON.parse(JSON.stringify(editorGrid)); // Copie profonde
-            player.x = spawnPoint.col * TILE_SIZE + (TILE_SIZE - player.width) / 2;
-            player.y = spawnPoint.row * TILE_SIZE + (TILE_SIZE - player.height);
-            player.velX = 0;
-            player.velY = 0;
-            player.onGround = false;
-            activeTnts = []; // Réinitialiser les TNTs actifs
-            gameRunning = true;
-            toggleUiVisibility(false);
-            gameOverlay.style.display = 'none'; // Ensure overlay is hidden
-            animationFrameId = requestAnimationFrame(animate);
-        }
-
-        function exitGame() {
-            gameRunning = false;
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            toggleUiVisibility(true);
-            showOverlay("Éditeur", "De retour à l'éditeur.", "OK");
-            drawEditorGrid(); // Redessine la grille de l'éditeur
-            generateLevelCode(); // S'assurer que le code est à jour
-        }
-
-        function showOverlay(title, message, buttonText) {
-            overlayTitle.textContent = title;
-            overlayMessage.textContent = message;
-            overlayButton.textContent = buttonText;
-            gameOverlay.style.display = 'flex';
-            overlayButton.onclick = () => {
-                gameOverlay.style.display = 'none';
-                if (title === "Game Over" || title === "Niveau Terminé !"){
-                    exitGame(); // Quitter le jeu après un game over ou une victoire
-                }
-            };
-        }
-
-        function drawGame() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-
-            // Draw tiles
-            for (let row = 0; row < GRID_ROWS; row++) {
-                for (let col = 0; col < GRID_COLS; col++) {
-                    const tile = gameGrid[row][col];
-                    const x = col * TILE_SIZE;
-                    const y = row * TIL
-                    E_SIZE;
-
-                    let tileType;
-                    let tileColor;
-                    let tileRotation = 0;
+                    let tileColor = '#444'; // Couleur par défaut pour le vide en mode éditeur
+                    let tileRotation = 0; // Default rotation for spikes
 
                     if (typeof tile === 'object' && tile !== null) {
                         tileType = tile.type;
                         if (tile.type === 1) {
                             tileColor = tile.color;
                         } else if (tile.type === TILE_SPIKE) {
-                            tileRotation = tile.rotation || 0;
+                            tileRotation = tile.rotation || 0; // Get rotation for spikes
                         }
                     } else {
                         tileType = tile;
                     }
 
-                    switch (tileType) {
-                        case TILE_SOLID_BLOCK:
-                            ctx.fillStyle = tileColor || DEFAULT_SOLID_BLOCK_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            break;
-                        case TILE_LAVA:
-                            ctx.fillStyle = DEFAULT_LAVA_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            break;
-                        case TILE_PLAYER_SPAWN: // Ne pas dessiner en jeu, c'est juste un point de spawn
-                            break;
-                        case TILE_TNT_SOLID:
-                            ctx.fillStyle = DEFAULT_TNT_SOLID_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('TNT', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_TNT_NON_SOLID:
-                            ctx.fillStyle = DEFAULT_TNT_NON_SOLID_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('TNT', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_END:
-                            ctx.fillStyle = DEFAULT_END_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('FIN', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_SMALL:
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_SMALL_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J1', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_MEDIUM:
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_MEDIUM_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J2', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_JUMP_PAD_HIGH:
-                            ctx.fillStyle = DEFAULT_JUMP_PAD_HIGH_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                            ctx.fillStyle = 'white';
-                            ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.fillText('J3', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_SMALL_JUMP:
-                            ctx.fillStyle = DEFAULT_ORB_SMALL_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O1', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_MEDIUM_JUMP:
-                            ctx.fillStyle = DEFAULT_ORB_MEDIUM_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O2', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_ORB_HIGH_JUMP:
-                            ctx.fillStyle = DEFAULT_ORB_HIGH_JUMP_COLOR;
-                            ctx.beginPath();
-                            ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            ctx.fillStyle = 'black';
-                            ctx.font = `${TILE_SIZE * 0.4}px 'Press Start 2P'`;
-                            ctx.fillText('O3', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            break;
-                        case TILE_SPIKE:
-                            ctx.fillStyle = DEFAULT_SPIKE_COLOR;
-                            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    if (tileType === 1) {
+                        ctx.fillStyle = tileColor;
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = tileColor;
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                    } else if (tileType === TILE_SPIKE) {
+                        ctx.save();
+                        ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2); // Move origin to center of tile
+                        ctx.rotate(tileRotation * Math.PI / 180); // Rotate by the specified angle
+                        ctx.fillStyle = '#808080';
+                        ctx.beginPath();
+                        ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2); // Bottom-left relative to center
+                        ctx.lineTo(0, -TILE_SIZE / 2);           // Top-middle relative to center
+                        ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2); // Bottom-right relative to center
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#696969';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.restore(); // Restore previous canvas state (translation and rotation)
+                    } else if (tileType === 3) {
+                        ctx.fillStyle = '#FF4500';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#CC3700';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                    } else if (tileType === 4) {
+                        ctx.fillStyle = '#00BFFF';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#008CCF';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.fillStyle = 'black';
+                        ctx.font = `${TILE_SIZE * 0.7}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('P', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    } else if (tileType === TILE_TNT_SOLID) {
+                        ctx.fillStyle = '#FF0000';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#CC0000';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('TNT', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    }
+                    else if (tileType === TILE_TNT_NON_SOLID) {
+                        ctx.fillStyle = '#0000FF';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#0000CC';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('TNT-', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    }
+                    else if (tileType === TILE_JUMP_PAD_SMALL) {
+                        ctx.fillStyle = '#FFC0CB';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#E0B0C4';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'black';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_JUMP_PAD_MEDIUM) {
+                        ctx.fillStyle = '#FFFF00';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#E0E000';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'black';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_JUMP_PAD_HIGH) {
+                        ctx.fillStyle = '#FF0000';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#CC0000';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^^^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) {
+                        let orbColor;
+                        let textColor = 'white';
+                        if (tileType === TILE_ORB_SMALL_JUMP) {
+                            orbColor = '#FF69B4'; // Hot Pink
+                        } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
+                            orbColor = '#FFD700'; // Gold
+                            textColor = 'black'; // Black text for better contrast
+                        } else { // TILE_ORB_HIGH_JUMP
+                            orbColor = '#DC143C'; // Crimson
+                        }
+                        ctx.fillStyle = orbColor;
+                        ctx.beginPath();
+                        ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 2 * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#555'; // Darker border
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
 
-                            ctx.save();
-                            ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-                            ctx.rotate(tileRotation * Math.PI / 180);
-                            ctx.fillStyle = 'red';
-                            ctx.beginPath();
-                            ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2);
-                            ctx.lineTo(0, -TILE_SIZE / 2);
-                            ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2);
-                            ctx.closePath();
-                            ctx.fill();
-                            ctx.restore();
-                            break;
+                        ctx.fillStyle = textColor;
+                        ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('O', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    }
+                    else if (tileType === TILE_END) {
+                        ctx.fillStyle = '#32CD32';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#228B22';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('FIN', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    }
+                    else {
+                        // Dessiner une grille légère pour les tuiles vides en mode éditeur
+                        ctx.fillStyle = '#444';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#555';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                    }
+                }
+            }
+        }
+
+        function updateSolidBlockPaletteColorPreview() {
+            solidBlockPaletteColorPreview.style.backgroundColor = currentSolidBlockColor;
+            solidBlockColorPicker.value = currentSolidBlockColor;
+        }
+
+        // --- Logique de l'éditeur ---
+        function generateLevelCode() {
+            let code = `// Map Size: ${GRID_ROWS}x${GRID_COLS} (${TILE_SIZE}px/tuile)\n`;
+            code += '[\n';
+            editorGrid.forEach(row => {
+                const rowContent = row.map(tile => {
+                    if (typeof tile === 'object' && tile !== null) {
+                        if (tile.type === 1 && tile.color !== DEFAULT_SOLID_BLOCK_COLOR) {
+                            return `{"type":1,"color":"${tile.color}"}`;
+                        } else if (tile.type === TILE_SPIKE) {
+                            return `{"type":${TILE_SPIKE},"rotation":${tile.rotation || 0}}`;
+                        }
+                        return tile.type; // Should not happen for other types, but for safety
+                    } else {
+                        return tile;
+                    }
+                }).join(',');
+                code += `    [${rowContent}],\n`;
+            });
+            code = code.slice(0, -2) + '\n]'; // Remove trailing comma and newline, then add final ']\n'
+            levelOutput.value = code;
+        }
+
+        function parseLevelCode() {
+            if (gameRunning) return;
+
+            const codeText = levelOutput.value.trim();
+            // Supprimer la première ligne de commentaire pour le parsing
+            const lines = codeText.split('\n');
+            const dataLines = lines.filter(line => !line.startsWith('//'));
+            const cleanCodeText = dataLines.join('\n');
+
+            let newGrid = [];
+            let newSpawnPoint = { row: -1, col: -1 };
+            let newEndPoint = { row: -1, col: -1 };
+            let hasError = false;
+
+            try {
+                let parsedArray;
+                try {
+                    parsedArray = JSON.parse(cleanCodeText);
+                } catch (jsonError) {
+                    parsedArray = eval(`(${cleanCodeText})`); 
+                }
+
+                if (!Array.isArray(parsedArray)) {
+                    throw new Error("Le code doit être un tableau (e.g., [[...],[...]]).");
+                }
+
+                if (parsedArray.length !== GRID_ROWS) {
+                    throw new Error(`Le niveau doit avoir ${GRID_ROWS} lignes pour la taille actuelle, trouvé ${parsedArray.length}.`);
+                }
+
+                for (let r = 0; r < parsedArray.length; r++) {
+                    const row = parsedArray[r];
+                    if (!Array.isArray(row) || row.length !== GRID_COLS) {
+                        throw new Error(`La ligne ${r} doit être un tableau avec ${GRID_COLS} colonnes pour la taille actuelle, trouvé ${row.length}.`);
+                    }
+                    newGrid[r] = [];
+                    for (let c = 0; c < row.length; c++) {
+                        let tileData = row[c];
+                        let tileType;
+                        let tileColor = DEFAULT_SOLID_BLOCK_COLOR;
+                        let tileRotation = 0;
+
+                        if (typeof tileData === 'object' && tileData !== null) {
+                            if (tileData.type === 1 && typeof tileData.color === 'string') {
+                                tileType = 1;
+                                tileColor = tileData.color;
+                            } else if (tileData.type === TILE_SPIKE && typeof tileData.rotation === 'number') {
+                                tileType = TILE_SPIKE;
+                                tileRotation = tileData.rotation;
+                            } else {
+                                throw new Error(`Objet de tuile invalide à [${r}, ${c}].`);
+                            }
+                        } else {
+                            tileType = parseInt(tileData);
+                            const validTileTypes = [0, 1, TILE_SPIKE, 3, 4, TILE_TNT_SOLID, TILE_END, TILE_TNT_NON_SOLID, TILE_JUMP_PAD_SMALL, TILE_JUMP_PAD_MEDIUM, TILE_JUMP_PAD_HIGH, TILE_ORB_SMALL_JUMP, TILE_ORB_MEDIUM_JUMP, TILE_ORB_HIGH_JUMP];
+                            if (isNaN(tileType) || !validTileTypes.includes(tileType)) {
+                                throw new Error(`Valeur de tuile invalide (${tileData}) à [${r}, ${c}].`);
+                            }
+                        }
+
+                        if (tileType === 4) {
+                            if (newSpawnPoint.row !== -1) {
+                                console.warn("Attention: Plus d'un point d'apparition trouvé. Seul le premier sera utilisé.");
+                            }
+                            newSpawnPoint = { row: r, col: c };
+                        } else if (tileType === TILE_END) {
+                            if (newEndPoint.row !== -1) {
+                                console.warn("Attention: Plus d'un bloc de fin trouvé. Seul le premier sera utilisé.");
+                            }
+                            newEndPoint = { row: r, col: c };
+                        }
+                        
+                        if (tileType === 1) {
+                            newGrid[r][c] = { type: 1, color: tileColor };
+                        } else if (tileType === TILE_SPIKE) {
+                            newGrid[r][c] = { type: TILE_SPIKE, rotation: tileRotation };
+                        } else {
+                            newGrid[r][c] = tileType;
+                        }
+                    }
+                }
+
+                editorGrid = newGrid;
+                spawnPoint = newSpawnPoint;
+                endPoint = newEndPoint;
+                drawEditorGrid();
+                levelOutput.style.borderColor = '#555';
+
+            } catch (error) {
+                console.error("Erreur de parsing du code du niveau :", error.message);
+                levelOutput.style.borderColor = 'red';
+                hasError = true;
+                alert("Erreur de formatage du code du niveau :\n" + error.message);
+            }
+
+            if (hasError) {
+                setTimeout(generateLevelCode, 2000); // Régénère le code correct après un délai
+            }
+        }
+
+        function exportLevelAsJson() {
+            const levelData = {
+                grid: editorGrid,
+                spawnPoint: spawnPoint,
+                endPoint: endPoint,
+                mapSize: { rows: GRID_ROWS, cols: GRID_COLS, tileSize: TILE_SIZE }
+            };
+            const jsonString = JSON.stringify(levelData, null, 2);
+
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `custom_level_${GRID_ROWS}x${GRID_COLS}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            exportJsonButton.textContent = 'Exporté !';
+            setTimeout(() => {
+                exportJsonButton.textContent = 'Exporter JSON';
+            }, 1500);
+        }
+
+        function drawTile(e) {
+            if (gameRunning) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const col = Math.floor(x / TILE_SIZE);
+            const row = Math.floor(y / TILE_SIZE);
+
+            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                const currentTile = editorGrid[row][col];
+                let tileToPlace;
+
+                if (selectedTileType === 1) {
+                    tileToPlace = { type: 1, color: currentSolidBlockColor };
+                    if (typeof currentTile === 'object' && currentTile !== null &&
+                        currentTile.type === 1 && currentTile.color === currentSolidBlockColor) {
+                        return;
+                    }
+                } else if (selectedTileType === TILE_SPIKE) {
+                    // When placing a spike, initialize its rotation to 0
+                    tileToPlace = { type: TILE_SPIKE, rotation: 0 };
+                    // Avoid redrawing if the tile is already a spike with 0 rotation
+                    if (typeof currentTile === 'object' && currentTile !== null &&
+                        currentTile.type === TILE_SPIKE && (currentTile.rotation || 0) === 0) {
+                        return;
+                    }
+                }
+                else {
+                    tileToPlace = selectedTileType;
+                    if (typeof currentTile !== 'object' && currentTile === selectedTileType) {
+                        return;
+                    }
+                }
+
+                let isCurrentTileSpawn = (typeof currentTile === 'number' && currentTile === 4);
+                let isNewTileSpawn = (selectedTileType === 4);
+
+                let isCurrentTileEnd = (typeof currentTile === 'number' && currentTile === TILE_END);
+                let isNewTileEnd = (selectedTileType === TILE_END);
+
+
+                if (isNewTileSpawn) {
+                    if (spawnPoint.row !== -1 && spawnPoint.col !== -1) {
+                        editorGrid[spawnPoint.row][spawnPoint.col] = 0; // Clear old spawn point
+                    }
+                    editorGrid[row][col] = tileToPlace;
+                    spawnPoint = { row: row, col: col };
+                } else if (isNewTileEnd) {
+                    if (endPoint.row !== -1 && endPoint.col !== -1) {
+                        editorGrid[endPoint.row][endPoint.col] = 0; // Clear old end point
+                    }
+                    editorGrid[row][col] = tileToPlace;
+                    endPoint = { row: row, col: col };
+                }
+                else {
+                    // If replacing current spawn/end point with another tile type
+                    if (isCurrentTileSpawn) {
+                        spawnPoint = { row: -1, col: -1 };
+                    } else if (isCurrentTileEnd) {
+                        endPoint = { row: -1, col: -1 };
+                    }
+                    editorGrid[row][col] = tileToPlace;
+                }
+                
+                drawEditorGrid();
+                generateLevelCode();
+            }
+        }
+
+        function pickColorFromTile(e) {
+            if (gameRunning) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const col = Math.floor(x / TILE_SIZE);
+            const row = Math.floor(y / TILE_SIZE);
+
+            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                const tile = editorGrid[row][col];
+                if (typeof tile === 'object' && tile !== null && tile.type === 1) {
+                    currentSolidBlockColor = tile.color;
+                    updateSolidBlockPaletteColorPreview();
+                    document.querySelector('.palette-item.selected')?.classList.remove('selected');
+                    document.querySelector('.palette-item[data-tile-type="1"]').classList.add('selected');
+                    selectedTileType = 1;
+                }
+            }
+        }
+
+        // New function to rotate a spike
+        function rotateSpike(e) {
+            if (gameRunning || selectedTileType !== TILE_SPIKE) return; // Only rotate if in editor and spike is selected
+
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const col = Math.floor(x / TILE_SIZE);
+            const row = Math.floor(y / TILE_SIZE);
+
+            if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                const tile = editorGrid[row][col];
+                if (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) {
+                    // Rotate by 90 degrees clockwise
+                    tile.rotation = ((tile.rotation || 0) + 90) % 360;
+                    drawEditorGrid();
+                    generateLevelCode();
+                }
+            }
+        }
+ 
+        function updateSwipeModeIndicator() {
+            if (isSwipeMode) {
+                swipeModeIndicator.textContent = 'Mode Swipe: ON';
+                swipeModeIndicator.classList.add('on');
+            } else {
+                swipeModeIndicator.textContent = 'Mode Swipe: OFF (Appuyez sur T)';
+                swipeModeIndicator.classList.remove('on');
+            }
+        }
+
+
+        // --- Gestion des événements de l'éditeur (déplacées vers des fonctions nommées) ---
+        canvas.addEventListener('mousedown', (e) => {
+            if (gameRunning) return;
+            isMouseDown = true;
+            if (e.button === 2) { // Right click
+                pickColorFromTile(e);
+            } else { // Left click
+                drawTile(e);
+            }
+        });
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent default right-click menu
+
+        canvas.addEventListener('mouseup', () => {
+            if (gameRunning) return;
+            isMouseDown = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (gameRunning) return;
+            if (e.buttons === 1 && isSwipeMode) { // Check for left mouse button and swipe mode
+                drawTile(e);
+            }
+        });
+
+        paletteItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (gameRunning) return;
+
+                document.querySelector('.palette-item.selected')?.classList.remove('selected');
+                item.classList.add('selected');
+                selectedTileType = parseInt(item.dataset.tileType);
+            });
+        });
+
+        copyButton.addEventListener('click', () => {
+            levelOutput.select();
+            document.execCommand('copy');
+            copyButton.textContent = 'Copié !';
+            setTimeout(() => {
+                copyButton.textContent = 'Copier le Code';
+            }, 1500);
+        });
+
+        exportJsonButton.addEventListener('click', exportLevelAsJson);
+
+        levelOutput.addEventListener('input', parseLevelCode);
+
+        solidBlockColorPicker.addEventListener('input', (event) => {
+            if (gameRunning) return;
+            currentSolidBlockColor = event.target.value;
+            updateSolidBlockPaletteColorPreview();
+            document.querySelector('.palette-item.selected')?.classList.remove('selected');
+            document.querySelector('.palette-item[data-tile-type="1"]').classList.add('selected');
+            selectedTileType = 1;
+        });
+
+        toggleMapSizeButton.addEventListener('click', () => {
+            if (gameRunning) return; // Ne pas permettre de changer la taille pendant le jeu
+            currentMapSizeIndex = (currentMapSizeIndex + 1) % mapConfigs.length;
+            initializeEditor(); // Réinitialise l'éditeur avec la nouvelle taille
+        });
+
+        // --- Fonctions de jeu ---
+        function startGame() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+
+            // Deep copy of the editor grid to game grid
+            gameGrid = JSON.parse(JSON.stringify(editorGrid));
+            activeTnts = [];
+
+            let playerSpawnX = TILE_SIZE * 2;
+            let playerSpawnY = canvas.height - TILE_SIZE * 4;
+
+            if (spawnPoint.row !== -1 && spawnPoint.col !== -1) {
+                playerSpawnX = spawnPoint.col * TILE_SIZE + (TILE_SIZE - player.width) / 2;
+                playerSpawnY = spawnPoint.row * TILE_SIZE + (TILE_SIZE - player.height) - 2; // -2 pour éviter la collision directe avec la tuile
+                // Ensure spawn point is cleared in gameGrid if it was a block in editorGrid
+                if (typeof gameGrid[spawnPoint.row][spawnPoint.col] !== 'number' || gameGrid[spawnPoint.row][spawnPoint.col] !== 0) {
+                    gameGrid[spawnPoint.row][spawnPoint.col] = 0; 
+                }
+            } else {
+                console.warn("Aucun point d'apparition défini. Le joueur démarrera à une position par défaut.");
+            }
+
+            player.x = playerSpawnX;
+            player.y = playerSpawnY;
+            player.velX = 0;
+            player.velY = 0;
+            player.onGround = false;
+
+            gameRunning = true;
+            gameOverlay.style.display = 'none';
+            toggleUiVisibility(false);
+
+            animationFrameId = requestAnimationFrame(updateGame);
+        }
+
+        function exitGame() {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            gameRunning = false;
+            gameOverlay.style.display = 'none';
+            toggleUiVisibility(true);
+            drawEditorGrid();
+
+            // Clear player movement state
+            keys.left = false;
+            keys.right = false;
+            keys.up = false;
+            playerClickedOrb = false; // Reset orb click state
+        }
+
+        function gameOver(messageTitle, messageBody) {
+            gameRunning = false;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+            
+            overlayTitle.textContent = messageTitle || "GAME OVER";
+            overlayMessage.textContent = messageBody || "Tu as été vaincu !";
+            gameOverlay.style.display = 'flex';
+
+            // Return to editor after a short delay
+            setTimeout(() => {
+                exitGame();
+            }, 1500);
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let row = 0; row < gameGrid.length; row++) {
+                for (let col = 0; col < gameGrid[row].length; col++) {
+                    const tile = gameGrid[row][col];
+                    let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
+                    const x = col * TILE_SIZE;
+                    const y = row * TILE_SIZE;
+                    let tileRotation = 0; // Default for non-spike tiles
+
+                    if (typeof tile === 'object' && tile !== null) {
+                        if (tile.type === TILE_SPIKE) {
+                            tileRotation = tile.rotation || 0;
+                        }
+                    }
+
+                    if (tileType === 1) {
+                        ctx.fillStyle = (typeof tile === 'object' && tile !== null) ? tile.color : DEFAULT_SOLID_BLOCK_COLOR;
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = ctx.fillStyle;
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                    } else if (tileType === TILE_SPIKE) {
+                        ctx.save();
+                        ctx.translate(x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                        ctx.rotate(tileRotation * Math.PI / 180);
+                        ctx.fillStyle = '#808080';
+                        ctx.beginPath();
+                        ctx.moveTo(-TILE_SIZE / 2, TILE_SIZE / 2);
+                        ctx.lineTo(0, -TILE_SIZE / 2);
+                        ctx.lineTo(TILE_SIZE / 2, TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#696969';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.restore();
+                    } else if (tileType === 3) {
+                        ctx.fillStyle = '#FF4500';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#CC3700';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                    } else if (tileType === TILE_TNT_SOLID || tileType === TILE_TNT_NON_SOLID) {
+                        ctx.fillStyle = (tileType === TILE_TNT_SOLID) ? '#FF0000' : '#0000FF';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = (tileType === TILE_TNT_SOLID) ? '#CC0000' : '#0000CC';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText((tileType === TILE_TNT_SOLID) ? 'TNT' : 'TNT-', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+
+                        const tntState = activeTnts.find(t => t.row === row && t.col === col);
+                        if (tntState) {
+                            const elapsed = Date.now() - tntState.activatedAt;
+                            const timeLeft = TNT_EXPLOSION_DELAY - elapsed;
+
+                            if (timeLeft > 0) {
+                                const flashInterval = 100;
+                                if (Math.floor(elapsed / flashInterval) % 2 === 0) {
+                                    ctx.strokeStyle = '#FFFF00';
+                                    ctx.lineWidth = 4;
+                                    ctx.strokeRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                                }
+                                const secondsLeft = Math.ceil(timeLeft / 1000);
+                                ctx.fillStyle = 'black';
+                                ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
+                                ctx.fillText(secondsLeft.toString(), x + TILE_SIZE / 2, y + TILE_SIZE * 0.25);
+                            }
+                        }
+                    }
+                    else if (tileType === TILE_JUMP_PAD_SMALL) {
+                        ctx.fillStyle = '#FFC0CB';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#E0B0C4';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'black';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_JUMP_PAD_MEDIUM) {
+                        ctx.fillStyle = '#FFFF00';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#E0E000';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'black';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_JUMP_PAD_HIGH) {
+                        ctx.fillStyle = '#FF0000';
+                        ctx.fillRect(x, y + TILE_SIZE / 2, TILE_SIZE, TILE_SIZE / 2);
+                        ctx.beginPath();
+                        ctx.moveTo(x, y + TILE_SIZE / 2);
+                        ctx.lineTo(x + TILE_SIZE / 2, y);
+                        ctx.lineTo(x + TILE_SIZE, y + TILE_SIZE / 2);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.strokeStyle = '#CC0000';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('^^^', x + TILE_SIZE / 2, y + TILE_SIZE * 0.6);
+                    }
+                    else if (tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) {
+                        let orbColor;
+                        let textColor = 'white';
+                        if (tileType === TILE_ORB_SMALL_JUMP) {
+                            orbColor = '#FF69B4'; // Hot Pink
+                        } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
+                            orbColor = '#FFD700'; // Gold
+                            textColor = 'black';
+                        } else { // TILE_ORB_HIGH_JRB
+                            orbColor = '#DC143C'; // Crimson
+                        }
+                        ctx.fillStyle = orbColor;
+                        ctx.beginPath();
+                        ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 2 * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#555';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        ctx.fillStyle = textColor;
+                        ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('O', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    }
+                    else if (tileType === TILE_END) {
+                        ctx.fillStyle = '#32CD32';
+                        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeStyle = '#228B22';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+                        ctx.fillStyle = 'white';
+                        ctx.font = `${TILE_SIZE * 0.5}px 'Press Start 2P'`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('FIN', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
                     }
                 }
             }
 
-            // Draw active TNTs (they are drawn on top of their original tile)
-            activeTnts.forEach(tnt => {
-                const x = tnt.col * TILE_SIZE;
-                const y = tnt.row * TILE_SIZE;
-                ctx.fillStyle = 'rgba(255, 100, 0, 0.7)'; // Orange translucent
-                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                ctx.fillStyle = 'white';
-                ctx.font = `${TILE_SIZE * 0.6}px 'Press Start 2P'`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('X', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
-            });
-
-            drawPlayer(); // Draw player last to ensure it's on top
-        }
-
-        function drawPlayer() {
             ctx.fillStyle = player.color;
             ctx.fillRect(player.x, player.y, player.width, player.height);
         }
 
-        function update() {
-            // Apply gravity
-            player.velY += GRAVITY;
+        // --- Utility function for collision detection (AABB) ---
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.width &&
+                   obj1.x + obj1.width > obj2.x &&
+                   obj1.y < obj2.y + obj2.height &&
+                   obj1.y + obj1.height > obj2.y;
+        }
 
-            // Apply horizontal movement
+        // Function to check collision between a player AABB and a rotated triangle (spike)
+        function checkSpikeCollision(playerRect, spikeTriangle, spikeRotation) {
+            // Player's corners
+            const px1 = playerRect.x;
+            const py1 = playerRect.y;
+            const px2 = playerRect.x + playerRect.width;
+            const py2 = playerRect.y + playerRect.height;
+
+            // Spike triangle vertices (relative to tile top-left)
+            let v1, v2, v3;
+            // Base vertices for a spike pointing upwards (rotation 0)
+            const baseV1 = { x: 0, y: TILE_SIZE };
+            const baseV2 = { x: TILE_SIZE / 2, y: 0 };
+            const baseV3 = { x: TILE_SIZE, y: TILE_SIZE };
+
+            // Rotate and translate spike vertices to world coordinates
+            const centerX = spikeTriangle.tileX + TILE_SIZE / 2;
+            const centerY = spikeTriangle.tileY + TILE_SIZE / 2;
+
+            function rotatePoint(point, angleInRadians, cx, cy) {
+                const cos = Math.cos(angleInRadians);
+                const sin = Math.sin(angleInRadians);
+                const nx = (point.x - cx) * cos - (point.y - cy) * sin + cx;
+                const ny = (point.x - cx) * sin + (point.y - cy) * cos + cy;
+                return { x: nx, y: ny };
+            }
+
+            const angleRad = spikeRotation * Math.PI / 180;
+
+            v1 = rotatePoint({ x: spikeTriangle.tileX + baseV1.x, y: spikeTriangle.tileY + baseV1.y }, angleRad, centerX, centerY);
+            v2 = rotatePoint({ x: spikeTriangle.tileX + baseV2.x, y: spikeTriangle.tileY + baseV2.y }, angleRad, centerX, centerY);
+            v3 = rotatePoint({ x: spikeTriangle.tileX + baseV3.x, y: spikeTriangle.tileY + baseV3.y }, angleRad, centerX, centerY);
+            
+            // Check for AABB-triangle collision
+            // A simple way is to check if any of the player's corners are inside the triangle,
+            // or if any of the triangle's edges intersect the player's AABB.
+            // For simplicity, we'll implement a basic check that covers most common cases:
+            // Check if player's AABB overlaps with the bounding box of the triangle,
+            // then a more precise (but still simplified) point-in-triangle check
+            // or edge-intersection for the player's bottom/top edge if spike is pointing up/down.
+
+            // Get the bounding box of the rotated triangle
+            const minX = Math.min(v1.x, v2.x, v3.x);
+            const maxX = Math.max(v1.x, v2.x, v3.x);
+            const minY = Math.min(v1.y, v2.y, v3.y);
+            const maxY = Math.max(v1.y, v2.y, v3.y);
+
+            const triangleBBox = { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+
+            if (!checkCollision(playerRect, triangleBBox)) {
+                return false; // No collision with bounding box, so no collision with triangle
+            }
+
+            // More detailed collision check (Point in Triangle for Player corners)
+            // This is simplified and might not catch all edge cases,
+            // but is a good start for typical spike interactions.
+            // Using barycentric coordinates or cross products for point-in-triangle test.
+            
+            function pointInTriangle(px, py, ax, ay, bx, by, cx, cy) {
+                // Calculate barycentric coordinates
+                const s = ax * cy - ay * cx + (cy - ay) * px + (ax - cx) * py;
+                const t = ay * bx - ax * by + (ax - bx) * py + (by - ay) * px;
+
+                if ((s < 0) != (t < 0) && (s < 0) != (s + t > 0)) {
+                    return false;
+                }
+                return true;
+            }
+
+            // Check player's bottom-center point for upward spikes (rotation 0)
+            if (spikeRotation === 0) { // Spike points upwards, player hits from top
+                const playerBottomCenter = { x: playerRect.x + playerRect.width / 2, y: playerRect.y + playerRect.height };
+                if (playerRect.y + playerRect.height > spikeTriangle.tileY + TILE_SIZE / 2 && // Player lower than spike mid-y
+                    pointInTriangle(playerBottomCenter.x, playerBottomCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
+                    return true;
+                }
+            } 
+            // Check player's top-center point for downward spikes (rotation 180)
+            else if (spikeRotation === 180) { // Spike points downwards, player hits from bottom
+                const playerTopCenter = { x: playerRect.x + playerRect.width / 2, y: playerRect.y };
+                 if (playerRect.y < spikeTriangle.tileY + TILE_SIZE / 2 && // Player higher than spike mid-y
+                     pointInTriangle(playerTopCenter.x, playerTopCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
+                    return true;
+                }
+            }
+            // Check player's right-center point for leftward spikes (rotation 270)
+            else if (spikeRotation === 270) { // Spike points left, player hits from right
+                const playerRightCenter = { x: playerRect.x + playerRect.width, y: playerRect.y + playerRect.height / 2 };
+                if (playerRect.x + playerRect.width > spikeTriangle.tileX + TILE_SIZE / 2 && // Player further right than spike mid-x
+                    pointInTriangle(playerRightCenter.x, playerRightCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
+                    return true;
+                }
+            }
+            // Check player's left-center point for rightward spikes (rotation 90)
+            else if (spikeRotation === 90) { // Spike points right, player hits from left
+                const playerLeftCenter = { x: playerRect.x, y: playerRect.y + playerRect.height / 2 };
+                if (playerRect.x < spikeTriangle.tileX + TILE_SIZE / 2 && // Player further left than spike mid-x
+                    pointInTriangle(playerLeftCenter.x, playerLeftCenter.y, v1.x, v1.y, v2.x, v2.y, v3.x, v3.y)) {
+                    return true;
+                }
+            }
+            // Fallback for general AABB intersection if more precise check isn't applicable
+            // For now, this handles the main directions. A more robust solution involves
+            // checking all player corners against the triangle and all triangle edges against the player AABB.
+            
+            return false;
+        }
+
+
+        function activateTnt(row, col, type) {
+            if (!activeTnts.some(t => t.row === row && t.col === col)) {
+                activeTnts.push({ row, col, type, activatedAt: Date.now() });
+            }
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+
+            // Update player horizontal velocity
             if (keys.left) {
                 player.velX = -PLAYER_SPEED;
             } else if (keys.right) {
@@ -827,413 +1549,274 @@
                 player.velX = 0;
             }
 
-            // Update player position
+            // Apply gravity
+            player.velY += GRAVITY;
+            
+            // Move player horizontally and check for collisions
             player.x += player.velX;
-            player.y += player.velY;
 
-            player.onGround = false; // Assume not on ground unless collision detected
-
-            // Collision detection and response
-            const playerLeft = player.x;
-            const playerRight = player.x + player.width;
-            const playerTop = player.y;
-            const playerBottom = player.y + player.height;
-
-            for (let row = 0; row < GRID_ROWS; row++) {
-                for (let col = 0; col < GRID_COLS; col++) {
+            for (let row = 0; row < gameGrid.length; row++) {
+                for (let col = 0; col < gameGrid[row].length; col++) {
                     const tile = gameGrid[row][col];
-                    const tileX = col * TILE_SIZE;
-                    const tileY = row * TILE_SIZE;
+                    let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
 
-                    let tileType;
-                    if (typeof tile === 'object' && tile !== null) {
-                        tileType = tile.type;
-                    } else {
-                        tileType = tile;
-                    }
+                    if (tileType === 1 || tileType === TILE_TNT_SOLID) { // Only solid blocks affect horizontal movement
+                        const tileX = col * TILE_SIZE;
+                        const tileY = row * TILE_SIZE;
+                        const tileObj = { x: tileX, y: tileY, width: TILE_SIZE, height: TILE_SIZE };
 
-                    // Only check collision with solid blocks (type 1) and TNT_SOLID (type 5)
-                    if (tileType === TILE_SOLID_BLOCK || tileType === TILE_TNT_SOLID) {
-                        // AABB collision detection
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE) {
-
-                            // Resolve collision
-                            const overlapX = Math.min(playerRight - tileX, (tileX + TILE_SIZE) - playerLeft);
-                            const overlapY = Math.min(playerBottom - tileY, (tileY + TILE_SIZE) - playerTop);
-
-                            if (overlapX < overlapY) {
-                                // Horizontal collision
-                                if (player.velX > 0) {
-                                    player.x -= overlapX;
-                                } else if (player.velX < 0) {
-                                    player.x += overlapX;
-                                }
-                                player.velX = 0;
-                            } else {
-                                // Vertical collision
-                                if (player.velY > 0) { // Falling onto a block
-                                    player.y -= overlapY;
-                                    player.velY = 0;
-                                    player.onGround = true;
-                                } else if (player.velY < 0) { // Hitting head on a block
-                                    player.y += overlapY;
-                                    player.velY = 0;
-                                }
+                        if (checkCollision(player, tileObj)) {
+                            // Resolve horizontal collision
+                            if (player.velX > 0) { // Moving right
+                                player.x = tileX - player.width;
+                            } else if (player.velX < 0) { // Moving left
+                                player.x = tileX + TILE_SIZE;
                             }
-                        }
-                    } else if (tileType === TILE_END) {
-                        // Collision with end block
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE) {
-                            showOverlay("Niveau Terminé !", "Félicitations, Ninja !", "Rejouer");
-                            gameRunning = false; // Stop the game
-                        }
-                    }
-                    // If player is on a TNT, activate it.
-                    if (tileType === TILE_TNT_SOLID || tileType === TILE_TNT_NON_SOLID) {
-                        if (playerBottom > tileY && playerTop < tileY + TILE_SIZE &&
-                            playerRight > tileX && playerLeft < tileX + TILE_SIZE) {
-                            
-                            const existingTnt = activeTnts.find(t => t.row === row && t.col === col);
-                            if (!existingTnt) {
-                                activeTnts.push({ row, col, type: tileType, activatedAt: Date.now() });
-                            }
-                        }
-                    }
+                            player.velX = 0; // Stop horizontal movement on collision
 
-                    // Collision with Jump Pads
-                    if (tileType === TILE_JUMP_PAD_SMALL || tileType === TILE_JUMP_PAD_MEDIUM || tileType === TILE_JUMP_PAD_HIGH) {
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE &&
-                            player.velY > 0) { // Only trigger if falling onto it
-                            
-                            if (tileType === TILE_JUMP_PAD_SMALL) {
-                                player.velY = JUMP_POWER_SMALL;
-                            } else if (tileType === TILE_JUMP_PAD_MEDIUM) {
-                                player.velY = JUMP_POWER_MEDIUM;
-                            } else if (tileType === TILE_JUMP_PAD_HIGH) {
-                                player.velY = JUMP_POWER_HIGH;
+                            if (tileType === TILE_TNT_SOLID) {
+                                activateTnt(row, col, tileType);
                             }
-                            player.onGround = false; // Player is now airborne
-                        }
-                    }
-
-                    // Collision with Orbs
-                    if ((tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) && !playerClickedOrb) {
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE) {
-                            
-                            playerClickedOrb = true; // Mark orb as clicked
-
-                            if (tileType === TILE_ORB_SMALL_JUMP) {
-                                player.velY = JUMP_POWER_SMALL;
-                            } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
-                                player.velY = JUMP_POWER_MEDIUM;
-                            } else if (tileType === TILE_ORB_HIGH_JUMP) {
-                                player.velY = JUMP_POWER_HIGH;
-                            }
-                            // Remove the orb from the game grid
-                            gameGrid[row][col] = TILE_EMPTY; // Set to empty tile
-                            setTimeout(() => { playerClickedOrb = false; }, ORB_COOLDOWN);
-                        }
-                    }
-                    // Collision with spikes
-                    if (tileType === TILE_SPIKE) {
-                        // AABB check first, then more precise check if needed
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE) {
-                            // Detailed spike collision based on player position relative to spike
-                            // This part is complex and needs precise geometric checks based on spike rotation.
-                            // For simplicity, a direct AABB collision with a spike means death for now.
-                            // This would be the place to implement triangle-point or triangle-rectangle collision.
-                            showOverlay("Game Over", "Vous avez touché les pics !", "Rejouer");
-                            gameRunning = false;
-                        }
-                    }
-                    // Collision with Lava
-                    if (tileType === TILE_LAVA) { // Lava
-                        if (playerRight > tileX && playerLeft < tileX + TILE_SIZE &&
-                            playerBottom > tileY && playerTop < tileY + TILE_SIZE) {
-                            showOverlay("Game Over", "Vous êtes tombé dans la lave !", "Rejouer");
-                            gameRunning = false;
                         }
                     }
                 }
             }
 
-            // Update active TNTs
-            const currentTime = Date.now();
-            activeTnts = activeTnts.filter(tnt => {
-                if (currentTime - tnt.activatedAt >= TNT_EXPLOSION_DELAY) {
-                    explodeTnt(tnt.row, tnt.col);
-                    return false; // Remove this TNT
+            // Move player vertically and check for collisions
+            player.y += player.velY;
+            player.onGround = false; // Reset onGround each frame
+
+            for (let row = 0; row < gameGrid.length; col++) { // Changed r,c to row,col for consistency
+                for (let col = 0; col < gameGrid[row].length; col++) {
+                    const tile = gameGrid[row][col];
+                    let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
+                    const tileX = col * TILE_SIZE;
+                    const tileY = row * TILE_SIZE;
+                    let tileObj = { x: tileX, y: tileY, width: TILE_SIZE, height: TILE_SIZE };
+                    let tileRotation = (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) ? (tile.rotation || 0) : 0;
+
+                    // Adjust tileObj for orbs to have a larger hitbox
+                    if (tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) {
+                        const ORB_HITBOX_SCALE = 1.5; // Example: 150% larger hitbox
+                        const scaledSize = TILE_SIZE * ORB_HITBOX_SCALE;
+                        const offset = (scaledSize - TILE_SIZE) / 2;
+                        tileObj = {
+                            x: tileX - offset,
+                            y: tileY - offset,
+                            width: scaledSize,
+                            height: scaledSize
+                        };
+                    }
+
+
+                    const isCollidingWithTile = checkCollision(player, tileObj);
+
+                    if (tileType === 1 || tileType === TILE_TNT_SOLID || tileType === TILE_JUMP_PAD_SMALL || tileType === TILE_JUMP_PAD_MEDIUM || tileType === TILE_JUMP_PAD_HIGH) {
+                        if (isCollidingWithTile) {
+                            if (player.velY > 0) { // Falling and hit a block from top
+                                player.y = tileY - player.height;
+                                player.velY = 0;
+                                player.onGround = true;
+
+                                if (tileType === TILE_TNT_SOLID) {
+                                    activateTnt(row, col, tileType);
+                                } else if (tileType === TILE_JUMP_PAD_SMALL) {
+                                    player.velY = JUMP_POWER_SMALL;
+                                    player.onGround = false; // Player is jumping
+                                } else if (tileType === TILE_JUMP_PAD_MEDIUM) {
+                                    player.velY = JUMP_POWER_MEDIUM;
+                                    player.onGround = false;
+                                } else if (tileType === TILE_JUMP_PAD_HIGH) {
+                                    player.velY = JUMP_POWER_HIGH;
+                                    player.onGround = false;
+                                }
+                            } else if (player.velY < 0) { // Jumping and hit a block from bottom
+                                player.y = tileY + TILE_SIZE;
+                                player.velY = 0;
+                                if (tileType === TILE_TNT_SOLID) {
+                                    activateTnt(row, col, tileType);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Orb activation (player "jumps" on it and "clicks")
+                    if ((tileType === TILE_ORB_SMALL_JUMP || tileType === TILE_ORB_MEDIUM_JUMP || tileType === TILE_ORB_HIGH_JUMP) && isCollidingWithTile && playerClickedOrb) {
+                        if (player.velY >= 0 || player.onGround) {
+                            if (tileType === TILE_ORB_SMALL_JUMP) {
+                                player.velY = JUMP_POWER_SMALL;
+                                player.onGround = false;
+                            } else if (tileType === TILE_ORB_MEDIUM_JUMP) {
+                                player.velY = JUMP_POWER_MEDIUM;
+                                player.onGround = false;
+                            } else if (tileType === TILE_ORB_HIGH_JUMP) {
+                                player.velY = JUMP_POWER_HIGH;
+                                player.onGround = false;
+                            }
+                        }
+                    }
+
+                    // TNT Non-Solide activation (player "traverses" it)
+                    if (tileType === TILE_TNT_NON_SOLID && isCollidingWithTile) {
+                        activateTnt(row, col, tileType);
+                    }
+
+                    // End block check
+                    if (tileType === TILE_END && isCollidingWithTile) {
+                        gameOver("Niveau Terminé !", "Félicitations, tu as atteint la fin !");
+                        return;
+                    }
                 }
-                return true; // Keep active
-            });
+            }
+
+            // Reset playerClickedOrb after checking for orb activation
+            if (playerClickedOrb) {
+                playerClickedOrb = false;
+            }
+
+            // Process active TNTs
+            for (let i = activeTnts.length - 1; i >= 0; i--) {
+                const tnt = activeTnts[i];
+                if (Date.now() - tnt.activatedAt >= TNT_EXPLOSION_DELAY) {
+                    explodeTnt(tnt.row, tnt.col);
+                    activeTnts.splice(i, 1); // Remove exploded TNT
+                    if (!gameRunning) return; 
+                }
+            }
+
+            // Check for collision with hazards (spikes, lava) after all movements are resolved
+            for (let row = 0; row < gameGrid.length; row++) {
+                for (let col = 0; col < gameGrid[row].length; col++) {
+                    const tile = gameGrid[row][col];
+                    let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
+                    const tileX = col * TILE_SIZE;
+                    const tileY = row * TILE_SIZE;
+                    const tileObj = { x: tileX, y: tileY, width: TILE_SIZE, height: TILE_SIZE };
+
+                    if (tileType === 3 && checkCollision(player, tileObj)) { // Lava
+                        gameOver("GAME OVER", "Tu as touché la lave !");
+                        return;
+                    } else if (tileType === TILE_SPIKE) { // Spikes with rotation
+                        const spikeRotation = tile.rotation || 0;
+                        const playerRect = { x: player.x, y: player.y, width: player.width, height: player.height };
+                        const spikeTriangle = { tileX: tileX, tileY: tileY };
+
+                        if (checkSpikeCollision(playerRect, spikeTriangle, spikeRotation)) {
+                            gameOver("GAME OVER", "Tu as été empalé par un pic !");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // Keep player within canvas horizontal bounds
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+
+            // Check if player falls off the bottom of the screen
+            if (player.y + player.height > canvas.height + TILE_SIZE) {
+                gameOver("GAME OVER", "Tu es tombé dans le vide !");
+                return;
+            }
+
+            drawGame();
+            animationFrameId = requestAnimationFrame(updateGame);
         }
 
         function explodeTnt(tntRow, tntCol) {
-            // Remove the TNT block from the game grid
-            gameGrid[tntRow][tntCol] = TILE_EMPTY;
+            gameGrid[tntRow][tntCol] = 0;
 
-            // Define explosion radius (e.g., 1 tile in all directions)
-            const explosionRadius = 1;
+            const startRow = Math.max(0, tntRow - TNT_EXPLOSION_RADIUS);
+            const endRow = Math.min(GRID_ROWS - 1, tntRow + TNT_EXPLOSION_RADIUS);
+            const startCol = Math.max(0, tntCol - TNT_EXPLOSION_RADIUS);
+            const endCol = Math.min(GRID_COLS - 1, tntCol + TNT_EXPLOSION_RADIUS);
 
-            for (let r = tntRow - explosionRadius; r <= tntRow + explosionRadius; r++) {
-                for (let c = tntCol - explosionRadius; c <= tntCol + explosionRadius; c++) {
-                    // Check bounds
-                    if (r >= 0 && r < GRID_ROWS && c >= 0 && c < GRID_COLS) {
-                        const affectedTile = gameGrid[r][c];
-                        let affectedTileType;
-                        if (typeof affectedTile === 'object' && affectedTile !== null) {
-                            affectedTileType = affectedTile.type;
-                        } else {
-                            affectedTileType = affectedTile;
-                        }
+            const playerTileRow = Math.floor((player.y + player.height / 2) / TILE_SIZE);
+            const playerTileCol = Math.floor((player.x + player.width / 2) / TILE_SIZE);
 
-                        // Destroy solid blocks and non-solid TNTs, but not player, spawn, end, etc.
-                        if (affectedTileType === TILE_SOLID_BLOCK ||
-                            affectedTileType === TILE_TNT_SOLID ||
-                            affectedTileType === TILE_TNT_NON_SOLID) {
-                            gameGrid[r][c] = TILE_EMPTY;
-                        }
-                    }
-                }
-            }
-
-            // Check if player is within explosion radius
-            const playerCenter = {
-                x: player.x + player.width / 2,
-                y: player.y + player.height / 2
-            };
-            const tntCenter = {
-                x: tntCol * TILE_SIZE + TILE_SIZE / 2,
-                y: tntRow * TILE_SIZE + TILE_SIZE / 2
-            };
-
-            const distance = Math.sqrt(
-                Math.pow(playerCenter.x - tntCenter.x, 2) +
-                Math.pow(playerCenter.y - tntCenter.y, 2)
-            );
-
-            // If player is within 1.5 tiles (approx) of the explosion center, game over
-            if (distance < TILE_SIZE * 1.5) {
-                showOverlay("Game Over", "Vous avez été pris dans l'explosion !", "Rejouer");
-                gameRunning = false;
-            }
-        }
-
-
-        function animate() {
-            if (!gameRunning) {
+            if (playerTileRow >= startRow && playerTileRow <= endRow &&
+                playerTileCol >= startCol && playerTileCol <= endCol) {
+                
+                gameOver("KABOOM !", "Tu as été soufflé par la TNT !");
                 return;
             }
-            update();
-            drawGame();
-            animationFrameId = requestAnimationFrame(animate);
-        }
 
-        // --- Event Listeners ---
+            for (let r = startRow; r <= endRow; r++) {
+                for (let c = startCol; c <= endCol; c++) {
+                    if ((r === spawnPoint.row && c === spawnPoint.col) || (r === endPoint.row && c === endPoint.col)) {
+                        continue; 
+                    }
 
-        applyGridConfigButton.addEventListener('click', applyMapConfig);
-        clearGridButton.addEventListener('click', () => {
-            initializeEditor(); // Réinitialise la grille
-            showOverlay("Grille Effacée", "La grille a été effacée. Un sol par défaut a été créé.", "OK");
-        });
+                    const tile = gameGrid[r][c];
+                    let tileType = (typeof tile === 'object' && tile !== null) ? tile.type : tile;
 
-        copyCodeButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(levelCodeOutput.textContent).then(() => {
-                showOverlay("Code Copié", "Le code du niveau a été copié dans le presse-papiers !", "OK");
-            }).catch(err => {
-                console.error('Erreur lors de la copie : ', err);
-                showOverlay("Erreur", "Impossible de copier le code.", "OK");
-            });
-        });
-
-        importLevelButton.addEventListener('click', () => {
-            importLevelCodeTextarea.style.display = 'block';
-            loadLevelFromImportButton.style.display = 'block';
-            showOverlay("Importer Niveau", "Collez le code du niveau ci-dessous et cliquez sur 'Charger'.", "Fermer");
-            overlayButton.onclick = () => { // Personnaliser le bouton Fermer pour l'import
-                gameOverlay.style.display = 'none';
-                importLevelCodeTextarea.style.display = 'none';
-                loadLevelFromImportButton.style.display = 'none';
-            };
-        });
-
-        loadLevelFromImportButton.addEventListener('click', () => {
-            loadLevelCode(importLevelCodeTextarea.value);
-            importLevelCodeTextarea.style.display = 'none';
-            loadLevelFromImportButton.style.display = 'none';
-        });
-
-        // Génération des items de la palette
-        const paletteItems = [
-            { type: TILE_SOLID_BLOCK, color: DEFAULT_SOLID_BLOCK_COLOR, name: 'Bloc Solide', class: 'solid-block' },
-            { type: TILE_LAVA, color: DEFAULT_LAVA_COLOR, name: 'Lave', class: 'lava' },
-            { type: TILE_SPIKE, name: 'Pics', class: 'spike' },
-            { type: TILE_PLAYER_SPAWN, color: DEFAULT_PLAYER_SPAWN_COLOR, name: 'Spawn Joueur', class: 'player-spawn' },
-            { type: TILE_END, color: DEFAULT_END_COLOR, name: 'Fin', class: 'end-block' },
-            { type: TILE_TNT_SOLID, color: DEFAULT_TNT_SOLID_COLOR, name: 'TNT Solide', class: 'tnt-solid' },
-            { type: TILE_TNT_NON_SOLID, color: DEFAULT_TNT_NON_SOLID_COLOR, name: 'TNT Non-Solide', class: 'tnt-non-solid' },
-            { type: TILE_JUMP_PAD_SMALL, color: DEFAULT_JUMP_PAD_SMALL_COLOR, name: 'Jump Pad S', class: 'jump-pad-small' },
-            { type: TILE_JUMP_PAD_MEDIUM, color: DEFAULT_JUMP_PAD_MEDIUM_COLOR, name: 'Jump Pad M', class: 'jump-pad-medium' },
-            { type: TILE_JUMP_PAD_HIGH, color: DEFAULT_JUMP_PAD_HIGH_COLOR, name: 'Jump Pad L', class: 'jump-pad-high' },
-            { type: TILE_ORB_SMALL_JUMP, color: DEFAULT_ORB_SMALL_JUMP_COLOR, name: 'Orbe S', class: 'orb-small-jump' },
-            { type: TILE_ORB_MEDIUM_JUMP, color: DEFAULT_ORB_MEDIUM_JUMP_COLOR, name: 'Orbe M', class: 'orb-medium-jump' },
-            { type: TILE_ORB_HIGH_JUMP, color: DEFAULT_ORB_HIGH_JUMP_COLOR, name: 'Orbe L', class: 'orb-high-jump' }
-        ];
-
-        paletteItems.forEach(item => {
-            const div = document.createElement('div');
-            div.className = `palette-item ${item.class}`;
-            div.title = item.name;
-
-            if (item.type === TILE_SOLID_BLOCK) {
-                const colorInput = document.createElement('input');
-                colorInput.type = 'color';
-                colorInput.value = item.color;
-                colorInput.addEventListener('input', (e) => {
-                    selectedColor = e.target.value;
-                });
-                colorInput.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Empêche la sélection de l'item de palette quand on clique sur le color picker
-                    selectedTileType = item.type;
-                    updatePaletteSelection(div);
-                });
-                div.appendChild(colorInput);
-                div.classList.add('color-picker');
-            }
-
-            div.addEventListener('click', () => {
-                selectedTileType = item.type;
-                updatePaletteSelection(div);
-                // Si l'élément sélectionné est un pic, réinitialiser la rotation pour l'aperçu si nécessaire
-                if (selectedTileType === TILE_SPIKE) {
-                    rotation = 0; // Réinitialise la rotation par défaut pour le nouvel élément sélectionné
-                    // Pas de mise à jour visuelle directe sur le div de la palette,
-                    // la rotation s'applique au moment du dessin sur la grille.
-                }
-            });
-            palette.appendChild(div);
-        });
-
-        function updatePaletteSelection(selectedDiv) {
-            document.querySelectorAll('.palette-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            selectedDiv.classList.add('selected');
-        }
-        // Sélectionne le premier élément par défaut
-        if (palette.children.length > 0) {
-            updatePaletteSelection(palette.children[0]);
-        }
-
-
-        // --- Event Handlers for Editor Grid Drawing ---
-        canvas.addEventListener('mousedown', (e) => {
-            if (!gameRunning) {
-                currentDrawing = true;
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
-
-                const col = Math.floor(mouseX / TILE_SIZE);
-                const row = Math.floor(mouseY / TILE_SIZE);
-
-                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
-                    if (e.button === 0) { // Clic gauche
-                        // Gérer le placement des tuiles
-                        if (selectedTileType === TILE_PLAYER_SPAWN) {
-                            // Retirer l'ancien spawn point
-                            if (spawnPoint.row !== -1 && spawnPoint.col !== -1) {
-                                if (typeof editorGrid[spawnPoint.row][spawnPoint.col] === 'object' && editorGrid[spawnPoint.row][spawnPoint.col].type === TILE_PLAYER_SPAWN) {
-                                    editorGrid[spawnPoint.row][spawnPoint.col] = 0; // Remettre à vide
-                                }
-                            }
-                            spawnPoint = { row: row, col: col };
-                            editorGrid[row][col] = selectedTileType;
-                        } else if (selectedTileType === TILE_END) {
-                            // Retirer l'ancien end point
-                            if (endPoint.row !== -1 && endPoint.col !== -1) {
-                                if (typeof editorGrid[endPoint.row][endPoint.col] === 'object' && editorGrid[endPoint.row][endPoint.col].type === TILE_END) {
-                                    editorGrid[endPoint.row][endPoint.col] = 0; // Remettre à vide
-                                }
-                            }
-                            endPoint = { row: row, col: col };
-                            editorGrid[row][col] = selectedTileType;
-                        } else if (selectedTileType === TILE_SOLID_BLOCK) {
-                            // Bloc solide avec couleur personnalisée
-                            editorGrid[row][col] = { type: selectedTileType, color: selectedColor };
-                        } else if (selectedTileType === TILE_SPIKE) {
-                            // Pour les pics, il faut un objet pour stocker la rotation
-                            editorGrid[row][col] = { type: TILE_SPIKE, rotation: 0 };
-                        } else {
-                            // Autres tuiles simples
-                            editorGrid[row][col] = selectedTileType;
-                        }
-                    } else if (e.button === 2) { // Clic droit pour effacer
-                        editorGrid[row][col] = 0;
-                        if (spawnPoint.row === row && spawnPoint.col === col) {
-                            spawnPoint = { row: -1, col: -1 };
-                        }
-                        if (endPoint.row === row && endPoint.col === col) {
-                            endPoint = { row: -1, col: -1 };
+                    // IMPORTANT: Orbs are now permanent, so they are NOT destroyed by TNT
+                    if ((tileType === 1 || tileType === TILE_SPIKE || tileType === 3 || tileType === TILE_TNT_SOLID || tileType === TILE_TNT_NON_SOLID)) {
+                        gameGrid[r][c] = 0;
+                        const index = activeTnts.findIndex(t => t.row === r && t.col === c);
+                        if (index !== -1) {
+                            activeTnts.splice(index, 1);
                         }
                     }
-                    drawEditorGrid();
-                    generateLevelCode();
                 }
             }
-        });
+        }
 
-        canvas.addEventListener('mousemove', (e) => {
-            if (!gameRunning && currentDrawing && isSwipeMode) {
-                const rect = canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
+        function toggleUiVisibility(isEditorMode) {
+            editorUi.style.display = isEditorMode ? 'block' : 'none';
+            outputContainer.style.display = isEditorMode ? 'block' : 'none';
+            playLevelButton.style.display = isEditorMode ? 'block' : 'none';
+            exitGameButton.style.display = isEditorMode ? 'none' : 'block';
 
-                const col = Math.floor(mouseX / TILE_SIZE);
-                const row = Math.floor(mouseY / TILE_SIZE);
-
-                if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
-                    // Éviter de dessiner le spawn/end point en mode balayage pour éviter les erreurs
-                    if (selectedTileType === TILE_PLAYER_SPAWN || selectedTileType === TILE_END) {
-                        return; // Ne pas dessiner ces types en mode balayage
-                    }
-                    if (e.buttons === 1) { // Clic gauche enfoncé
-                        if (selectedTileType === TILE_SOLID_BLOCK) {
-                            editorGrid[row][col] = { type: selectedTileType, color: selectedColor };
-                        } else if (selectedTileType === TILE_SPIKE) {
-                            // Assurez-vous que l'objet tuile existe avant de tenter de définir la rotation
-                            if (typeof editorGrid[row][col] !== 'object' || editorGrid[row][col] === null || editorGrid[row][col].type !== TILE_SPIKE) {
-                                editorGrid[row][col] = { type: TILE_SPIKE, rotation: 0 };
-                            }
-                        } else {
-                            editorGrid[row][col] = selectedTileType;
-                        }
-                    } else if (e.buttons === 2) { // Clic droit enfoncé (pour effacer)
-                        editorGrid[row][col] = 0;
-                        if (spawnPoint.row === row && spawnPoint.col === col) {
-                            spawnPoint = { row: -1, col: -1 };
-                        }
-                        if (endPoint.row === row && endPoint.col === col) {
-                            endPoint = { row: -1, col: -1 };
-                        }
-                    }
-                    drawEditorGrid();
-                    generateLevelCode();
-                }
+            if (isEditorMode) {
+                canvas.addEventListener('mousedown', handleEditorMouseDown);
+                canvas.addEventListener('mouseup', handleEditorMouseUp);
+                canvas.addEventListener('mousemove', handleEditorMouseMove);
+                levelOutput.addEventListener('input', parseLevelCode);
+                solidBlockColorPicker.addEventListener('input', handleSolidBlockColorChange);
+                toggleMapSizeButton.style.display = 'block';
+                mapSizeDisplay.style.display = 'block';
+            } else {
+                canvas.removeEventListener('mousedown', handleEditorMouseDown);
+                canvas.removeEventListener('mouseup', handleEditorMouseUp);
+                canvas.removeEventListener('mousemove', handleEditorMouseMove);
+                levelOutput.removeEventListener('input', parseLevelCode);
+                solidBlockColorPicker.removeEventListener('input', handleSolidBlockColorChange);
+                toggleMapSizeButton.style.display = 'none';
+                mapSizeDisplay.style.display = 'none';
             }
-        });
+        }
 
-        canvas.addEventListener('mouseup', () => {
-            currentDrawing = false;
-        });
+        function handleEditorMouseDown(e) {
+            isMouseDown = true;
+            if (e.button === 2) { // Right click
+                pickColorFromTile(e);
+            } else { // Left click
+                drawTile(e);
+            }
+        }
+
+        function handleEditorMouseUp() {
+            isMouseDown = false;
+        }
+
+        function handleEditorMouseMove(e) {
+            if (e.buttons === 1 && isSwipeMode) { // Check for left mouse button and swipe mode
+                drawTile(e);
+            }
+        }
+
+        function handleSolidBlockColorChange(event) {
+            if (gameRunning) return;
+            currentSolidBlockColor = event.target.value;
+            updateSolidBlockPaletteColorPreview();
+            document.querySelector('.palette-item.selected')?.classList.remove('selected');
+            document.querySelector('.palette-item[data-tile-type="1"]').classList.add('selected');
+            selectedTileType = 1;
+        }
 
         document.addEventListener('keydown', (e) => {
-            if (gameRunning) { // Only process input if game is running
+            if (gameRunning) {
                 if (e.code === 'ArrowLeft' || e.key === 'q') keys.left = true;
                 if (e.code === 'ArrowRight' || e.key === 'd') keys.right = true;
                 if (e.code === 'Space' || e.key === 'z' || e.code === 'ArrowUp') {
@@ -1241,27 +1824,27 @@
                         player.velY = JUMP_POWER;
                         player.onGround = false;
                     }
+                    playerClickedOrb = true;
                 }
             } else { // In editor mode
                 if (e.key === 't' || e.key === 'T') {
-                    isSwipeMode = !isSwipeMode; // Toggle swipe mode
-                    updateSwipeModeIndicator(); // Update indicator
+                    isSwipeMode = !isSwipeMode;
+                    updateSwipeModeIndicator();
                 }
-                if (e.key === 'r' || e.key === 'R') {
-                    // Rotate spike if a spike is selected in the palette AND we are drawing
-                    if (selectedTileType === TILE_SPIKE && currentDrawing) {
+                if (e.key === 'r' || e.key === 'R') { // New: Rotate spike
+                    if (selectedTileType === TILE_SPIKE && isMouseDown) {
+                         // Find the tile under the mouse and rotate it
                         const rect = canvas.getBoundingClientRect();
-                        const mouseX = event.clientX - rect.left;
-                        const mouseY = event.clientY - rect.top;
+                        const x = e.clientX - rect.left;
+                        const y = e.clientY - rect.top;
 
-                        const col = Math.floor(mouseX / TILE_SIZE);
-                        const row = Math.floor(mouseY / TILE_SIZE);
+                        const col = Math.floor(x / TILE_SIZE);
+                        const row = Math.floor(y / TILE_SIZE);
 
-                        if (col >= 0 && col < GRID_COLS && row >= 0 && row < GRID_ROWS) {
-                            // IMPORRTANT FIX HERE: Ensure the tile is an object and a spike type before rotating
-                            const currentTile = editorGrid[row][col];
-                            if (typeof currentTile === 'object' && currentTile !== null && currentTile.type === TILE_SPIKE) {
-                                currentTile.rotation = (currentTile.rotation + 90) % 360;
+                        if (row >= 0 && row < GRID_ROWS && col >= 0 && col < GRID_COLS) {
+                            const tile = editorGrid[row][col];
+                            if (typeof tile === 'object' && tile !== null && tile.type === TILE_SPIKE) {
+                                tile.rotation = ((tile.rotation || 0) + 90) % 360;
                                 drawEditorGrid();
                                 generateLevelCode();
                             }
@@ -1290,15 +1873,10 @@
         playLevelButton.addEventListener('click', startGame);
         exitGameButton.addEventListener('click', exitGame);
 
-        canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // Prevent right click context menu on canvas
-
-        function updateSwipeModeIndicator() {
-            swipeModeIndicator.textContent = `Mode Balayage: ${isSwipeMode ? 'Activé' : 'Désactivé'} (T)`;
-        }
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
         initializeEditor();
         toggleUiVisibility(true);
-        updateSwipeModeIndicator(); // Initial call to set the indicator text
     </script>
 </body>
 </html>
