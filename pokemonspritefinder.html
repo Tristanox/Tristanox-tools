@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chercher un Pokémon par nom (FR)</title>
+    <style>
+        /* Styles CSS modifiés avec la nouvelle palette de couleurs */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #1e2124; /* Couleur de fond la plus foncée */
+            color: #f0f0f0; /* Texte clair pour contraste */
+        }
+        .container {
+            background-color: #282b30; /* Fond du conteneur */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Ombre plus foncée */
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #424549; /* Bordure des champs de saisie */
+            border-radius: 4px;
+            width: 250px;
+            font-size: 16px;
+            background-color: #36393e; /* Fond des champs de saisie */
+            color: #f0f0f0; /* Texte des champs de saisie */
+        }
+        button {
+            padding: 10px 15px;
+            margin: 0 5px 20px 5px;
+            border: none;
+            border-radius: 44px;
+            background-color: #72da72; /* Couleur principale des boutons (vert) */
+            color: #1e2124; /* Texte foncé sur bouton clair pour contraste */
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, filter 0.3s ease; /* Ajout de transition pour le filtre */
+        }
+        button:hover {
+            filter: brightness(0.8); /* Assombrit légèrement le bouton au survol */
+        }
+        #pokemonImage {
+            margin-top: 20px;
+            max-width: 200px;
+            height: auto;
+            border: 1px solid #424549; /* Bordure de l'image Pokémon */
+            border-radius: 4px;
+            padding: 5px;
+            background-color: #36393e; /* Fond de l'image Pokémon */
+        }
+        #message {
+            color: red; /* Gardé en rouge pour les messages d'erreur */
+            margin-top: 10px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Permet aux boutons de passer à la ligne si l'espace est limité */
+        }
+        #loadingMessage {
+            color: #424549; /* Couleur initiale du message de chargement */
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trouvez votre Pokémon</h1>
+        <p>Entrez le nom d'un Pokémon (en français) et appuyez sur Entrée :</p>
+        <input type="text" id="pokemonNameInput" placeholder="Ex: Bulbizarre">
+        <div id="loadingMessage">Chargement des données...</div>
+        <div class="button-group">
+            <button id="normalSpriteBtn" style="display: none;">Normal</button>
+            <button id="shinySpriteBtn" style="display: none;">Shiny</button>
+            <button id="gigamaxSpriteBtn" style="display: none;">Gigamax</button>
+        </div>
+        <div id="megaButtonsContainer" class="button-group"></div> 
+
+        <div id="message"></div>
+        <img id="pokemonImage" src="" alt="Image du Pokémon" style="display: none;">
+    </div>
+
+    <script>
+        const pokemonNameInput = document.getElementById('pokemonNameInput');
+        const pokemonImage = document.getElementById('pokemonImage');
+        const messageDiv = document.getElementById('message');
+        const normalSpriteBtn = document.getElementById('normalSpriteBtn');
+        const shinySpriteBtn = document.getElementById('shinySpriteBtn');
+        const gigamaxSpriteBtn = document.getElementById('gigamaxSpriteBtn');
+        const megaButtonsContainer = document.getElementById('megaButtonsContainer');
+        const loadingMessageDiv = document.getElementById('loadingMessage');
+
+        let currentPokemonData = { 
+            base: null, 
+            gigantamax: null, 
+            mega: {} 
+        }; 
+        let pokemonNamesMap = new Map(); // Map: nom français -> nom anglais
+        let allPokemonDataFromJSON = []; // Nouvelle variable pour stocker les données du JSON local
+
+        // --- Fonctions d'initialisation et de chargement des données ---
+        async function initializeApplicationData() {
+            try {
+                // 1. Chargement de la carte des noms français/anglais depuis PokéAPI
+                loadingMessageDiv.textContent = "Chargement des noms de Pokémon (FR/EN)...";
+                const speciesResponse = await fetch('https://pokeapi.co/api/v2/pokemon-species/?limit=10000');
+                if (!speciesResponse.ok) {
+                    throw new Error("Impossible de charger la liste des espèces Pokémon.");
+                }
+                const speciesData = await speciesResponse.json();
+                const speciesUrls = speciesData.results.map(p => p.url);
+
+                const namePromises = speciesUrls.map(async url => {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    
+                    const frenchNameEntry = data.names.find(name => name.language.name === 'fr');
+                    const englishNameEntry = data.names.find(name => name.language.name === 'en');
+
+                    if (frenchNameEntry && englishNameEntry) {
+                        pokemonNamesMap.set(frenchNameEntry.name.toLowerCase(), englishNameEntry.name.toLowerCase());
+                    }
+                });
+
+                await Promise.all(namePromises);
+                loadingMessageDiv.textContent = "Noms de Pokémon chargés !";
+
+                // 2. Chargement des données complètes des Pokémon depuis le JSON local
+                loadingMessageDiv.textContent = "Chargement des données de sprites locales...";
+                const localJSONResponse = await fetch('https://raw.githubusercontent.com/Tristanox/GUN/refs/heads/main/ressources_spritefinder.json');
+                if (!localJSONResponse.ok) {
+                    throw new Error("Impossible de charger le fichier JSON local de ressources.");
+                }
+                allPokemonDataFromJSON = await localJSONResponse.json();
+                
+                loadingMessageDiv.textContent = "Données chargées ! Prêt.";
+                loadingMessageDiv.style.color = "#72da72"; 
+                setTimeout(() => { loadingMessageDiv.style.display = 'none'; }, 2000);
+
+            } catch (error) {
+                loadingMessageDiv.textContent = `Erreur lors du chargement des données : ${error.message}`;
+                loadingMessageDiv.style.color = "red";
+                console.error("Erreur de chargement :", error);
+            }
+        }
+
+        // Fonction pour afficher le sprite (normal, shiny, gigamax ou méga)
+        function displayPokemonSprite(type = 'normal', formKey = null) {
+            let dataToUse = null;
+            let altTextSuffix = "";
+
+            if (type === 'normal' || type === 'shiny') {
+                dataToUse = currentPokemonData.base;
+                altTextSuffix = type === 'normal' ? "" : " (Shiny)";
+            } else if (type === 'gigamax') {
+                dataToUse = currentPokemonData.gigantamax;
+                altTextSuffix = " (Gigamax)";
+            } else if (type === 'mega' && formKey && currentPokemonData.mega[formKey]) {
+                dataToUse = currentPokemonData.mega[formKey];
+                // Le formKey est le nom complet de la forme (ex: charizard-mega-x)
+                // On essaie d'extraire la partie 'mega-x' pour l'affichage
+                const displayFormName = formKey.split('-').slice(1).join(' ').toUpperCase(); // ex: MEGA X
+                altTextSuffix = ` (${displayFormName})`;
+            }
+
+            if (!dataToUse || !dataToUse.sprites) {
+                messageDiv.textContent = `Aucune donnée de sprite trouvée pour ce type de sprite (${type}${formKey ? ' - ' + formKey : ''}).`;
+                pokemonImage.style.display = 'none';
+                return;
+            }
+
+            let imageUrl = '';
+            // Utilise les sprites classiques (default et shiny)
+            if (type === 'shiny') {
+                imageUrl = dataToUse.sprites.shiny; // Utilise le champ 'shiny' de notre JSON
+            } else {
+                imageUrl = dataToUse.sprites.default; // Utilise le champ 'default' de notre JSON
+            }
+            // Les lignes pour 'official_artwork' ont été retirées ici pour ne pas les utiliser.
+            // Si vous souhaitez les réactiver pour une future option "artwork", vous pourriez les rajouter.
+
+
+            if (imageUrl) {
+                pokemonImage.src = imageUrl;
+                const baseFrenchNameEntry = Array.from(pokemonNamesMap.entries()).find(([frName, enName]) => enName === currentPokemonData.base.name);
+                const baseFrenchName = baseFrenchNameEntry ? baseFrenchNameEntry[0] : currentPokemonData.base.name;
+
+                pokemonImage.alt = `Image de ${baseFrenchName}${altTextSuffix}`;
+                pokemonImage.style.display = 'block';
+                messageDiv.textContent = ""; 
+            } else {
+                messageDiv.textContent = `Aucun sprite ${type}${formKey ? ' (' + formKey + ')' : ''} trouvé pour ce Pokémon.`;
+                pokemonImage.style.display = 'none';
+            }
+        }
+
+        // Fonction principale appelée quand on cherche un Pokémon
+        async function searchPokemon() {
+            const frenchPokemonName = pokemonNameInput.value.toLowerCase().trim();
+
+            // Réinitialise l'affichage et les données
+            messageDiv.textContent = "";
+            pokemonImage.style.display = 'none';
+            normalSpriteBtn.style.display = 'none';
+            shinySpriteBtn.style.display = 'none';
+            gigamaxSpriteBtn.style.display = 'none';
+            megaButtonsContainer.innerHTML = ''; // Vide le conteneur des boutons Méga
+            currentPokemonData = { base: null, gigantamax: null, mega: {} };
+
+            if (frenchPokemonName === "") {
+                messageDiv.textContent = "Veuillez entrer un nom de Pokémon.";
+                return;
+            }
+
+            const englishPokemonName = pokemonNamesMap.get(frenchPokemonName);
+
+            if (!englishPokemonName) {
+                messageDiv.textContent = `Pokémon "${frenchPokemonName}" non reconnu ou introuvable dans la liste des noms français.`;
+                return;
+            }
+
+            // Cherche le Pokémon de base dans les données chargées
+            const basePokemon = allPokemonDataFromJSON.find(p => p.name === englishPokemonName);
+
+            if (!basePokemon) {
+                messageDiv.textContent = `Impossible de trouver les données pour "${frenchPokemonName}" dans les ressources locales.`;
+                return;
+            }
+
+            currentPokemonData.base = basePokemon;
+
+            // Parcourt les formes pour trouver Gigamax et Méga
+            if (basePokemon.forms) {
+                for (const form of basePokemon.forms) {
+                    if (form.type === 'gigantamax' && form.sprites && form.sprites.default) {
+                        currentPokemonData.gigantamax = form;
+                    }
+                    if (form.type === 'mega' && form.sprites && form.sprites.default) {
+                        currentPokemonData.mega[form.name] = form; // Stocke par le nom complet de la forme
+                    }
+                }
+            }
+
+            // Affiche le sprite normal par défaut
+            displayPokemonSprite('normal');
+            normalSpriteBtn.style.display = 'inline-block';
+
+            // Affiche les boutons supplémentaires si les sprites correspondants existent
+            if (currentPokemonData.base.sprites.shiny) {
+                shinySpriteBtn.style.display = 'inline-block';
+            }
+            if (currentPokemonData.gigantamax) { 
+                gigamaxSpriteBtn.style.display = 'inline-block';
+            }
+
+            // Crée les boutons pour les formes Méga-Évolution
+            for (const formName in currentPokemonData.mega) {
+                if (currentPokemonData.mega.hasOwnProperty(formName)) {
+                    const megaButton = document.createElement('button');
+                    // Exemple: "charizard-mega-x" devient "Méga X"
+                    const displayFormText = formName.replace(englishPokemonName + '-', '').replace('-', ' ').toUpperCase();
+                    megaButton.textContent = `Méga ${displayFormText}`;
+                    megaButton.addEventListener('click', () => displayPokemonSprite('mega', formName));
+                    megaButtonsContainer.appendChild(megaButton);
+                }
+            }
+        }
+
+        // --- Écouteurs d'événements ---
+        pokemonNameInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchPokemon();
+            }
+        });
+
+        normalSpriteBtn.addEventListener('click', () => displayPokemonSprite('normal'));
+        shinySpriteBtn.addEventListener('click', () => displayPokemonSprite('shiny'));
+        gigamaxSpriteBtn.addEventListener('click', () => displayPokemonSprite('gigamax'));
+
+        // --- Lancement du chargement des noms au chargement de la page ---
+        window.addEventListener('load', initializeApplicationData);
+    </script>
+</body>
+</html>
