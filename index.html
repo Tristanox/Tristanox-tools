@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tristanox Games</title>
+    <style>
+        /* Importation de la police Babynotes */
+        @font-face {
+            font-family: 'Babynotes';
+            src: url('https://dl.dafont.com/dl/?f=babynotes') format('truetype');
+            /* Pour une meilleure fiabilité, téléchargez le fichier .ttf et hébergez-le sur votre Neocities.
+               Exemple si le fichier est à la racine de votre site : src: url('babynotes.ttf') format('truetype'); */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #282b30; /* Couleur principale du fond */
+            color: lightgray; /* Couleur du texte par défaut */
+            text-align: center;
+        }
+
+        header {
+            margin-bottom: 40px;
+        }
+
+        header img {
+            display: block; /* Permet de centrer l'image avec margin auto */
+            margin: 0 auto 30px auto; /* Centre l'image et ajoute de l'espace en bas */
+            max-width: 600px; /* Taille du logo */
+            height: auto;
+            border-radius: 10px; /* Bords légèrement arrondis pour le logo */
+            border: none; /* Supprime toute bordure */
+            outline: none; /* Supprime l'outline (contour de focus) */
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Adapté pour des miniatures plus grandes */
+            gap: 40px; /* Espace entre les éléments */
+            max-width: 1000px; /* Largeur maximale pour favoriser 2 colonnes avec les nouvelles tailles */
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #1e2124; /* Fond de la grille */
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .game-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: lightgray;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border-radius: 10px;
+            padding: 0;
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        .game-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            background-color: transparent;
+        }
+
+        .game-item img {
+            width: 350px; /* Miniatures plus larges */
+            height: 200px; /* Miniatures plus hautes */
+            object-fit: cover;
+            border-radius: 8px;
+            border: none; /* Pas de bordure sur les miniatures */
+            outline: none;
+            display: block;
+        }
+
+        /* Styles pour les petits écrans (mobiles) */
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr; /* Une seule colonne sur petits écrans */
+                gap: 20px;
+                padding: 15px;
+            }
+            header img {
+                max-width: 250px; /* Logo réduit sur mobile */
+            }
+            .game-item img {
+                width: 100%; /* L'image prend toute la largeur disponible de son conteneur */
+                height: auto;
+                max-height: 200px; /* Garde une hauteur raisonnable sur mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.imgur.com/bgXj7TV.png" alt="Tristanox Logo">
+    </header>
+
+    <div class="games-grid">
+        <a href="https://tristanox.neocities.org/pokedex" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/5en2AW7.png" alt="Miniature Sand Ninja (pour Pokedex)">
+        </a>
+
+        <a href="https://tristanox.neocities.org/Sand-Ninja" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/PCdu5Uh.png" alt="Miniature Pokedex (pour Sand Ninja)">
+        </a>
+
+        <a href="https://tristanox.neocities.org/Infinity%20clicker" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/j8Jnxyz.png" alt="Miniature Infinity Clicker">
+        </a>
+
+        <a href="https://tristanox.neocities.org/Stimulation-clicker" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/PLqsf8K.png" alt="Miniature Stimulation Clicker">
+        </a>
+
+        <a href="https://tristanox.neocities.org/CPSTEST" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/lukb3l0.png" alt="Miniature CPS Test">
+        </a>
+
+        <a href="https://tristanox.neocities.org/aimtrainer" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/lsQ09F3.png" alt="Miniature Aim Trainer">
+        </a>
+
+        <a href="https://tristanox.neocities.org/NJcatalogue" target="_blank" class="game-item">
+            <img src="https://i.imgur.com/mocKrnP.png" alt="Miniature Sandbox Library">
+        </a>
+
+    </div>
+
+</body>
+</html>
