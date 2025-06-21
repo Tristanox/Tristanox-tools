@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette Maker</title>
+    <style>
+        /* Votre palette de couleurs pour le style de l'interface */
+        :root {
+            --color-primary-dark: #1e2124; /* Noir très foncé pour header, boutons principaux */
+            --color-secondary-dark: #282b30; /* Gris très foncé pour arrière-plan général */
+            --color-medium-dark: #36393e; /* Gris foncé moyen pour fonds d'éléments, bordures internes des blocs */
+            --color-light-dark: #424549; /* Gris foncé clair pour texte secondaire, bordures externes des blocs */
+            --color-accent-green: #55ff75; /* Vert vif pour actions positives */
+            --color-soft-green: #72da72; /* Vert plus doux pour hover */
+            --color-text-light: #ffffff; /* Texte clair sur fonds sombres */
+        }
+
+        /* Styles CSS */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--color-secondary-dark); /* Fond général du body */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            color: var(--color-light-dark); /* Texte général par défaut */
+        }
+
+        header {
+            background-color: var(--color-primary-dark); /* Header avec le noir très foncé */
+            color: var(--color-text-light); /* Texte blanc dans le header */
+            padding: 20px 0;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Ombre plus prononcée */
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 1px;
+        }
+
+        main {
+            max-width: 1200px;
+            width: 100%;
+            background-color: var(--color-secondary-dark); /* Assure que le main n'est pas blanc */
+        }
+
+        #palette {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 40px;
+            background-color: var(--color-secondary-dark); /* S'assurer que le conteneur de la palette n'est pas blanc */
+            padding: 10px; /* Petit padding pour espacement si besoin */
+            border-radius: 10px; /* Coins arrondis pour le conteneur de palette */
+        }
+
+        .color-block {
+            position: relative;
+            width: 220px;
+            height: 300px;
+            border: 1px solid var(--color-light-dark); /* Bordure externe du bloc */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25); /* Ombre plus visible */
+            background-color: var(--color-medium-dark); /* Fond du bloc (là où étaient les inputs) */
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .color-block:hover {
+            transform: translateY(-5px);
+        }
+
+        .color-display {
+            width: 100%;
+            height: 120px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--color-light-dark); /* Bordure de la zone de couleur */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); /* Ombre interne */
+        }
+
+        .color-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .color-input-group label {
+            font-size: 0.95em;
+            color: var(--color-text-light); /* Texte des labels clair pour lisibilité */
+            font-weight: 600;
+        }
+
+        .color-input-group input[type="text"],
+        .color-input-group input[type="color"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid var(--color-light-dark); /* Bordure des inputs */
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box;
+            background-color: var(--color-secondary-dark); /* Fond des inputs */
+            color: var(--color-text-light); /* Texte des inputs blanc */
+        }
+
+        .color-input-group input[type="color"] {
+            height: 45px;
+            cursor: pointer;
+            -webkit-appearance: none;
+            border: none;
+            background: none;
+            padding: 0;
+        }
+        .color-input-group input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .color-input-group input[type="color"]::-webkit-color-swatch {
+            border-radius: 5px;
+            border: 1px solid var(--color-light-dark); /* Bordure du swatch de couleur */
+        }
+
+        .hex-code-display {
+            font-size: 0.9em;
+            color: var(--color-text-light); /* Texte du code hex clair pour lisibilité */
+            text-align: center;
+            margin-top: -10px;
+            font-weight: bold;
+        }
+
+        .actions-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            justify-content: center;
+            width: 100%;
+            flex-wrap: wrap; /* Permet aux boutons de s'enrouler si l'écran est petit */
+        }
+
+        .action-button {
+            background-color: var(--color-medium-dark); /* Boutons d'action par défaut */
+            color: var(--color-text-light); /* Texte blanc sur les boutons d'action */
+            padding: 15px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            flex-grow: 1;
+            max-width: 250px;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+        }
+
+        #add-color-btn {
+            background-color: var(--color-accent-green); /* Vert vif pour Ajouter */
+            color: var(--color-primary-dark); /* Texte foncé sur vert vif */
+            font-weight: bold;
+        }
+        #add-color-btn:hover {
+            background-color: var(--color-soft-green); /* Vert plus doux au hover */
+        }
+
+        #export-png-btn {
+            background-color: var(--color-primary-dark); /* Noir très foncé pour Exporter */
+        }
+        #export-png-btn:hover {
+            background-color: var(--color-light-dark); /* Gris foncé clair au hover */
+        }
+
+        /* Styles pour le nouveau champ d'importation en masse */
+        .mass-import-container {
+            width: 100%;
+            max-width: 800px; /* Limite la largeur pour une meilleure lisibilité */
+            margin: 40px auto;
+            padding: 25px;
+            background-color: var(--color-medium-dark); /* Fond du conteneur d'importation */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .mass-import-container h2 {
+            color: var(--color-text-light);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .mass-import-container textarea {
+            width: calc(100% - 40px); /* Ajuste la largeur */
+            height: 100px;
+            padding: 15px;
+            border: 1px solid var(--color-light-dark);
+            border-radius: 8px;
+            font-size: 1em;
+            background-color: var(--color-secondary-dark); /* Fond du textarea */
+            color: var(--color-text-light); /* Texte du textarea */
+            resize: vertical; /* Permet le redimensionnement vertical */
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        #import-mass-btn {
+            background-color: var(--color-accent-green); /* Même vert que le bouton "Ajouter" */
+            color: var(--color-primary-dark);
+            font-weight: bold;
+        }
+        #import-mass-btn:hover {
+            background-color: var(--color-soft-green);
+        }
+
+
+        .delete-color-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545; /* Reste rouge pour la clarté visuelle */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            opacity: 0.8;
+        }
+
+        .delete-color-btn:hover {
+            background-color: #c82333;
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        .delete-color-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Classes pour masquer/afficher lors de l'exportation */
+        .hide-for-export {
+            display: none !important;
+        }
+        .show-for-export {
+            display: block !important;
+        }
+
+        /* Ajustements pour les blocs de couleur lors de l'exportation */
+        #palette.exporting {
+            background-color: var(--color-secondary-dark); /* Fond de la palette exportée */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        #palette.exporting .color-block {
+            gap: 0;
+            background-color: transparent; /* Pas de fond pour les blocs eux-mêmes lors de l'export */
+            border: none; /* Pas de bordure visible */
+        }
+
+        .color-block.export-mode {
+            width: 200px;
+            height: 220px;
+            padding: 10px;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            background-color: transparent;
+            justify-content: center;
+            gap: 5px;
+        }
+        .color-block.export-mode .color-display {
+            width: 100%;
+            height: 180px;
+            border-radius: 0;
+            margin-bottom: 0;
+            border: none;
+            box-shadow: none;
+        }
+        .color-block.export-mode .hex-code-display {
+            margin-top: 5px;
+            font-size: 1em;
+            color: var(--color-text-light); /* Texte blanc pour le code hex en mode export */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Ajoute une ombre au texte pour la lisibilité sur toutes les couleurs */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Color Palette Maker</h1>
+    </header>
+
+    <main>
+        <section id="palette">
+            </section>
+
+        <div class="actions-container">
+            <button id="add-color-btn" class="action-button">Ajouter une couleur</button>
+            <button id="export-png-btn" class="action-button">Exporter en PNG</button>
+        </div>
+
+        <section class="mass-import-container">
+            <h2>Importer des couleurs en masse</h2>
+            <textarea id="mass-hex-input" placeholder="Entrez des codes HEX séparés par des virgules, des espaces ou des sauts de ligne : #XXXXXX, #YYYYYY, #ZZZZZZ..."></textarea>
+            <button id="import-mass-btn" class="action-button">Importer les couleurs</button>
+        </section>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        // JavaScript
+        document.addEventListener('DOMContentLoaded', () => {
+            const paletteContainer = document.getElementById('palette');
+            const addColorBtn = document.getElementById('add-color-btn');
+            const exportPngBtn = document.getElementById('export-png-btn');
+            const massHexInput = document.getElementById('mass-hex-input');
+            const importMassBtn = document.getElementById('import-mass-btn');
+
+            // Fonction pour générer une couleur hexadécimale aléatoire
+            function getRandomHexColor() {
+                const letters = '0123456789ABCDEF';
+                let color = '#';
+                for (let i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // Fonction pour valider un code hexadécimal (simple vérification)
+            function isValidHex(hex) {
+                return /^#?([0-9A-F]{3}){1,2}$/i.test(hex);
+            }
+
+            // Fonction pour créer un bloc de couleur
+            function createColorBlock(initialColor) {
+                const colorBlock = document.createElement('div');
+                colorBlock.classList.add('color-block');
+
+                const colorDisplay = document.createElement('div');
+                colorDisplay.classList.add('color-display');
+                colorDisplay.style.backgroundColor = initialColor;
+
+                const inputControls = document.createElement('div');
+                inputControls.classList.add('input-controls');
+
+                const hexInputGroup = document.createElement('div');
+                hexInputGroup.classList.add('color-input-group');
+                const hexLabel = document.createElement('label');
+                hexLabel.textContent = 'Code Hex:';
+                const hexInput = document.createElement('input');
+                hexInput.type = 'text';
+                hexInput.value = initialColor;
+                hexInputGroup.appendChild(hexLabel);
+                hexInputGroup.appendChild(hexInput);
+
+                const colorWheelInputGroup = document.createElement('div');
+                colorWheelInputGroup.classList.add('color-input-group');
+                const colorWheelLabel = document.createElement('label');
+                colorWheelLabel.textContent = 'Roue Chromatique:';
+                const colorWheelInput = document.createElement('input');
+                colorWheelInput.type = 'color';
+                colorWheelInput.value = initialColor;
+                colorWheelInputGroup.appendChild(colorWheelLabel);
+                colorWheelInputGroup.appendChild(colorWheelInput);
+
+                inputControls.appendChild(hexInputGroup);
+                inputControls.appendChild(colorWheelInputGroup);
+
+                const hexCodeDisplay = document.createElement('div');
+                hexCodeDisplay.classList.add('hex-code-display');
+                hexCodeDisplay.classList.add('hide-for-export');
+                hexCodeDisplay.textContent = initialColor;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('delete-color-btn');
+                deleteButton.textContent = '×';
+                deleteButton.title = 'Supprimer cette couleur';
+
+                deleteButton.addEventListener('click', () => {
+                    colorBlock.remove();
+                });
+
+                hexInput.addEventListener('input', (event) => {
+                    let value = event.target.value;
+                    if (!value.startsWith('#') && value.length <= 6) {
+                        value = '#' + value;
+                    }
+                    if (isValidHex(value)) {
+                        colorDisplay.style.backgroundColor = value;
+                        colorWheelInput.value = value;
+                        hexCodeDisplay.textContent = value;
+                    }
+                    event.target.value = value;
+                });
+
+                colorWheelInput.addEventListener('input', (event) => {
+                    const newColor = event.target.value;
+                    colorDisplay.style.backgroundColor = newColor;
+                    hexInput.value = newColor;
+                    hexCodeDisplay.textContent = newColor;
+                });
+
+                colorBlock.appendChild(colorDisplay);
+                colorBlock.appendChild(hexCodeDisplay);
+                colorBlock.appendChild(inputControls);
+                colorBlock.appendChild(deleteButton);
+
+                paletteContainer.appendChild(colorBlock);
+            }
+
+            // MODIFICATION ICI: Initialiser avec 1 couleur - blanc pur
+            // Supprimez la boucle for (let i = 0; i < 5; i++) { createColorBlock(getRandomHexColor()); }
+            // Et remplacez-la par :
+            createColorBlock("#FFFFFF"); // Démarre avec une seule couleur blanche pure
+
+            // Ajouter une nouvelle couleur au clic sur le bouton (aléatoire par défaut)
+            addColorBtn.addEventListener('click', () => {
+                createColorBlock(getRandomHexColor());
+            });
+
+            // Gérer l'importation de couleurs en masse
+            importMassBtn.addEventListener('click', () => {
+                const rawInput = massHexInput.value;
+                const colorsToImport = rawInput.split(/[, \n]+/).map(color => color.trim()).filter(color => color !== '');
+
+                let importedCount = 0;
+                colorsToImport.forEach(color => {
+                    if (!color.startsWith('#')) {
+                        color = '#' + color;
+                    }
+                    if (isValidHex(color)) {
+                        createColorBlock(color);
+                        importedCount++;
+                    } else {
+                        console.warn(`Couleur HEX invalide ignorée: ${color}`);
+                    }
+                });
+
+                if (importedCount > 0) {
+                    massHexInput.value = '';
+                    alert(`${importedCount} couleur(s) importée(s) avec succès !`);
+                } else {
+                    alert('Aucune couleur valide n\'a été trouvée pour l\'importation. Vérifiez le format (ex: #XXXXXX, #YYYYYY).');
+                }
+            });
+
+            // Exporter la palette en PNG
+            exportPngBtn.addEventListener('click', () => {
+                const actionButtonsContainer = document.querySelector('.actions-container');
+                actionButtonsContainer.classList.add('hide-for-export');
+
+                const massImportSection = document.querySelector('.mass-import-container');
+                massImportSection.classList.add('hide-for-export');
+
+                const allDeleteButtons = document.querySelectorAll('.delete-color-btn');
+                allDeleteButtons.forEach(btn => btn.classList.add('hide-for-export'));
+
+                const allInputControls = document.querySelectorAll('.input-controls');
+                allInputControls.forEach(ctrl => ctrl.classList.add('hide-for-export'));
+
+                const allHexCodeDisplays = document.querySelectorAll('.hex-code-display');
+                const allColorBlocks = document.querySelectorAll('.color-block');
+
+                allHexCodeDisplays.forEach(display => display.classList.add('show-for-export'));
+                allColorBlocks.forEach(block => block.classList.add('export-mode'));
+                paletteContainer.classList.add('exporting');
+
+
+                html2canvas(paletteContainer, {
+                    scale: 2,
+                    backgroundColor: getComputedStyle(paletteContainer).backgroundColor,
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'palette-de-couleurs.png';
+                    link.href = canvas.toDataURL('image/png');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(error => {
+                    console.error('Erreur lors de l\'exportation en PNG:', error);
+                    alert('Une erreur est survenue lors de l\'exportation. Veuillez réessayer.');
+                }).finally(() => {
+                    actionButtonsContainer.classList.remove('hide-for-export');
+                    massImportSection.classList.remove('hide-for-export');
+                    allDeleteButtons.forEach(btn => btn.classList.remove('hide-for-export'));
+                    allInputControls.forEach(ctrl => ctrl.classList.remove('hide-for-export'));
+
+                    allHexCodeDisplays.forEach(display => display.classList.remove('show-for-export'));
+                    allColorBlocks.forEach(block => block.classList.remove('export-mode'));
+                    paletteContainer.classList.remove('exporting');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

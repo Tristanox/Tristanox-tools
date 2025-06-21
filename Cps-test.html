@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tristanox CPS Test</title>
+
+    <style>
+        /* Définition des variables CSS pour les couleurs */
+        :root {
+            --color-dark-gray: #424549;
+            --color-almost-black: #1e2124;
+            --color-vivid-green: #55ff75;
+            --color-very-dark-gray: #282b30;
+            --color-medium-gray: #36393e;
+            --color-light-green: #72da72;
+            --color-white: #ffffff;
+            --color-clicked-bg: #80FF80; /* Couleur pour le feedback visuel du clic */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-almost-black); /* Fond sombre */
+            color: var(--color-white); /* Texte clair par default */
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Permet au footer de rester en bas */
+            overflow-y: scroll; /* Permet le défilement si le contenu dépasse */
+        }
+
+        header {
+            background-color: var(--color-medium-gray); /* Couleur de l'en-tête */
+            color: var(--color-vivid-green); /* Titre en vert vif */
+            padding: 1em 0;
+            border-bottom: 2px solid var(--color-very-dark-gray);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            color: var(--color-vivid-green);
+        }
+
+        .container {
+            display: flex;
+            flex: 1; /* Prend l'espace restant pour grandir */
+            max-width: 1200px; /* Limite la largeur max */
+            width: 100%;
+            margin: 0 auto; /* Centre le conteneur */
+            padding: 0 10px; /* Petit padding horizontal */
+            align-items: flex-start; /* Aligne les éléments en haut */
+        }
+
+        /* Styles des barres latérales */
+        .sidebar {
+            width: 180px; /* Largeur fixe */
+            background-color: var(--color-dark-gray); /* Fond des barres latérales */
+            border: 1px solid var(--color-very-dark-gray); /* Bordure sombre */
+            box-sizing: border-box; /* Inclut padding et border dans la largeur */
+            display: flex;
+            flex-direction: column;
+            padding: 0; /* Pas de padding global, les liens gèrent leur propre padding */
+        }
+
+        .left-sidebar {
+            margin-right: 20px; /* Espace entre la barre latérale gauche et le contenu */
+        }
+
+        .right-sidebar {
+            margin-left: 20px; /* Espace entre la barre latérale droite et le contenu */
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 0;
+        }
+
+        .sidebar ul li a {
+            color: var(--color-white); /* Texte des liens en blanc */
+            text-decoration: none;
+            padding: 12px 15px; /* Padding pour la hauteur des boutons */
+            display: block;
+            border-bottom: 1px solid var(--color-very-dark-gray); /* Lignes de séparation sombres */
+            transition: background-color 0.1s ease, color 0.1s ease;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Supprime la bordure supérieure du premier élément et inférieure du dernier pour éviter le doublement */
+        .sidebar ul li:first-child a {
+            border-top: none;
+        }
+        .sidebar ul li:last-child a {
+            border-bottom: none;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: var(--color-very-dark-gray); /* Changement de couleur au survol */
+            color: var(--color-vivid-green); /* Texte vert au survol */
+        }
+
+        .sidebar ul li a.active {
+            background-color: var(--color-vivid-green); /* Fond vert vif pour l'élément actif */
+            color: var(--color-almost-black); /* Texte sombre sur fond vert actif */
+        }
+
+        /* Contenu central (zone de test) */
+        .content {
+            flex: 1;
+            background-color: var(--color-dark-gray); /* Fond de la zone centrale */
+            border: 1px solid var(--color-very-dark-gray); /* Bordure sombre */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            color: var(--color-white); /* Texte blanc dans le contenu */
+        }
+
+        /* Section de test unique */
+        .test-section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Zone où l'on clique/frappe */
+        .test-area {
+            width: 90%;
+            max-width: 600px;
+            height: 300px;
+            border: 2px solid var(--color-light-green); /* Bordure verte claire par défaut */
+            margin: 20px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            cursor: pointer;
+            background-color: var(--color-medium-gray); /* Fond de la zone de clic */
+            user-select: none;
+            position: relative;
+            color: var(--color-white); /* Texte blanc dans la zone de clic */
+            transition: background-color 0.05s ease, border-color 0.2s ease; /* Transition rapide pour le clic */
+        }
+
+        .test-area.active {
+            background-color: var(--color-very-dark-gray); /* Devient plus sombre quand le test est actif */
+            border-color: var(--color-vivid-green); /* Bordure vert vif pendant le test */
+        }
+
+        /* NOUVEAU STYLE: Feedback visuel de clic */
+        .test-area.clicked-visual {
+            background-color: var(--color-clicked-bg); /* Couleur vive pour le clic */
+            border-color: var(--color-vivid-green);
+        }
+
+        .instruction-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--color-light-green); /* Texte d'instruction en vert clair */
+        }
+
+        /* Conteneur des statistiques CPS */
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 0px; /* Pas de gap, un seul élément */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .stat-box {
+            border: 1px solid var(--color-very-dark-gray); /* Bordure des stats sombre */
+            padding: 10px 20px;
+            min-width: 150px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            background-color: var(--color-medium-gray); /* Fond des stats */
+            color: var(--color-vivid-green); /* Texte des stats en vert vif */
+        }
+
+        .stat-box span {
+            color: var(--color-white); /* Les valeurs numériques en blanc */
+        }
+
+        .click-count-display { /* Nouveau style pour le compteur de clics */
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--color-light-green);
+            margin-top: 5px; /* Petit espace au-dessus */
+            margin-bottom: 10px; /* Petit espace en dessous */
+        }
+
+        .timer-display {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--color-light-green); /* Temps restant en vert clair */
+            margin-top: 10px;
+        }
+
+        .reset-button {
+            background-color: var(--color-medium-gray); /* Fond du bouton réinitialiser */
+            color: var(--color-vivid-green); /* Texte vert vif */
+            padding: 8px 15px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 0;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            display: none;
+        }
+
+        .reset-button:hover {
+            background-color: var(--color-very-dark-gray);
+            color: var(--color-light-green); /* Texte vert clair au survol */
+        }
+
+        /* Section des touches personnalisées - initialement cachée */
+        .custom-keys-settings {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-white); /* Texte blanc */
+            display: none; /* Masqué par défaut */
+        }
+
+        .custom-keys-settings.active {
+            display: flex; /* Affiché quand actif */
+        }
+
+        .custom-keys-settings label {
+            font-weight: bold;
+        }
+
+        .custom-keys-settings input[type="text"] {
+            padding: 8px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 0;
+            width: 150px;
+            font-size: 1em;
+            background-color: var(--color-dark-gray); /* Fond de l'input */
+            color: var(--color-white); /* Texte de l'input */
+        }
+
+        .custom-keys-settings input[type="text"]::placeholder {
+            color: var(--color-light-green); /* Placeholder en vert clair */
+        }
+
+        .custom-keys-settings .button { /* Bouton "Définir" */
+            background-color: var(--color-medium-gray);
+            color: var(--color-vivid-green);
+            padding: 8px 15px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .custom-keys-settings .button:hover {
+            background-color: var(--color-very-dark-gray);
+            color: var(--color-light-green);
+        }
+
+        /* --- NOUVEAUX STYLES POUR L'AUTOCLICKER --- */
+        .autoclicker-settings {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-white);
+            display: none; /* Masqué par défaut */
+        }
+
+        .autoclicker-settings.active {
+            display: flex; /* Affiché quand actif */
+        }
+
+        .autoclicker-settings input[type="number"] {
+            padding: 8px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 0;
+            width: 80px;
+            font-size: 1em;
+            background-color: var(--color-dark-gray);
+            color: var(--color-white);
+            text-align: center;
+        }
+
+        .autoclicker-settings .button {
+            background-color: var(--color-medium-gray);
+            color: var(--color-vivid-green);
+            padding: 8px 15px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .autoclicker-settings .button.start {
+            background-color: var(--color-vivid-green);
+            color: var(--color-almost-black);
+        }
+        .autoclicker-settings .button.start:hover {
+            background-color: var(--color-light-green);
+            color: var(--color-white);
+        }
+
+        .autoclicker-settings .button.stop {
+            background-color: #f44336; /* Rouge */
+            color: var(--color-white);
+        }
+        .autoclicker-settings .button.stop:hover {
+            background-color: #d32f2f; /* Rouge plus foncé */
+        }
+
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            padding: 15px;
+            background-color: var(--color-medium-gray); /* Fond du footer */
+            color: var(--color-white); /* Texte blanc */
+            border-top: 2px solid var(--color-very-dark-gray);
+            font-size: 0.9em;
+        }
+
+        /* --- Styles de la Popup de Résultats --- */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); /* Fond semi-transparent */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Assure que la popup est au-dessus de tout */
+            visibility: hidden; /* Caché par default */
+            opacity: 0; /* Transparence pour l'animation */
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+
+        .popup-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .popup-content {
+            background-color: var(--color-dark-gray); /* Fond de la popup */
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 90%;
+            max-width: 450px;
+            position: relative;
+            transform: scale(0.9); /* Pour animation d'entrée */
+            transition: transform 0.3s ease;
+            color: var(--color-white);
+            border: 1px solid var(--color-very-dark-gray);
+        }
+
+        .popup-overlay.show .popup-content {
+            transform: scale(1);
+        }
+
+        .popup-content h2 {
+            color: var(--color-vivid-green);
+            margin-top: 0;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .popup-content p {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: var(--color-light-green);
+            font-weight: bold;
+        }
+
+        .popup-content p span {
+            color: var(--color-white);
+        }
+
+        .popup-close-btn {
+            background-color: var(--color-medium-gray);
+            color: var(--color-vivid-green);
+            padding: 10px 20px;
+            border: 1px solid var(--color-very-dark-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .popup-close-btn:hover {
+            background-color: var(--color-very-dark-gray);
+            color: var(--color-white);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tristanox CPS Test</h1>
+    </header>
+
+    <div class="container">
+        <nav class="sidebar left-sidebar">
+            <ul>
+                <li><a href="#" class="nav-link active" data-target="mouse">CPS souris</a></li>
+                <li><a href="#" class="nav-link" data-target="spacebar">CPS Espace</a></li>
+                <li><a href="#" class="nav-link" data-target="custom-keys">CPS Libre</a></li>
+                <li><a href="#" class="nav-link" data-target="autoclicker">Autoclicker</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div id="custom-keys-settings" class="custom-keys-settings">
+                <label for="keys-input">Touches (ex: a,s,d,f):</label>
+                <input type="text" id="keys-input" placeholder="a,b,c">
+                <button id="set-keys-button" class="button">Définir</button>
+                <p>Touches actives: <span id="active-keys-display">Aucune</span></p>
+            </div>
+
+            <div id="autoclicker-settings" class="autoclicker-settings">
+                <label for="autoclicker-speed">Vitesse (CPS):</label>
+                <input type="number" id="autoclicker-speed" value="50" min="1" max="1000">
+                <button id="autoclicker-start-button" class="button start">Démarrer</button>
+                <button id="autoclicker-stop-button" class="button stop">Arrêter</button>
+            </div>
+
+            <section id="main-test-section" class="test-section">
+                <div id="test-area" class="test-area">
+                    <span id="instruction-text" class="instruction-text"></span>
+                </div>
+                <p class="click-count-display">Clics: <span id="clicks-display">0</span></p>
+                <div class="stats-container">
+                    <div class="stat-box">CPS : <span id="current-cps">0.00</span></div>
+                </div>
+                <p class="timer-display">Temps restant: <span id="timer-display">5</span>s</p>
+                <button id="reset-button" class="reset-button">Recommencer</button>
+            </section>
+        </main>
+
+        <nav class="sidebar right-sidebar">
+            <ul>
+                <li><a href="#" class="duration-link active" data-duration="1">1 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="2">2 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="5">5 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="10">10 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="20">20 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="50">50 sec</a></li>
+                <li><a href="#" class="duration-link" data-duration="100">100 sec</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Tristanox CPS Test. Tous droits réservés.</p>
+    </footer>
+
+    <div id="results-popup-overlay" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Résultats du Test</h2>
+            <p>CPS moyen : <span id="popup-avg-cps">0.00</span></p>
+            <p>Nombre de clics : <span id="popup-total-clicks">0</span></p>
+            <button id="popup-close-btn" class="popup-close-btn">Fermer</button>
+        </div>
+    </div>
+
+    <audio id="click-sound" src="https://raw.githubusercontent.com/Tristanox/GUN/main/happy-pop-2-185287.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Éléments du DOM globaux ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const durationLinks = document.querySelectorAll('.duration-link');
+
+            const resultsPopupOverlay = document.getElementById('results-popup-overlay');
+            const popupAvgCps = document.getElementById('popup-avg-cps');
+            const popupTotalClicks = document.getElementById('popup-total-clicks');
+            const popupCloseBtn = document.getElementById('popup-close-btn');
+            const clickSound = document.getElementById('click-sound');
+
+            // Éléments du DOM pour le champ de test unique
+            const testArea = document.getElementById('test-area');
+            const currentCpsDisplay = document.getElementById('current-cps');
+            const timerDisplay = document.getElementById('timer-display');
+            const resetButton = document.getElementById('reset-button');
+            const clicksDisplay = document.getElementById('clicks-display');
+            const instructionTextElement = document.getElementById('instruction-text');
+
+            // Éléments spécifiques aux touches personnalisées
+            const customKeysSettings = document.getElementById('custom-keys-settings');
+            const keysInput = document.getElementById('keys-input');
+            const setKeysButton = document.getElementById('set-keys-button');
+            const activeKeysDisplay = document.getElementById('active-keys-display');
+
+            // NOUVEAUX Éléments spécifiques à l'autoclicker
+            const autoclickerSettings = document.getElementById('autoclicker-settings');
+            const autoclickerSpeedInput = document.getElementById('autoclicker-speed');
+            const autoclickerStartButton = document.getElementById('autoclicker-start-button');
+            const autoclickerStopButton = document.getElementById('autoclicker-stop-button');
+
+            let currentTestDuration = 5;
+            let currentMode = 'mouse'; // 'mouse', 'spacebar', 'custom-keys', 'autoclicker'
+            let autoclickerInterval = null; // Pour stocker l'intervalle de l'autoclicker
+            let autoclickerTimerInterval = null; // Pour le timer de l'autoclicker affichant le temps écoulé
+
+
+            // --- Classe générique pour gérer un test de CPS ---
+            class CPSTest {
+                constructor(testAreaElement, currentCpsElement, timerElement, resetButtonElement, clicksDisplayElement, instructionTextElement, clickSoundElement) {
+                    this.testArea = testAreaElement;
+                    this.currentCpsDisplay = currentCpsElement;
+                    this.timerDisplay = timerElement;
+                    this.resetButton = resetButtonElement;
+                    this.clicksDisplay = clicksDisplayElement;
+                    this.instructionTextElement = instructionTextElement;
+                    this.clickSoundElement = clickSoundElement;
+
+                    this.clicks = 0;
+                    this.timer = currentTestDuration;
+                    this.interval = null; // Intervalle pour le compte à rebours normal du test
+                    this.gameStarted = false;
+                    this.allowedKeys = null; // null pour souris, [' '] pour espace, [] pour touches personnalisées
+                    this.initialInstructionText = ""; // Sera défini par la logique de mode
+                    this.startTime = 0; // Pour calculer le CPS réel de tous les modes
+                    this.lastClickTime = 0; // Pour éviter les clics multiples trop rapides ou laggy sur les navigateurs
+                    this.animationTimeout = null; // Pour gérer l'animation du clic visuel
+                }
+
+                updateInstructionText(text) {
+                    if (this.instructionTextElement) {
+                        this.instructionTextElement.textContent = text;
+                    }
+                }
+
+                startGame() {
+                    // Empêcher de démarrer si une popup est affichée ou si le jeu est déjà en cours (sauf autoclicker)
+                    if (resultsPopupOverlay.classList.contains('show') || (this.gameStarted && currentMode !== 'autoclicker')) return;
+
+                    this.gameStarted = true;
+                    this.clicks = 0;
+                    this.currentCpsDisplay.textContent = '0.00';
+                    this.clicksDisplay.textContent = '0';
+                    this.timer = currentTestDuration;
+                    this.timerDisplay.textContent = this.timer + 's';
+                    this.updateInstructionText('C\'est parti !');
+                    this.testArea.classList.add('active');
+                    this.resetButton.style.display = 'none';
+                    this.startTime = Date.now(); // Enregistre le temps de début du jeu
+
+
+                    if (currentMode !== 'autoclicker') {
+                        // Pour les modes normaux, démarre le compte à rebours
+                        this.interval = setInterval(() => {
+                            this.timer--;
+                            this.timerDisplay.textContent = this.timer + 's';
+
+                            const elapsedSeconds = (Date.now() - this.startTime) / 1000;
+                            let currentCps = 0;
+                            if (elapsedSeconds > 0) {
+                                currentCps = this.clicks / elapsedSeconds;
+                            }
+
+                            if (!isNaN(currentCps) && isFinite(currentCps)) {
+                                this.currentCpsDisplay.textContent = currentCps.toFixed(2);
+                            }
+
+                            if (this.timer <= 0) {
+                                this.endGame();
+                            }
+                        }, 1000);
+                    } else {
+                        // En mode autoclicker, le timer est affiché comme temps écoulé
+                        this.timerDisplay.textContent = '0s'; // Commence à 0s pour l'autoclicker
+                        let elapsedAutoclickerTime = 0;
+                        autoclickerTimerInterval = setInterval(() => {
+                            elapsedAutoclickerTime++;
+                            this.timerDisplay.textContent = `${elapsedAutoclickerTime}s`;
+                            // Met à jour le CPS de l'autoclicker en temps réel basé sur les clics réels
+                            const actualElapsedSeconds = (Date.now() - this.startTime) / 1000;
+                            if (actualElapsedSeconds > 0) {
+                                const actualCps = this.clicks / actualElapsedSeconds;
+                                this.currentCpsDisplay.textContent = actualCps.toFixed(2);
+                            }
+                        }, 1000);
+                    }
+                }
+
+                recordClick(isAutoClick = false) {
+                    // Empêcher le clic manuel si une popup est affichée
+                    if (resultsPopupOverlay.classList.contains('show')) return;
+                    // Empêcher le clic manuel si autoclicker actif ET ce n'est pas un autoclic
+                    if (currentMode === 'autoclicker' && autoclickerInterval && !isAutoClick) return;
+
+                    // Gérer les clics si le jeu n'a pas encore commencé (sauf autoclicker)
+                    if (!this.gameStarted && currentMode !== 'autoclicker') {
+                        this.startGame();
+                    }
+                    
+                    // Si le jeu n'est pas démarré (hors autoclicker qui démarre tout de suite), ne pas enregistrer le clic
+                    if (!this.gameStarted && !isAutoClick) return;
+
+
+                    // Gérer le délai pour éviter des clics trop rapprochés qui causent des lags audio/visuels pour les clics MANUELS
+                    const now = Date.now();
+                    if (!isAutoClick && (now - this.lastClickTime < 50)) { // 50ms anti-spam pour les clics manuels
+                         return;
+                    }
+                    this.lastClickTime = now;
+
+                    this.clicks++;
+                    this.clicksDisplay.textContent = this.clicks;
+
+                    // --- Feedback visuel du clic ---
+                    this.testArea.classList.add('clicked-visual');
+                    if (this.animationTimeout) {
+                        clearTimeout(this.animationTimeout);
+                    }
+                    this.animationTimeout = setTimeout(() => {
+                        this.testArea.classList.remove('clicked-visual');
+                    }, 50); // Temps court pour l'effet visuel
+
+
+                    // --- Jouer le son de clic (reset à chaque fois) ---
+                    if (this.clickSoundElement) {
+                        try {
+                            this.clickSoundElement.currentTime = 0; // Toujours réinitialiser le son au début
+                            this.clickSoundElement.play().catch(e => {
+                                // Gérer l'erreur si l'utilisateur n'a pas interagi avec la page avant le premier son
+                                // ou si trop de sons sont joués rapidement.
+                                // console.warn("Erreur de lecture audio (peut-être trop rapide ou interaction manquante):", e.message);
+                            });
+                        } catch (e) {
+                            // console.warn("Erreur d'accès à l'élément audio:", e);
+                        }
+                    }
+
+
+                    // Mise à jour du CPS en temps réel pour tous les modes
+                    const actualElapsedSeconds = (Date.now() - this.startTime) / 1000;
+                    if (actualElapsedSeconds > 0) {
+                        const actualCps = this.clicks / actualElapsedSeconds;
+                        this.currentCpsDisplay.textContent = actualCps.toFixed(2);
+                    }
+                }
+
+                endGame() {
+                    clearInterval(this.interval);
+                    this.gameStarted = false;
+
+                    const finalCps = (this.clicks / currentTestDuration);
+                    const finalCpsFormatted = isNaN(finalCps) || !isFinite(finalCps) ? '0.00' : finalCps.toFixed(2);
+
+                    this.currentCpsDisplay.textContent = finalCpsFormatted;
+                    this.testArea.classList.remove('active');
+                    this.resetButton.style.display = 'inline-block';
+                    this.updateInstructionText(this.initialInstructionText);
+
+                    popupAvgCps.textContent = finalCpsFormatted;
+                    popupTotalClicks.textContent = this.clicks;
+                    resultsPopupOverlay.classList.add('show');
+                }
+
+                resetGame() {
+                    clearInterval(this.interval);
+                    clearInterval(autoclickerTimerInterval); // Arrête le timer spécifique autoclicker
+                    stopAutoclicker(false); // Arrête l'autoclicker, false pour ne pas réinitialiser le jeu à nouveau
+
+                    this.gameStarted = false;
+                    this.clicks = 0;
+                    this.timer = currentTestDuration;
+                    this.currentCpsDisplay.textContent = '0.00';
+                    this.clicksDisplay.textContent = '0';
+                    this.timerDisplay.textContent = currentTestDuration + 's'; // Ajoute 's' pour la cohérence
+                    this.updateInstructionText(this.initialInstructionText);
+                    this.testArea.classList.remove('active');
+                    if (this.animationTimeout) {
+                        clearTimeout(this.animationTimeout);
+                        this.animationTimeout = null;
+                    }
+                    this.testArea.classList.remove('clicked-visual'); // S'assure que le feedback visuel est retiré
+                    this.resetButton.style.display = 'none';
+                    resultsPopupOverlay.classList.remove('show');
+                    this.startTime = 0; // Réinitialise le temps de début
+                }
+
+                updateDuration() {
+                    this.timer = currentTestDuration;
+                    this.timerDisplay.textContent = currentTestDuration + 's';
+                    if (this.gameStarted && currentMode !== 'autoclicker') {
+                        this.resetGame();
+                    } else if (!this.gameStarted && currentMode !== 'autoclicker') {
+                        this.timerDisplay.textContent = currentTestDuration + 's';
+                    }
+                }
+            }
+
+            // --- Instance du test unique ---
+            const mainTest = new CPSTest(
+                testArea, currentCpsDisplay, timerDisplay, resetButton, clicksDisplay, instructionTextElement, clickSound
+            );
+
+            // --- Fonctions de gestion de l'autoclicker ---
+            function startAutoclicker() {
+                stopAutoclicker(); // S'assurer qu'aucun autre autoclicker n'est en cours
+
+                let speed = parseFloat(autoclickerSpeedInput.value);
+                if (isNaN(speed) || speed <= 0) {
+                    alert("Veuillez entrer une vitesse CPS valide (nombre positif).");
+                    return;
+                }
+                // Limiter la vitesse max pour éviter des lags extrêmes ou des plantages
+                const maxSpeed = 500; // Limite arbitraire, peut être ajustée
+                if (speed > maxSpeed) {
+                    alert(`La vitesse maximale recommandée est de ${maxSpeed} CPS pour des raisons de performance. La vitesse sera ajustée.`);
+                    speed = maxSpeed;
+                    autoclickerSpeedInput.value = maxSpeed;
+                }
+
+                // Pour un CPS de X, l'intervalle est 1000ms / X
+                const intervalMs = 1000 / speed;
+
+                mainTest.resetGame(); // Réinitialise le compteur etc.
+                mainTest.startGame(); // Démarre le "jeu" (avec le timer pour l'autoclicker)
+
+                autoclickerInterval = setInterval(() => {
+                    mainTest.recordClick(true); // Passer true pour indiquer que c'est un autoclic
+                }, intervalMs);
+
+                autoclickerStartButton.disabled = true;
+                autoclickerStopButton.disabled = false;
+                autoclickerSpeedInput.disabled = true;
+                testArea.classList.add('active'); // La zone de test devient active
+                mainTest.updateInstructionText(`Autoclicker actif à ${speed} CPS`);
+            }
+
+            // `shouldResetGame` est un paramètre pour savoir si la réinitialisation complète est nécessaire
+            function stopAutoclicker(shouldResetGame = true) {
+                clearInterval(autoclickerInterval);
+                autoclickerInterval = null;
+                clearInterval(autoclickerTimerInterval); // Arrête le timer spécifique autoclicker
+                autoclickerTimerInterval = null;
+
+                if (shouldResetGame) {
+                    mainTest.resetGame(); // Réinitialise le CPS et le compteur à zéro
+                } else {
+                    // Si on ne réinitialise pas le jeu, on nettoie juste l'état de l'autoclicker
+                    mainTest.gameStarted = false; // L'autoclicker n'est plus "en jeu"
+                    testArea.classList.remove('active');
+                    if (mainTest.animationTimeout) {
+                        clearTimeout(mainTest.animationTimeout);
+                        mainTest.animationTimeout = null;
+                    }
+                    testArea.classList.remove('clicked-visual'); // S'assure que le feedback visuel est retiré
+                }
+
+                autoclickerStartButton.disabled = false;
+                autoclickerStopButton.disabled = true;
+                autoclickerSpeedInput.disabled = false;
+                mainTest.updateInstructionText(mainTest.initialInstructionText); // Restaure l'instruction initiale
+            }
+
+            // --- Gestion du changement de section/mode ---
+            function showSection(mode) {
+                resultsPopupOverlay.classList.remove('show');
+                currentMode = mode;
+
+                // Cacher tous les paramètres spécifiques d'abord
+                customKeysSettings.classList.remove('active');
+                autoclickerSettings.classList.remove('active');
+
+                // Arrêter l'autoclicker si on change de mode
+                stopAutoclicker();
+
+                // On retire TOUS les écouteurs pour éviter les doublons ou conflits
+                testArea.removeEventListener('mousedown', mouseClickHandler);
+                document.removeEventListener('keydown', keyboardHandler);
+
+
+                if (currentMode === 'mouse') {
+                    mainTest.allowedKeys = null;
+                    mainTest.initialInstructionText = 'Cliquez ici pour commencer !';
+                    testArea.addEventListener('mousedown', mouseClickHandler);
+                    testArea.style.cursor = 'pointer';
+                    resetButton.style.display = 'none'; // Cache le bouton reset au démarrage
+                } else if (currentMode === 'spacebar') {
+                    mainTest.allowedKeys = [' '];
+                    mainTest.initialInstructionText = 'Appuyez sur la barre d\'espace pour commencer !';
+                    document.addEventListener('keydown', keyboardHandler);
+                    testArea.style.cursor = 'default';
+                    resetButton.style.display = 'none';
+                } else if (currentMode === 'custom-keys') {
+                    customKeysSettings.classList.add('active');
+                    const initialKeys = keysInput.value.toLowerCase().trim();
+                    mainTest.allowedKeys = initialKeys ? initialKeys.split(',').map(key => key.trim()).filter(key => key !== '') : [];
+                    activeKeysDisplay.textContent = mainTest.allowedKeys.length > 0 ? mainTest.allowedKeys.join(', ') : 'Aucune';
+                    mainTest.initialInstructionText = mainTest.allowedKeys.length > 0 ? `Appuyez sur une des touches (${mainTest.allowedKeys.join(', ')}) pour commencer !` : 'Définissez vos touches, puis commencez !';
+                    document.addEventListener('keydown', keyboardHandler);
+                    testArea.style.cursor = 'default';
+                    resetButton.style.display = 'none';
+                } else if (currentMode === 'autoclicker') {
+                    autoclickerSettings.classList.add('active');
+                    mainTest.allowedKeys = null;
+                    mainTest.initialInstructionText = 'Appuyez sur "Démarrer" pour simuler des clics !';
+                    testArea.style.cursor = 'default';
+                    autoclickerStopButton.disabled = true; // S'assurer que le bouton stop est désactivé au début
+                    autoclickerStartButton.disabled = false; // S'assurer que le bouton start est activé
+                    autoclickerSpeedInput.disabled = false;
+                    resetButton.style.display = 'none'; // Le bouton reset est géré par l'autoclicker lui-même
+                }
+
+                mainTest.resetGame(); // Réinitialise le jeu avec les nouvelles instructions/keys/mode
+                mainTest.updateInstructionText(mainTest.initialInstructionText); // Met à jour le texte tout de suite
+                mainTest.timerDisplay.textContent = currentTestDuration + 's';
+            }
+
+            // Gestionnaires d'événements centralisés pour les interactions utilisateur
+            function mouseClickHandler() {
+                if (currentMode === 'mouse') {
+                    mainTest.recordClick();
+                }
+            }
+
+            function keyboardHandler(event) {
+                if (resultsPopupOverlay.classList.contains('show')) {
+                    if (event.code === 'Space') {
+                        event.preventDefault();
+                    }
+                    return;
+                }
+
+                // Pour éviter la répétition des clics par un appui long sur la touche
+                if (event.repeat) return;
+
+                if (currentMode === 'spacebar') {
+                    if (event.code === 'Space') {
+                        event.preventDefault();
+                        mainTest.recordClick();
+                    }
+                } else if (currentMode === 'custom-keys') {
+                    if (mainTest.allowedKeys && mainTest.allowedKeys.includes(event.key.toLowerCase())) {
+                        event.preventDefault();
+                        mainTest.recordClick();
+                    }
+                }
+            }
+
+            // Écouteurs pour le menu de gauche (type de test)
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    e.target.classList.add('active');
+                    showSection(e.target.getAttribute('data-target'));
+                });
+            });
+
+            // Écouteurs pour le menu de droite (durée du test)
+            durationLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    durationLinks.forEach(l => l.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    currentTestDuration = parseInt(e.target.getAttribute('data-duration'), 10);
+                    mainTest.updateDuration();
+                });
+            });
+
+            // Gestion du bouton "Définir" pour les touches personnalisées
+            setKeysButton.addEventListener('click', () => {
+                const inputVal = keysInput.value.toLowerCase().trim();
+                if (inputVal) {
+                    mainTest.allowedKeys = inputVal.split(',').map(key => key.trim()).filter(key => key !== '');
+                    activeKeysDisplay.textContent = mainTest.allowedKeys.join(', ');
+                    mainTest.initialInstructionText = `Appuyez sur une des touches (${mainTest.allowedKeys.join(', ')}) pour commencer !`;
+                    mainTest.resetGame();
+                    mainTest.updateInstructionText(mainTest.initialInstructionText);
+                } else {
+                    alert("Veuillez entrer au moins une touche valide (ex: a,b,c).");
+                    mainTest.allowedKeys = [];
+                    activeKeysDisplay.textContent = 'Aucune';
+                    mainTest.initialInstructionText = 'Appuyez sur les touches définies pour commencer !';
+                    mainTest.resetGame();
+                    mainTest.updateInstructionText(mainTest.initialInstructionText);
+                }
+            });
+
+            // Écouteurs pour les boutons de l'autoclicker
+            autoclickerStartButton.addEventListener('click', startAutoclicker);
+            autoclickerStopButton.addEventListener('click', stopAutoclicker);
+
+            // Gestion du bouton de fermeture de la popup
+            popupCloseBtn.addEventListener('click', () => {
+                resultsPopupOverlay.classList.remove('show');
+            });
+
+
+            // --- Initialisation au chargement de la page ---
+            // Affiche la section souris par défaut et initialise le test
+            showSection('mouse');
+            mainTest.timerDisplay.textContent = currentTestDuration + 's';
+        });
+    </script>
+</body>
+</html>

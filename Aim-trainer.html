@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Aim Trainer Pro</title>
+<style>
+  body {
+    overflow: hidden;
+    margin: 0;
+    background-color: #282b30;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #55ff75;
+  }
+
+  #controls {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  #controls button {
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #424549;
+    color: #55ff75;
+    border: 1px solid #55ff75;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+  }
+
+  #controls button:hover {
+    background-color: #1e2124;
+    transform: translateY(-2px);
+  }
+
+  #stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #55ff75;
+  }
+
+  #game-container {
+    position: relative;
+    width: 90vw;
+    height: 70vh;
+    border: 2px solid #55ff75;
+    background-color: #1e2124;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  .target {
+    position: absolute;
+    background-color: #55ff75;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+  }
+
+  .target:hover {
+    background-color: #45cc60;
+  }
+
+  /* Target sizes based on difficulty */
+  .easy {
+    width: 70px;
+    height: 70px;
+  }
+  .medium {
+    width: 50px;
+    height: 50px;
+  }
+  .hard {
+    width: 30px;
+    height: 30px;
+  }
+
+  /* Explosion effect */
+  .explosion {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+    animation: explode 0.3s forwards;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  @keyframes explode {
+    0% {
+      transform: translate(-50%, -50%) scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(1.5);
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <button id="easyMode">Facile</button>
+  <button id="mediumMode">Normal</button>
+  <button id="hardMode">Difficile</button>
+</div>
+
+<div id="stats">
+  <div id="accuracy-display">Précision: 100%</div>
+  <div id="reaction-time-display">Temps de réaction moyen: 0 ms</div>
+  <div id="hit-miss-display">Réussies: 0 / Ratées: 0</div>
+</div>
+
+<div id="game-container"></div>
+
+<script>
+  const gameContainer = document.getElementById('game-container');
+  const accuracyDisplay = document.getElementById('accuracy-display');
+  const reactionTimeDisplay = document.getElementById('reaction-time-display');
+  const hitMissDisplay = document.getElementById('hit-miss-display');
+
+  const easyModeBtn = document.getElementById('easyMode');
+  const mediumModeBtn = document.getElementById('mediumMode');
+  const hardModeBtn = document.getElementById('hardMode');
+
+  // Create an Audio object for the gun sound
+  const gunSound = new Audio('https://github.com/Tristanox/GUN/raw/refs/heads/main/submachine-gun-79846%20(1).mp3');
+  gunSound.preload = 'auto'; // Preload the sound for faster playback
+
+  let totalClicks = 0;
+  let successfulHits = 0;
+  let missedClicks = 0;
+  let targetSpawnTime = 0;
+  let totalReactionTime = 0;
+  let currentTargetSize = 50; // Default medium size
+
+  // --- Functions to update stats ---
+  function updateAccuracy() {
+    if (totalClicks === 0) {
+      accuracyDisplay.textContent = 'Précision: 100%';
+    } else {
+      const accuracy = (successfulHits / totalClicks) * 100;
+      accuracyDisplay.textContent = `Précision: ${accuracy.toFixed(2)}%`;
+    }
+  }
+
+  function updateReactionTime() {
+    if (successfulHits === 0) {
+      reactionTimeDisplay.textContent = 'Temps de réaction moyen: 0 ms';
+    } else {
+      const averageReactionTime = totalReactionTime / successfulHits;
+      reactionTimeDisplay.textContent = `Temps de réaction moyen: ${averageReactionTime.toFixed(0)} ms`;
+    }
+  }
+
+  function updateHitMissCount() {
+    hitMissDisplay.textContent = `Réussies: ${successfulHits} / Ratées: ${missedClicks}`;
+  }
+
+  // --- Target creation and interaction ---
+  function createTarget() {
+    // Remove existing target if any, before creating a new one
+    const existingTarget = document.querySelector('.target');
+    if (existingTarget) {
+      existingTarget.remove();
+    }
+
+    const target = document.createElement('div');
+    target.classList.add('target');
+    target.classList.add(getDifficultyClass(currentTargetSize));
+
+    const containerWidth = gameContainer.offsetWidth;
+    const containerHeight = gameContainer.offsetHeight;
+
+    const randomX = Math.random() * (containerWidth - currentTargetSize);
+    const randomY = Math.random() * (containerHeight - currentTargetSize);
+
+    target.style.left = `${randomX}px`;
+    target.style.top = `${randomY}px`;
+
+    target.addEventListener('click', (event) => {
+      event.stopPropagation(); // Prevent gameContainer click
+
+      // Play the gun sound
+      gunSound.currentTime = 0; // Rewind to the start
+      gunSound.play().catch(e => console.error("Error playing sound:", e)); // Play and catch potential errors
+
+      const reactionTime = Date.now() - targetSpawnTime;
+      totalReactionTime += reactionTime;
+      successfulHits++;
+      totalClicks++;
+
+      // Create and display the white explosion on click
+      const explosion = document.createElement('div');
+      explosion.classList.add('explosion');
+      explosion.style.left = `${event.clientX - gameContainer.getBoundingClientRect().left}px`;
+      explosion.style.top = `${event.clientY - gameContainer.getBoundingClientRect().top}px`;
+      gameContainer.appendChild(explosion);
+
+      // Remove the explosion after its animation
+      setTimeout(() => {
+        explosion.remove();
+      }, 300); // Must match CSS animation duration
+
+      target.remove();
+      createTarget(); // Create a new target
+      updateAccuracy();
+      updateReactionTime();
+      updateHitMissCount();
+    });
+
+    gameContainer.appendChild(target);
+    targetSpawnTime = Date.now(); // Record time when target appears
+  }
+
+  function getDifficultyClass(size) {
+    if (size === 70) return 'easy';
+    if (size === 50) return 'medium';
+    if (size === 30) return 'hard';
+    return 'medium'; // Default
+  }
+
+  // --- Handle clicks on the game container (misses) ---
+  gameContainer.addEventListener('click', () => {
+    if (document.querySelector('.target')) {
+      totalClicks++;
+      missedClicks++;
+      updateAccuracy();
+      updateHitMissCount();
+    }
+  });
+
+  // --- Difficulty buttons ---
+  easyModeBtn.addEventListener('click', () => {
+    currentTargetSize = 70;
+    resetGame();
+  });
+
+  mediumModeBtn.addEventListener('click', () => {
+    currentTargetSize = 50;
+    resetGame();
+  });
+
+  hardModeBtn.addEventListener('click', () => {
+    currentTargetSize = 30;
+    resetGame();
+  });
+
+  function resetGame() {
+    totalClicks = 0;
+    successfulHits = 0;
+    missedClicks = 0;
+    totalReactionTime = 0;
+    updateAccuracy();
+    updateReactionTime();
+    updateHitMissCount();
+    createTarget();
+  }
+
+  // Initial setup
+  createTarget();
+  updateHitMissCount();
+</script>
+
+</body>
+</html>
