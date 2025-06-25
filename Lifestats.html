@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ma Vie en Chiffres</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1e2124; /* Noir/gris très foncé */
+            color: #f0f0f0; /* Texte clair pour contraste */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, #282b30 0%, #1e2124 100%); /* Dégradé de gris */
+        }
+
+        .container {
+            background-color: #36393e; /* Gris foncé pour les conteneurs */
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée */
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+            opacity: 0; /* Hidden initially for animation */
+            transform: translateY(20px);
+            animation: fadeInSlideUp 0.8s forwards ease-out;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes fadeInSlideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #55ff75; /* Vert clair pour le titre principal */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: #72da72; /* Vert plus doux pour la ligne sous le titre */
+            border-radius: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #a0a0a0; /* Texte des labels légèrement plus clair */
+            font-size: 1.1em;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #424549; /* Bordure des inputs gris foncé */
+            border-radius: 8px;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background-color: #282b30; /* Fond des inputs gris légèrement plus clair */
+            color: #f0f0f0; /* Texte des inputs clair */
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #55ff75; /* Vert clair au focus */
+            box-shadow: 0 0 8px rgba(85, 255, 117, 0.4); /* Ombre verte au focus */
+            outline: none;
+        }
+
+        button {
+            background-color: #55ff75; /* Vert clair pour les boutons */
+            color: #1e2124; /* Texte foncé pour les boutons verts */
+            padding: 14px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.15em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #72da72; /* Vert plus doux au survol */
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            margin-top: 30px;
+            text-align: left;
+            width: 100%;
+            display: none; /* Hidden by default until calculations are run */
+        }
+
+        .results-section h2 {
+            color: #55ff75; /* Vert clair pour les titres de section */
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #424549; /* Bordure sous le titre de section gris foncé */
+            padding-bottom: 10px;
+        }
+
+        .result-item {
+            background-color: #282b30; /* Fond des résultats gris légèrement plus clair */
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            opacity: 0; /* Hidden initially for scroll animation */
+            transform: translateY(20px);
+        }
+
+        .result-item:hover {
+            transform: translateY(-3px);
+            background-color: #424549; /* Gris foncé au survol des résultats */
+        }
+
+        .result-item .label {
+            flex-grow: 1;
+            text-align: left;
+            color: #e0e0e0; /* Texte des labels de résultats plus clair */
+        }
+
+        .result-item .value-container {
+            display: flex;
+            align-items: baseline;
+            flex-shrink: 0;
+        }
+
+        .result-item .value-container strong {
+            color: #55ff75; /* Vert clair pour les valeurs importantes */
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+
+        .result-item .percentage {
+            font-size: 0.9em;
+            color: #a0a0a0; /* Pourcentage en gris clair */
+            margin-right: 10px;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        #error-message, .game-error, .salary-error, #school-error-message, #work-error-message, #dob-error {
+            color: #ff5555; /* Rouge vif pour les messages d'erreur */
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+            font-size: 0.9em;
+            text-align: left;
+            width: 100%;
+        }
+
+        .school-input-group, .work-input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .school-input-group label, .work-input-group label {
+            flex-basis: 100%;
+            margin-bottom: 0;
+        }
+
+        .school-input-group input.school-age-input, .work-input-group input.work-age-input {
+            flex: 1;
+            min-width: 90px;
+            margin-bottom: 0;
+            text-align: center;
+        }
+
+        input#shower-minutes {
+            width: calc(100% - 20px);
+        }
+
+        .game-input-row, .salary-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+            align-items: center;
+        }
+        .game-input-row input[type="text"], .salary-input-row input[type="text"] {
+            flex: 2;
+            min-width: 120px;
+            margin-bottom: 0;
+        }
+        .game-input-row input[type="number"], .salary-input-row input[type="number"] {
+            flex: 1;
+            min-width: 80px;
+            margin-bottom: 0;
+        }
+        .salary-input-row .duration-input { /* Specific style for duration input */
+            flex: 1;
+            min-width: 80px;
+        }
+        .game-input-row button.remove-game, .salary-input-row button.remove-item {
+            background-color: #ff5555; /* Rouge pour le bouton de suppression */
+            padding: 8px 12px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            box-shadow: none;
+            transition: background-color 0.2s ease;
+            color: #1e2124; /* Texte foncé sur bouton rouge */
+        }
+        .game-input-row button.remove-game:hover, .salary-input-row button.remove-item:hover {
+            background-color: #cc4444; /* Rouge plus foncé au survol */
+            transform: translateY(0);
+        }
+
+        .show-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .show-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: #a0a0a0; /* Texte du footer en gris clair */
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 25px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            button {
+                padding: 12px 20px;
+                font-size: 1em;
+            }
+            .result-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .result-item .label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .result-item .value-container {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            .result-item strong {
+                font-size: 1.1em;
+            }
+            .school-input-group input.school-age-input, .work-input-group input.work-age-input {
+                width: 100%;
+                flex: none;
+            }
+            .game-input-row input, .salary-input-row input {
+                width: 100%;
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Combien de temps avez-vous vécu ?</h1>
+
+        <div class="input-group">
+            <label for="dob">Votre date de naissance (JJ/MM/AAAA) :</label>
+            <input type="text" id="dob" placeholder="JJ/MM/AAAA" maxlength="10" required>
+            <p id="dob-error">Veuillez entrer une date valide au format JJ/MM/AAAA.</p>
+        </div>
+
+        <div class="input-group">
+            <label for="sleep-hours">Heures de sommeil moyennes par jour :</label>
+            <input type="number" id="sleep-hours" min="0" max="24" step="0.5" value="8" required>
+        </div>
+
+        <div class="input-group">
+            <label for="shower-minutes">Temps moyen passé sous la douche par jour (en minutes) :</label>
+            <input type="number" id="shower-minutes" min="0" max="120" step="1" value="10" required>
+        </div>
+
+        <button onclick="calculateLifeStatistics()">Calculer ma Vie</button>
+
+        <p id="error-message">Veuillez remplir tous les champs correctement.</p>
+    </div>
+
+    <div class="container results-section" id="life-lived-section">
+        <h2>Votre Vie Passée</h2>
+        <div id="life-results">
+            <div class="result-item show-on-scroll" id="result-seconds"><span class="label">Secondes vécues :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-minutes"><span class="label">Minutes vécues :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-hours"><span class="label">Heures vécues :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-days"><span class="label">Jours vécus :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-months"><span class="label">Mois calendaires vécus :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-years"><span class="label">Années calendaires vécues :</span> <div class="value-container"><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="sleep-section">
+        <h2>Temps Passé à Dormir</h2>
+        <div id="sleep-results">
+            <div class="result-item show-on-scroll" id="sleep-hours-result"><span class="label">Heures passées à dormir :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-days-result"><span class="label">Jours passés à dormir :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-months-result"><span class="label">Mois passés à dormir (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-years-result"><span class="label">Années passées à dormir (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="school-section">
+        <h2>Temps Passé à l'École</h2>
+        <div class="input-group">
+            <label>J'ai été à l'école de
+                <input type="number" id="school-start-age" min="0" value="6" class="school-age-input"> à
+                <input type="number" id="school-end-age" min="0" value="18" class="school-age-input"> ans, pendant
+                <input type="number" id="school-hours-per-day" min="0" max="24" step="0.5" value="6" class="school-age-input"> heures par jour (jours d'école).
+            </label>
+            <button onclick="calculateSchoolTime()" style="margin-top: 15px;">Calculer le temps d'école</button>
+            <p id="school-error-message" style="color: #ff5555; margin-top: 10px; display: none;">Veuillez entrer des âges valides (début < fin) et des heures d'école.</p>
+        </div>
+        <div id="school-results">
+            <div class="result-item show-on-scroll" id="school-hours-total"><span class="label">Heures totales d'école :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="shower-section">
+        <h2>Temps Passé Sous la Douche</h2>
+        <div id="shower-results">
+            <div class="result-item show-on-scroll" id="shower-time-hours"><span class="label">Temps passé sous la douche :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
+            <div class="result-item show-on-scroll" id="shower-water-consumption"><span class="label">Consommation d'eau totale pour la douche :</span> <div class="value-container"><strong>0 litres</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="work-section">
+        <h2>Temps Passé au Travail</h2>
+        <div class="input-group work-input-group">
+            <label>J'ai travaillé
+                <input type="number" id="work-hours-per-week" min="0" max="168" step="0.5" value="35" class="work-age-input"> heures par semaine, de
+                <input type="number" id="work-start-age" min="0" value="20" class="work-age-input"> à
+                <input type="number" id="work-end-age" min="0" value="60" class="work-age-input"> ans.
+            </label>
+            <button onclick="calculateWorkTime()" style="margin-top: 15px;">Calculer le temps de travail</button>
+            <p id="work-error-message" style="color: #ff5555; margin-top: 10px; display: none;">Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).</p>
+        </div>
+        <div id="work-results">
+            <div class="result-item show-on-scroll" id="work-hours-total"><span class="label">Heures totales de travail :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="screen-time-section">
+        <h2>Temps d'écran :</h2>
+        <div class="input-group">
+            <h3>Temps passé sur les jeux :</h3>
+            <div id="game-inputs-container">
+                </div>
+            <button onclick="addGameInput()" style="margin-top: 15px; margin-bottom: 10px;">Ajouter un jeu</button>
+        </div>
+        <div id="game-results">
+            <div class="result-item show-on-scroll" id="total-game-time"><span class="label">Temps total de jeu :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
+            </div>
+        <p id="game-input-error" class="game-error" style="display: none;">Veuillez entrer un nom et des heures valides pour chaque jeu.</p>
+    </div>
+
+    <div class="container results-section" id="money-earned-section">
+        <h2>Argent Gagné</h2>
+        <div class="input-group">
+            <h3>Détails des Salaires :</h3>
+            <div id="salary-inputs-container">
+                </div>
+            <button onclick="addSalaryInput()" style="margin-top: 15px; margin-bottom: 10px;">Ajouter un métier</button>
+        </div>
+        <div id="salary-results">
+            <div class="result-item show-on-scroll" id="total-money-earned"><span class="label">Argent total gagné :</span> <div class="value-container"><strong>0 €</strong></div></div>
+            </div>
+        <p id="salary-input-error" class="salary-error" style="display: none;">Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide pour chaque métier.</p>
+    </div>
+
+    <div class="container results-section" id="body-stats-section">
+        <h2>Votre corps</h2>
+        <div id="body-stats-results">
+            <div class="result-item show-on-scroll" id="heart-beats"><span class="label">Total de battements de cœur :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="cells-regenerated"><span class="label">Nombre de cellules régénérées :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="air-breathed"><span class="label">Nombre de litres d’air respirés :</span> <div class="value-container"><strong>0 litres</strong></div></div>
+            <div class="result-item show-on-scroll" id="steps-count"><span class="label">Nombre de pas (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="km-walked"><span class="label">Distance parcourue (estimation) :</span> <div class="value-container"><strong>0 km</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="food-drink-section">
+        <h2>Nourriture et boisson</h2>
+        <div id="food-drink-results">
+            <div class="result-item show-on-scroll" id="food-kg"><span class="label">Nombre de kilos de nourriture ingérés :</span> <div class="value-container"><strong>0 kg</strong></div></div>
+            <div class="result-item show-on-scroll" id="food-tonnes"><span class="label">Nombre de tonnes de nourriture ingérées :</span> <div class="value-container"><strong>0 tonnes</strong></div></div>
+            <div class="result-item show-on-scroll" id="toilet-time-hours"><span class="label">Temps passé aux toilettes :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
+            <div class="result-item show-on-scroll" id="water-liters-drunk"><span class="label">Nombre de litres d'eau bus :</span> <div class="value-container"><strong>0 litres</strong></div></div>
+            <div class="result-item show-on-scroll" id="meals-count"><span class="label">Nombre de repas :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="stool-weight"><span class="label">Poids total des selles :</span> <div class="value-container"><strong>0 kg</strong></div></div>
+            <div class="result-item show-on-scroll" id="salt-ingested"><span class="label">Poids de sel ingéré :</span> <div class="value-container"><strong>0 g</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="world-change-section">
+        <h2>Le monde aussi a changé</h2>
+        <div id="world-change-results">
+            <div class="result-item show-on-scroll" id="population-growth"><span class="label">Augmentation de la population mondiale :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sun-distance"><span class="label">Distance parcourue autour du soleil :</span> <div class="value-container"><strong>0 km</strong></div></div>
+            <div class="result-item show-on-scroll" id="deaths-since-birth"><span class="label">Nombre de décès depuis ta naissance :</span> <div class="value-container"><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="container results-section" id="other-life-stats-section">
+        <h2>Autres Statistiques de Vie</h2>
+        <div id="other-life-stats-results">
+            <div class="result-item show-on-scroll" id="full-moons"><span class="label">Nombre de pleines lunes vues :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="holidays-lived"><span class="label">Nombre de jours fériés vécus :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="weekends-lived"><span class="label">Nombre de weekends vécus :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sitting-hours"><span class="label">Nombre d'heures passées assis :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
+            <div class="result-item show-on-scroll" id="teeth-brush-count"><span class="label">Nombre de lavages de dents :</span> <div class="value-container"><strong>0</strong></div></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2025 Ma Vie en Chiffres. Tous droits réservés.</p>
+    </div>
+
+    <script>
+        let totalHoursLivedPrecise = 0; // Global variable to store precise hours lived for percentages
+        let daysLivedPrecise = 0; // Global variable for other calculations
+        let minutesLivedPrecise = 0; // Global variable for heart beats
+        let yearsLivedPrecise = 0; // Global variable for calculations based on years lived (e.g., holidays)
+
+
+        // Population data mapping (Year: Population in billions)
+        const worldPopulationData = {
+            1900: 1.55,
+            1910: 1.75,
+            1920: 1.86,
+            1930: 2.07,
+            1940: 2.3,
+            1950: 2.5,
+            1955: 2.7,
+            1960: 3.0,
+            1965: 3.3,
+            1970: 3.7,
+            1975: 4.0,
+            1980: 4.4,
+            1985: 4.8,
+            1990: 5.3,
+            2000: 6.1,
+            2005: 6.5,
+            2010: 6.9,
+            2015: 7.3,
+            2020: 7.7,
+            2025: 8.1
+        };
+
+        function getPopulationAtYear(year) {
+            const years = Object.keys(worldPopulationData).map(Number).sort((a, b) => a - b);
+
+            // If year is exactly in the data
+            if (worldPopulationData[year]) {
+                return worldPopulationData[year] * 1e9; // Convert billions to actual number
+            }
+
+            // Find the closest years for interpolation
+            let lowerYear = null;
+            let upperYear = null;
+
+            for (let i = 0; i < years.length; i++) {
+                if (years[i] <= year) {
+                    lowerYear = years[i];
+                }
+                if (years[i] >= year) {
+                    upperYear = years[i];
+                    break;
+                }
+            }
+
+            // Handle years outside the data range
+            if (lowerYear === null) { // Year is before the earliest data point
+                return worldPopulationData[years[0]] * 1e9;
+            }
+            if (upperYear === null) { // Year is after the latest data point
+                return worldPopulationData[years[years.length - 1]] * 1e9;
+            }
+
+            // Linear interpolation
+            const popLower = worldPopulationData[lowerYear];
+            const popUpper = worldPopulationData[upperYear];
+            const ratio = (year - lowerYear) / (upperYear - lowerYear);
+            const interpolatedPopulation = popLower + (popUpper - popLower) * ratio;
+
+            return interpolatedPopulation * 1e9;
+        }
+
+
+        // Get the DOB input field
+        const dobInput = document.getElementById('dob');
+        const dobError = document.getElementById('dob-error');
+
+        // Add event listeners for formatting and validation
+        dobInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+
+            // Add slashes automatically
+            if (value.length > 2 && value.length <= 4) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            } else if (value.length > 4 && value.length <= 8) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4);
+            }
+            e.target.value = value;
+        });
+
+        dobInput.addEventListener('blur', function() {
+            validateAndParseDOB();
+        });
+
+        function validateAndParseDOB() {
+            const dobString = dobInput.value;
+            const parts = dobString.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+                const year = parseInt(parts[2], 10);
+
+                const date = new Date(year, month, day);
+                const isValidDate = date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
+
+                if (isValidDate) {
+                    dobError.style.display = 'none';
+                    return date;
+                }
+            }
+            dobError.style.display = 'block';
+            return null;
+        }
+
+        function calculateLifeStatistics() {
+            const sleepHoursInput = document.getElementById('sleep-hours');
+            const showerMinutesInput = document.getElementById('shower-minutes');
+            const errorMessage = document.getElementById('error-message');
+            const gameInputError = document.getElementById('game-input-error');
+            const salaryInputError = document.getElementById('salary-input-error');
+
+            const birthDate = validateAndParseDOB();
+            const avgSleepHours = parseFloat(sleepHoursInput.value);
+            const avgShowerMinutes = parseFloat(showerMinutesInput.value);
+
+            if (!birthDate || isNaN(avgSleepHours) || avgSleepHours < 0 || avgSleepHours > 24 ||
+                isNaN(avgShowerMinutes) || avgShowerMinutes < 0) {
+                errorMessage.style.display = 'block';
+                resetResults();
+                return;
+            } else {
+                errorMessage.style.display = 'none';
+            }
+
+            const currentDate = new Date(); // Use actual current date/time
+
+            // --- Life Lived Calculations ---
+            const totalMillisecondsLived = currentDate.getTime() - birthDate.getTime();
+            totalHoursLivedPrecise = totalMillisecondsLived / (1000 * 60 * 60);
+            daysLivedPrecise = totalMillisecondsLived / (1000 * 60 * 60 * 24);
+            minutesLivedPrecise = totalMillisecondsLived / (1000 * 60); // For heart beats
+
+            const secondsLived = Math.floor(totalMillisecondsLived / 1000);
+            const minutesLived = Math.floor(secondsLived / 60);
+            const hoursLived = Math.floor(minutesLived / 60);
+            const daysLived = Math.floor(hoursLived / 24);
+
+            let yearsLived = currentDate.getFullYear() - birthDate.getFullYear();
+            let monthsLived = currentDate.getMonth() - birthDate.getMonth();
+
+            if (currentDate.getDate() < birthDate.getDate()) {
+                monthsLived--;
+            }
+
+            if (monthsLived < 0) {
+                monthsLived += 12;
+                yearsLived--;
+            }
+            yearsLivedPrecise = totalMillisecondsLived / (1000 * 60 * 60 * 24 * 365.25); // For more precise year calculations
+
+            // --- Sleep Time Calculations ---
+            const totalSleepHours = totalHoursLivedPrecise * (avgSleepHours / 24);
+
+            const sleepHours = Math.floor(totalSleepHours);
+            const sleepDays = Math.floor(totalSleepHours / 24);
+            const sleepMonths = Math.floor(sleepDays / (365.25 / 12));
+            const sleepYears = Math.floor(sleepDays / 365.25);
+
+            // --- Shower Time Calculations ---
+            const totalShowerMinutes = daysLivedPrecise * avgShowerMinutes;
+            const totalShowerHours = totalShowerMinutes / 60;
+            const waterConsumptionPerMinute = 1020 / 60;
+            const totalWaterConsumptionLiters = totalShowerMinutes * waterConsumptionPerMinute;
+
+            // --- Votre corps Calculations ---
+            const heartRatePerMinute = 80;
+            const totalHeartBeats = Math.floor(heartRatePerMinute * minutesLivedPrecise);
+
+            const cellsRegeneratedPerDay = 330000000000; // 330 billion
+            const totalCellsRegenerated = daysLivedPrecise * cellsRegeneratedPerDay;
+
+            const airBreathedPerDay = 11000; // Liters
+            const totalAirBreathed = daysLivedPrecise * airBreathedPerDay;
+
+            const averageStepsPerDay = 5500;
+            const totalSteps = daysLivedPrecise * averageStepsPerDay;
+
+            const metersPerStep = 0.8;
+            const totalKmWalked = (totalSteps * metersPerStep) / 1000;
+
+            // --- Nourriture et boisson Calculations ---
+            const kgFoodIngestedPerDay = 2.9;
+            const totalKgFoodIngested = daysLivedPrecise * kgFoodIngestedPerDay;
+            const totalTonnesFoodIngested = totalKgFoodIngested * 0.001;
+
+            const toiletMinutesPerDay = 7;
+            const toiletHours = (daysLivedPrecise * toiletMinutesPerDay) / 60;
+
+            const waterLitersPerDay = 1.1; // Litres of water (pure water, not including drinks/food)
+            const totalWaterLitersDrunk = daysLivedPrecise * waterLitersPerDay;
+
+            // NOUVEAU: Nombre de repas
+            const totalMeals = daysLivedPrecise * 3;
+
+            // NOUVEAU: Poids total des selles
+            const totalStoolWeightKg = yearsLivedPrecise * 46.7;
+
+            // NOUVEAU: Poids de sel ingéré
+            const totalSaltIngestedGrams = daysLivedPrecise * 9;
+
+            // --- Le monde aussi a changé Calculations ---
+            const currentWorldPopulation = getPopulationAtYear(currentDate.getFullYear());
+            const birthYearPopulation = getPopulationAtYear(birthDate.getFullYear());
+            const worldPopulationGrowth = currentWorldPopulation - birthYearPopulation;
+
+            const distanceAroundSunPerDay = 2587825; // km
+            const totalSunDistance = daysLivedPrecise * distanceAroundSunPerDay;
+
+            const averageDeathsPerDayGlobal = 160000;
+            const totalDeathsSinceBirth = daysLivedPrecise * averageDeathsPerDayGlobal;
+
+            // --- Autres Statistiques de Vie Calculations (remaining from old 'other-metrics') ---
+            const lunarCycleDays = 29.5;
+            const totalFullMoons = totalMillisecondsLived / (1000 * 60 * 60 * 24 * lunarCycleDays); // More precise
+
+            const holidaysPerYear = 11; // Average for France
+            const totalHolidaysLived = Math.floor(yearsLivedPrecise * holidaysPerYear);
+
+            const weekendsPerYear = 105; // 52.5 weeks * 2 days
+            const totalWeekendsLived = Math.floor(yearsLivedPrecise * weekendsPerYear);
+            const percentageWeekends = daysLivedPrecise > 0 ? (totalWeekendsLived / daysLivedPrecise * 100).toFixed(2) : 0;
+
+            const sittingHoursPerDay = 7.5;
+            const totalSittingHours = daysLivedPrecise * sittingHoursPerDay;
+
+            // NOUVEAU: Nombre de lavages de dents
+            const teethBrushCount = Math.floor(yearsLivedPrecise * 730);
+
+
+            // --- Call other calculation functions here to ensure they run with "Calculer ma Vie" ---
+            calculateSchoolTime();
+            calculateWorkTime(); // Added this line
+            updateTotalGameTimeDisplay(); // Ensures games are updated
+            updateTotalMoneyEarnedDisplay(); // Ensures salaries are updated
+
+            // --- Display Life Results ---
+            updateResult('result-seconds', 'Secondes vécues :', secondsLived.toLocaleString('fr-FR'), false);
+            updateResult('result-minutes', 'Minutes vécues :', minutesLived.toLocaleString('fr-FR'), false);
+            updateResult('result-hours', 'Heures vécues :', hoursLived.toLocaleString('fr-FR'), true);
+            updateResult('result-days', 'Jours vécus :', daysLived.toLocaleString('fr-FR'), false);
+            updateResult('result-months', 'Mois calendaires vécus :', (yearsLived * 12 + monthsLived).toLocaleString('fr-FR'), false);
+            updateResult('result-years', 'Années calendaires vécues :', yearsLived.toLocaleString('fr-FR'), false);
+
+            // --- Display Sleep Results ---
+            updateResult('sleep-hours-result', 'Heures passées à dormir :', sleepHours.toLocaleString('fr-FR'), true);
+            updateResult('sleep-days-result', 'Jours passés à dormir :', sleepDays.toLocaleString('fr-FR'), false);
+            updateResult('sleep-months-result', 'Mois passés à dormir (estimation) :', sleepMonths.toLocaleString('fr-FR'), false);
+            updateResult('sleep-years-result', 'Années passées à dormir (estimation) :', sleepYears.toLocaleString('fr-FR'), false);
+
+            // --- Display Shower Results ---
+            updateResult('shower-time-hours', 'Temps passé sous la douche :', Math.floor(totalShowerHours).toLocaleString('fr-FR') + ' heures', true);
+            updateResult('shower-water-consumption', 'Consommation d\'eau totale pour la douche :', Math.floor(totalWaterConsumptionLiters).toLocaleString('fr-FR') + ' litres', false);
+
+            // --- Display Votre corps ---
+            updateResult('heart-beats', 'Total de battements de cœur :', Math.floor(totalHeartBeats).toLocaleString('fr-FR'), false);
+            updateResult('cells-regenerated', 'Nombre de cellules régénérées :', `${totalCellsRegenerated.toLocaleString('fr-FR')} milliards`, false);
+            updateResult('air-breathed', 'Nombre de litres d’air respirés :', `${Math.floor(totalAirBreathed).toLocaleString('fr-FR')} litres`, false);
+            updateResult('steps-count', 'Nombre de pas (estimation) :', Math.floor(totalSteps).toLocaleString('fr-FR'), false);
+            updateResult('km-walked', 'Distance parcourue (estimation) :', totalKmWalked.toFixed(2).toLocaleString('fr-FR') + ' km', false);
+
+            // --- Display Nourriture et boisson ---
+            updateResult('food-kg', 'Nombre de kilos de nourriture ingérés :', Math.floor(totalKgFoodIngested).toLocaleString('fr-FR') + ' kg', false);
+            updateResult('food-tonnes', 'Nombre de tonnes de nourriture ingérées :', totalTonnesFoodIngested.toFixed(2).toLocaleString('fr-FR') + ' tonnes', false);
+            updateResult('toilet-time-hours', 'Temps passé aux toilettes :', Math.floor(toiletHours).toLocaleString('fr-FR') + ' heures', true);
+            updateResult('water-liters-drunk', 'Nombre de litres d\'eau bus :', `${Math.floor(totalWaterLitersDrunk).toLocaleString('fr-FR')} litres`, false);
+            // NOUVEAU: Affichage Nombre de repas
+            updateResult('meals-count', 'Nombre de repas :', Math.floor(totalMeals).toLocaleString('fr-FR'), false);
+            // NOUVEAU: Affichage Poids total des selles
+            updateResult('stool-weight', 'Poids total des selles :', totalStoolWeightKg.toFixed(2).toLocaleString('fr-FR') + ' kg', false);
+            // NOUVEAU: Affichage Poids de sel ingéré
+            updateResult('salt-ingested', 'Poids de sel ingéré :', Math.floor(totalSaltIngestedGrams).toLocaleString('fr-FR') + ' g', false);
+
+
+            // --- Le monde aussi a changé ---
+            updateResult('population-growth', 'Augmentation de la population mondiale :', Math.floor(worldPopulationGrowth).toLocaleString('fr-FR') + ' personnes', false);
+            updateResult('sun-distance', 'Distance parcourue autour du soleil :', `${Math.floor(totalSunDistance).toLocaleString('fr-FR')} km`, false);
+            updateResult('deaths-since-birth', 'Nombre de décès depuis ta naissance :', Math.floor(totalDeathsSinceBirth).toLocaleString('fr-FR'), false);
+
+            // --- Autres Statistiques de Vie ---
+            updateResult('full-moons', 'Nombre de pleines lunes vues :', Math.floor(totalFullMoons).toLocaleString('fr-FR'), false);
+            updateResult('holidays-lived', 'Nombre de jours fériés vécus :', Math.floor(totalHolidaysLived).toLocaleString('fr-FR'), false);
+            updateResult('weekends-lived', 'Nombre de weekends vécus :', `${Math.floor(totalWeekendsLived).toLocaleString('fr-FR')} (${percentageWeekends}%)`, false);
+            updateResult('sitting-hours', 'Nombre d\'heures passées assis :', `${Math.floor(totalSittingHours).toLocaleString('fr-FR')} heures`, true);
+            // NOUVEAU: Affichage Nombre de lavages de dents
+            updateResult('teeth-brush-count', 'Nombre de lavages de dents :', Math.floor(teethBrushCount).toLocaleString('fr-FR'), false);
+
+
+            // Show all results sections and trigger scroll animation for new content
+            document.getElementById('life-lived-section').style.display = 'block';
+            document.getElementById('sleep-section').style.display = 'block';
+            document.getElementById('school-section').style.display = 'block';
+            document.getElementById('shower-section').style.display = 'block';
+            document.getElementById('work-section').style.display = 'block'; // Ensure new section is visible
+            document.getElementById('screen-time-section').style.display = 'block';
+            document.getElementById('money-earned-section').style.display = 'block';
+            document.getElementById('body-stats-section').style.display = 'block';
+            document.getElementById('food-drink-section').style.display = 'block';
+            document.getElementById('world-change-section').style.display = 'block';
+            document.getElementById('other-life-stats-section').style.display = 'block';
+            animateResultsOnScroll();
+            // Scroll to the first results section
+            document.getElementById('life-lived-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+
+        let gameInputCounter = 0; // To give unique IDs to new inputs
+        let salaryInputCounter = 0; // New counter for salary inputs
+
+        function addGameInput() {
+            const container = document.getElementById('game-inputs-container');
+            const newRow = document.createElement('div');
+            newRow.classList.add('game-input-row');
+            const rowId = `game-row-${gameInputCounter++}`;
+            newRow.id = rowId;
+            newRow.innerHTML = `
+                <input type="text" class="game-name-input" placeholder="Nom du jeu" required>
+                <input type="number" class="game-hours-input" min="0" step="1" placeholder="Heures de jeu" required>
+                <button type="button" class="remove-game remove-item" onclick="removeGameInput('${rowId}')">X</button>
+                <p class="game-error" style="display: none;">Veuillez entrer un nom et des heures valides.</p>
+            `;
+            container.appendChild(newRow);
+
+            const hoursInput = newRow.querySelector('.game-hours-input');
+            hoursInput.addEventListener('input', updateTotalGameTimeDisplay);
+            newRow.querySelector('.game-name-input').addEventListener('input', updateTotalGameTimeDisplay);
+
+
+            updateTotalGameTimeDisplay();
+            animateResultsOnScroll();
+        }
+
+        function removeGameInput(rowId) {
+            const rowToRemove = document.getElementById(rowId);
+            if (rowToRemove) {
+                rowToRemove.remove();
+                updateTotalGameTimeDisplay();
+                // We don't need to call calculateLifeStatistics here, as updateTotalGameTimeDisplay is sufficient
+            }
+        }
+
+        function updateTotalGameTimeDisplay() {
+            let totalGameHours = 0;
+            const gameInputRows = document.querySelectorAll('.game-input-row');
+            const gameInputError = document.getElementById('game-input-error');
+            let anyInvalidGameInput = false;
+
+            // Clear previous individual game results if they were generated
+            const gameResultsDiv = document.getElementById('game-results');
+            Array.from(gameResultsDiv.children).filter(child => child.id && child.id.startsWith('game-result-')).forEach(child => child.remove());
+
+
+            gameInputRows.forEach((row, index) => { // Added index here
+                const gameNameInput = row.querySelector('.game-name-input');
+                const gameHoursInput = row.querySelector('.game-hours-input');
+                const gameErrorRow = row.querySelector('.game-error');
+
+                const gameName = gameNameInput ? gameNameInput.value.trim() : '';
+                const gameHours = parseFloat(gameHoursInput ? gameHoursInput.value : '');
+
+                if (gameName === '' || isNaN(gameHours) || gameHours < 0) {
+                    anyInvalidGameInput = true;
+                    if (gameErrorRow) gameErrorRow.style.display = 'block';
+                } else {
+                    if (gameErrorRow) gameErrorRow.style.display = 'none';
+                    totalGameHours += gameHours;
+
+                    // Re-add individual game results here after validation
+                    const gameResultItem = document.createElement('div');
+                    gameResultItem.classList.add('result-item', 'show-on-scroll');
+                    gameResultItem.id = `game-result-${index}`; // Use index for unique ID
+                    gameResultItem.innerHTML = `
+                        <span class="label">Temps passé sur ${gameName || 'Jeu Inconnu'} :</span>
+                        <div class="value-container">
+                            <span class="percentage"></span>
+                            <strong>${Math.floor(gameHours).toLocaleString('fr-FR')} heures</strong>
+                        </div>
+                    `;
+                    const totalGameTimeDiv = document.getElementById('total-game-time');
+                    gameResultsDiv.insertBefore(gameResultItem, totalGameTimeDiv);
+                    updateResult(`game-result-${index}`, `Temps passé sur ${gameName || 'Jeu Inconnu'} :`, `${Math.floor(gameHours).toLocaleString('fr-FR')} heures`, true);
+                }
+            });
+
+            if (anyInvalidGameInput) {
+                gameInputError.style.display = 'block';
+            } else {
+                gameInputError.style.display = 'none';
+            }
+
+            updateResult('total-game-time', 'Temps total de jeu :', `${Math.floor(totalGameHours).toLocaleString('fr-FR')} heures`, totalHoursLivedPrecise > 0);
+            animateResultsOnScroll(); // Re-animate newly added result items
+        }
+
+        function addSalaryInput() {
+            const container = document.getElementById('salary-inputs-container');
+            const newRow = document.createElement('div');
+            newRow.classList.add('salary-input-row');
+            const rowId = `salary-row-${salaryInputCounter++}`;
+            newRow.id = rowId;
+            newRow.innerHTML = `
+                <input type="text" class="job-name-input" placeholder="Nom du métier" required>
+                <input type="number" class="net-salary-input" min="0" step="1" placeholder="Salaire net mensuel (€)" required>
+                <input type="number" class="duration-months-input duration-input" min="0" step="1" placeholder="Durée (mois)" required>
+                <button type="button" class="remove-salary remove-item" onclick="removeSalaryInput('${rowId}')">X</button>
+                <p class="salary-error" style="display: none;">Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide.</p>
+            `;
+            container.appendChild(newRow);
+
+            // Add event listeners for immediate updates
+            newRow.querySelector('.job-name-input').addEventListener('input', updateTotalMoneyEarnedDisplay);
+            newRow.querySelector('.net-salary-input').addEventListener('input', updateTotalMoneyEarnedDisplay);
+            newRow.querySelector('.duration-months-input').addEventListener('input', updateTotalMoneyEarnedDisplay);
+
+            updateTotalMoneyEarnedDisplay();
+            animateResultsOnScroll();
+        }
+
+        function removeSalaryInput(rowId) {
+            const rowToRemove = document.getElementById(rowId);
+            if (rowToRemove) {
+                rowToRemove.remove();
+                updateTotalMoneyEarnedDisplay();
+                // We don't need to call calculateLifeStatistics here, as updateTotalMoneyEarnedDisplay is sufficient
+            }
+        }
+
+        function updateTotalMoneyEarnedDisplay() {
+            let totalMoneyEarned = 0;
+            const salaryInputRows = document.querySelectorAll('.salary-input-row');
+            const salaryInputError = document.getElementById('salary-input-error');
+            let anyInvalidSalaryInput = false;
+
+            // Clear previous individual salary results if they were generated
+            const salaryResultsDiv = document.getElementById('salary-results');
+            Array.from(salaryResultsDiv.children).filter(child => child.id && child.id.startsWith('salary-result-')).forEach(child => child.remove());
+
+
+            salaryInputRows.forEach((row, index) => { // Added index here
+                const jobNameInput = row.querySelector('.job-name-input');
+                const netSalaryInput = row.querySelector('.net-salary-input');
+                const durationMonthsInput = row.querySelector('.duration-months-input');
+                const salaryErrorRow = row.querySelector('.salary-error');
+
+                const jobName = jobNameInput ? jobNameInput.value.trim() : '';
+                const netSalary = parseFloat(netSalaryInput ? netSalaryInput.value : '');
+                const durationMonths = parseFloat(durationMonthsInput ? durationMonthsInput.value : '');
+
+                if (jobName === '' || isNaN(netSalary) || netSalary < 0 || isNaN(durationMonths) || durationMonths < 0) {
+                    anyInvalidSalaryInput = true;
+                    if (salaryErrorRow) salaryErrorRow.style.display = 'block';
+                } else {
+                    if (salaryErrorRow) salaryErrorRow.style.display = 'none';
+                    const earnedForThisJob = netSalary * durationMonths;
+                    totalMoneyEarned += earnedForThisJob;
+
+                    // Re-add individual salary results here after validation
+                    const salaryResultItem = document.createElement('div');
+                    salaryResultItem.classList.add('result-item', 'show-on-scroll');
+                    salaryResultItem.id = `salary-result-${index}`; // Use index for unique ID
+                    salaryResultItem.innerHTML = `
+                        <span class="label">Argent gagné avec ${jobName || 'Métier Inconnu'} :</span>
+                        <div class="value-container">
+                            <strong>${earnedForThisJob.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</strong>
+                        </div>
+                    `;
+                    const totalMoneyEarnedDiv = document.getElementById('total-money-earned');
+                    salaryResultsDiv.insertBefore(salaryResultItem, totalMoneyEarnedDiv);
+                }
+            });
+
+            if (anyInvalidSalaryInput) {
+                salaryInputError.style.display = 'block';
+            } else {
+                salaryInputError.style.display = 'none';
+            }
+
+            updateResult('total-money-earned', 'Argent total gagné :', totalMoneyEarned.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }), false);
+            animateResultsOnScroll(); // Re-animate newly added result items
+        }
+
+
+        function calculateSchoolTime() {
+            const birthDate = validateAndParseDOB();
+            const schoolStartAge = parseInt(document.getElementById('school-start-age').value);
+            const schoolEndAge = parseInt(document.getElementById('school-end-age').value);
+            const schoolHoursPerDay = parseFloat(document.getElementById('school-hours-per-day').value);
+            const schoolErrorMessage = document.getElementById('school-error-message');
+
+            if (!birthDate) { // Check birthDate first
+                 schoolErrorMessage.style.display = 'block';
+                 schoolErrorMessage.textContent = 'Veuillez d\'abord entrer une date de naissance valide.';
+                 updateResult('school-hours-total', 'Heures totales d\'école :', '0', false);
+                 return;
+            }
+
+            if (isNaN(schoolStartAge) || isNaN(schoolEndAge) || isNaN(schoolHoursPerDay) ||
+                schoolStartAge < 0 || schoolEndAge < 0 || schoolStartAge >= schoolEndAge || schoolHoursPerDay < 0 || schoolHoursPerDay > 24) {
+                schoolErrorMessage.style.display = 'block';
+                schoolErrorMessage.textContent = 'Veuillez entrer des âges valides (début < fin) et des heures d\'école.';
+                updateResult('school-hours-total', 'Heures totales d\'école :', '0', false);
+                return;
+            } else {
+                schoolErrorMessage.style.display = 'none';
+            }
+
+            // Calculate current age based on birthDate
+            const currentDate = new Date();
+            const currentAgeInYears = currentDate.getFullYear() - birthDate.getFullYear();
+            if (currentDate.getMonth() < birthDate.getMonth() || (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())) {
+                // currentAgeInYears--; // No need to decrement here, currentAge will be precise enough
+            }
+
+            // Determine the effective period of schooling
+            const effectiveSchoolEndAge = Math.min(schoolEndAge, currentAgeInYears);
+
+            // Calculate the number of years actually spent in school
+            let actualYearsInSchool = 0;
+            if (effectiveSchoolEndAge > schoolStartAge) {
+                actualYearsInSchool = effectiveSchoolEndAge - schoolStartAge;
+            }
+
+
+            const schoolDaysPerYear = 180; // Approximate number of school days in a year
+            let totalSchoolHours = actualYearsInSchool * schoolDaysPerYear * schoolHoursPerDay;
+
+            updateResult('school-hours-total', 'Heures totales d\'école :', Math.floor(totalSchoolHours).toLocaleString('fr-FR'), true);
+
+            animateResultsOnScroll();
+        }
+
+        function calculateWorkTime() {
+            const birthDate = validateAndParseDOB();
+            const workHoursPerWeek = parseFloat(document.getElementById('work-hours-per-week').value);
+            const workStartAge = parseInt(document.getElementById('work-start-age').value);
+            const workEndAge = parseInt(document.getElementById('work-end-age').value);
+            const workErrorMessage = document.getElementById('work-error-message');
+
+            if (!birthDate) { // Check birthDate first
+                workErrorMessage.style.display = 'block';
+                workErrorMessage.textContent = 'Veuillez d\'abord entrer une date de naissance valide.';
+                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            }
+
+            if (isNaN(workHoursPerWeek) || isNaN(workStartAge) || isNaN(workEndAge) ||
+                workHoursPerWeek < 0 || workHoursPerWeek > 168 || workStartAge < 0 || workEndAge < 0 || workStartAge >= workEndAge) {
+                workErrorMessage.style.display = 'block';
+                workErrorMessage.textContent = 'Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).';
+                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            } else {
+                workErrorMessage.style.display = 'none';
+            }
+
+            const currentDate = new Date();
+            const currentAgeInYears = currentDate.getFullYear() - birthDate.getFullYear();
+            if (currentDate.getMonth() < birthDate.getMonth() || (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())) {
+                // currentAgeInYears--; // No need to decrement here, currentAge will be precise enough
+            }
+
+            let effectiveWorkEndAge = Math.min(workEndAge, currentAgeInYears);
+
+            if (effectiveWorkEndAge <= workStartAge) {
+                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            }
+
+            const yearsWorking = effectiveWorkEndAge - workStartAge;
+            const workWeeksPerYear = 47; // Assuming 52 weeks - 5 weeks holiday
+            let totalWorkHours = yearsWorking * workWeeksPerWeek * workHoursPerWeek;
+
+            updateResult('work-hours-total', 'Heures totales de travail :', Math.floor(totalWorkHours).toLocaleString('fr-FR'), true);
+
+            animateResultsOnScroll();
+        }
+
+
+        function updateResult(elementId, labelText, valueText, showPercentage) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                return;
+            }
+
+            let labelSpan = element.querySelector('.label');
+            let valueContainer = element.querySelector('.value-container');
+            let strongElement = valueContainer ? valueContainer.querySelector('strong') : null;
+            let percentageElement = valueContainer ? valueContainer.querySelector('.percentage') : null;
+
+            if (!labelSpan) {
+                labelSpan = document.createElement('span');
+                labelSpan.classList.add('label');
+                element.prepend(labelSpan);
+            }
+            labelSpan.textContent = labelText;
+
+            if (!valueContainer) {
+                valueContainer = document.createElement('div');
+                valueContainer.classList.add('value-container');
+                element.appendChild(valueContainer);
+            }
+
+            if (!strongElement) {
+                strongElement = document.createElement('strong');
+                valueContainer.appendChild(strongElement);
+            }
+            strongElement.textContent = valueText;
+
+            if (showPercentage && totalHoursLivedPrecise > 0) {
+                if (!percentageElement) {
+                    percentageElement = document.createElement('span');
+                    percentageElement.classList.add('percentage');
+                    valueContainer.prepend(percentageElement);
+                }
+
+                let calculatedPercentage;
+                if (elementId === 'weekends-lived') {
+                    const match = valueText.match(/\(([^%]+)%\)/);
+                    calculatedPercentage = match ? parseFloat(match[1]).toFixed(2) : '0.00';
+                } else if (elementId === 'result-hours') {
+                    calculatedPercentage = '100.00';
+                } else {
+                    const valueMatch = valueText.match(/(\d[\d\s\.,]*)/); // Extract number from valueText
+                    const numericalValue = valueMatch ? parseFloat(valueMatch[1].replace(/\s/g, '').replace(',', '.')) : 0;
+                    calculatedPercentage = totalHoursLivedPrecise > 0 ? ((numericalValue / totalHoursLivedPrecise) * 100).toFixed(2) : '0.00';
+                }
+                percentageElement.textContent = `${calculatedPercentage}%`;
+
+            } else if (percentageElement) {
+                percentageElement.remove();
+            }
+        }
+
+
+        function resetResults() {
+            const results = document.querySelectorAll('.result-item');
+            results.forEach(item => {
+                const strongElement = item.querySelector('strong');
+                if (strongElement) {
+                    if (['result-seconds', 'result-minutes', 'result-days', 'result-months', 'result-years', 'steps-count', 'heart-beats', 'holidays-lived', 'full-moons', 'deaths-since-birth', 'meals-count', 'teeth-brush-count'].includes(item.id)) {
+                        strongElement.textContent = '0';
+                    } else if (['result-hours', 'sleep-hours-result', 'school-hours-total', 'toilet-time-hours', 'sitting-hours', 'work-hours-total', 'total-game-time'].includes(item.id)) {
+                        strongElement.textContent = '0 heures';
+                    } else if (item.id === 'km-walked') {
+                        strongElement.textContent = '0 km';
+                    } else if (item.id === 'shower-time-hours') {
+                        strongElement.textContent = '0 heures';
+                    } else if (item.id === 'shower-water-consumption') {
+                        strongElement.textContent = '0 litres';
+                    } else if (item.id === 'food-kg') {
+                        strongElement.textContent = '0 kg';
+                    } else if (item.id === 'food-tonnes') {
+                        strongElement.textContent = '0 tonnes';
+                    } else if (item.id === 'population-growth') {
+                         strongElement.textContent = '0 personnes';
+                    } else if (item.id === 'water-liters-drunk' || item.id === 'air-breathed') {
+                         strongElement.textContent = '0 litres';
+                    } else if (item.id === 'weekends-lived') {
+                         strongElement.textContent = '0 (0.00%)';
+                    } else if (item.id === 'sun-distance') {
+                        strongElement.textContent = '0 km';
+                    } else if (item.id === 'cells-regenerated') {
+                        strongElement.textContent = '0 milliards';
+                    } else if (item.id === 'total-money-earned') {
+                        strongElement.textContent = '0 €';
+                    } else if (item.id === 'stool-weight') { // NEW
+                        strongElement.textContent = '0 kg';
+                    } else if (item.id === 'salt-ingested') { // NEW
+                        strongElement.textContent = '0 g';
+                    }
+                }
+
+                const percentageSpan = item.querySelector('.percentage');
+                if (percentageSpan) {
+                    percentageSpan.textContent = '';
+                }
+            });
+            // Reset all results sections visibility
+            document.querySelectorAll('.results-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            dobError.style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('game-input-error').style.display = 'none';
+            document.getElementById('salary-input-error').style.display = 'none';
+            document.getElementById('school-error-message').style.display = 'none';
+            document.getElementById('work-error-message').style.display = 'none';
+
+
+            // Clear all dynamically added game input rows
+            document.getElementById('game-inputs-container').innerHTML = '';
+            const gameResultsDiv = document.getElementById('game-results');
+            Array.from(gameResultsDiv.children).filter(child => child.id && child.id.startsWith('game-result-')).forEach(child => child.remove());
+
+            // Clear all dynamically added salary input rows
+            document.getElementById('salary-inputs-container').innerHTML = '';
+            const salaryResultsDiv = document.getElementById('salary-results');
+            Array.from(salaryResultsDiv.children).filter(child => child.id && child.id.startsWith('salary-result-')).forEach(child => child.remove());
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        function animateResultsOnScroll() {
+            const results = document.querySelectorAll('.show-on-scroll');
+            results.forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resetResults();
+
+            // Add event listeners for the input fields for work and school to trigger recalculations
+            document.getElementById('school-start-age').addEventListener('input', calculateSchoolTime);
+            document.getElementById('school-end-age').addEventListener('input', calculateSchoolTime);
+            document.getElementById('school-hours-per-day').addEventListener('input', calculateSchoolTime);
+
+            document.getElementById('work-hours-per-week').addEventListener('input', calculateWorkTime);
+            document.getElementById('work-start-age').addEventListener('input', calculateWorkTime);
+            document.getElementById('work-end-age').addEventListener('input', calculateWorkTime);
+        });
+    </script>
+</body>
+</html>
