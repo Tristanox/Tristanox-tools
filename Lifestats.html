@@ -9,21 +9,21 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #1e2124; /* Noir/gris très foncé */
-            color: #f0f0f0; /* Texte clair pour contraste */
+            background-color: #1E2124; /* Changed */
+            color: #f4f7f6; /* Changed */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            background: linear-gradient(135deg, #282b30 0%, #1e2124 100%); /* Dégradé de gris */
+            background: linear-gradient(135deg, #1E2124 0%, #282B30 100%); /* Changed */
         }
 
         .container {
-            background-color: #36393e; /* Gris foncé pour les conteneurs */
+            background-color: #36393E; /* Changed */
             padding: 30px 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Changed */
             max-width: 800px;
             width: 100%;
             text-align: center;
@@ -43,7 +43,7 @@
         }
 
         h1 {
-            color: #55ff75; /* Vert clair pour le titre principal */
+            color: #55FF75; /* Changed */
             margin-bottom: 25px;
             font-size: 2.2em;
             position: relative;
@@ -58,7 +58,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background-color: #72da72; /* Vert plus doux pour la ligne sous le titre */
+            background-color: #72DA72; /* Changed */
             border-radius: 2px;
         }
 
@@ -71,7 +71,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #a0a0a0; /* Texte des labels légèrement plus clair */
+            color: #f4f7f6; /* Changed */
             font-size: 1.1em;
         }
 
@@ -80,36 +80,36 @@
             width: calc(100% - 20px);
             padding: 12px;
             margin-bottom: 15px;
-            border: 1px solid #424549; /* Bordure des inputs gris foncé */
+            border: 1px solid #424549; /* Changed */
             border-radius: 8px;
             font-size: 1.1em;
             box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: #282b30; /* Fond des inputs gris légèrement plus clair */
-            color: #f0f0f0; /* Texte des inputs clair */
+            background-color: #282B30; /* Changed */
+            color: #f4f7f6; /* Changed */
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
-            border-color: #55ff75; /* Vert clair au focus */
-            box-shadow: 0 0 8px rgba(85, 255, 117, 0.4); /* Ombre verte au focus */
+            border-color: #72DA72; /* Changed */
+            box-shadow: 0 0 8px rgba(114, 218, 114, 0.4); /* Changed */
             outline: none;
         }
 
         button {
-            background-color: #55ff75; /* Vert clair pour les boutons */
-            color: #1e2124; /* Texte foncé pour les boutons verts */
+            background-color: #72DA72; /* Changed */
+            color: #1E2124; /* Changed */
             padding: 14px 25px;
             border: none;
             border-radius: 8px;
             font-size: 1.15em;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         button:hover {
-            background-color: #72da72; /* Vert plus doux au survol */
+            background-color: #55FF75; /* Changed */
             transform: translateY(-2px);
         }
 
@@ -121,19 +121,19 @@
         }
 
         .results-section h2 {
-            color: #55ff75; /* Vert clair pour les titres de section */
+            color: #55FF75; /* Changed */
             margin-bottom: 20px;
             font-size: 1.8em;
-            border-bottom: 2px solid #424549; /* Bordure sous le titre de section gris foncé */
+            border-bottom: 2px solid #424549; /* Changed */
             padding-bottom: 10px;
         }
 
         .result-item {
-            background-color: #282b30; /* Fond des résultats gris légèrement plus clair */
+            background-color: #282B30; /* Changed */
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -145,13 +145,13 @@
 
         .result-item:hover {
             transform: translateY(-3px);
-            background-color: #424549; /* Gris foncé au survol des résultats */
+            background-color: #424549; /* Changed */
         }
 
         .result-item .label {
             flex-grow: 1;
             text-align: left;
-            color: #e0e0e0; /* Texte des labels de résultats plus clair */
+            color: #f4f7f6; /* Changed */
         }
 
         .result-item .value-container {
@@ -161,27 +161,27 @@
         }
 
         .result-item .value-container strong {
-            color: #55ff75; /* Vert clair pour les valeurs importantes */
+            color: #55FF75; /* Changed */
             font-size: 1.2em;
             white-space: nowrap;
         }
 
         .result-item .percentage {
             font-size: 0.9em;
-            color: #a0a0a0; /* Pourcentage en gris clair */
+            color: #72DA72; /* Changed */
             margin-right: 10px;
             white-space: nowrap;
             font-weight: bold;
         }
 
-        #error-message, .game-error, .salary-error, #school-error-message, #work-error-message, #dob-error {
-            color: #ff5555; /* Rouge vif pour les messages d'erreur */
+        #error-message, #dob-error, .game-error, .salary-error, #school-error-message, #work-error-message {
+            color: #FF5555; /* Changed from red, assuming a bright error color */
             margin-top: 15px;
             font-weight: bold;
             display: none;
             font-size: 0.9em;
-            text-align: left;
             width: 100%;
+            text-align: left;
         }
 
         .school-input-group, .work-input-group {
@@ -229,16 +229,16 @@
             min-width: 80px;
         }
         .game-input-row button.remove-game, .salary-input-row button.remove-item {
-            background-color: #ff5555; /* Rouge pour le bouton de suppression */
+            background-color: #FF5555; /* Changed */
             padding: 8px 12px;
             font-size: 0.9em;
             border-radius: 5px;
             box-shadow: none;
             transition: background-color 0.2s ease;
-            color: #1e2124; /* Texte foncé sur bouton rouge */
+            color: #f4f7f6; /* Changed */
         }
         .game-input-row button.remove-game:hover, .salary-input-row button.remove-item:hover {
-            background-color: #cc4444; /* Rouge plus foncé au survol */
+            background-color: #CC4444; /* Changed */
             transform: translateY(0);
         }
 
@@ -256,7 +256,7 @@
         .footer {
             margin-top: 40px;
             font-size: 0.9em;
-            color: #a0a0a0; /* Texte du footer en gris clair */
+            color: #999; /* Changed */
         }
 
         @media (max-width: 600px) {
@@ -353,7 +353,7 @@
                 <input type="number" id="school-hours-per-day" min="0" max="24" step="0.5" value="6" class="school-age-input"> heures par jour (jours d'école).
             </label>
             <button onclick="calculateSchoolTime()" style="margin-top: 15px;">Calculer le temps d'école</button>
-            <p id="school-error-message" style="color: #ff5555; margin-top: 10px; display: none;">Veuillez entrer des âges valides (début < fin) et des heures d'école.</p>
+            <p id="school-error-message" style="color: #FF5555; margin-top: 10px; display: none;">Veuillez entrer des âges valides (début < fin) et des heures d'école.</p>
         </div>
         <div id="school-results">
             <div class="result-item show-on-scroll" id="school-hours-total"><span class="label">Heures totales d'école :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
@@ -377,7 +377,7 @@
                 <input type="number" id="work-end-age" min="0" value="60" class="work-age-input"> ans.
             </label>
             <button onclick="calculateWorkTime()" style="margin-top: 15px;">Calculer le temps de travail</button>
-            <p id="work-error-message" style="color: #ff5555; margin-top: 10px; display: none;">Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).</p>
+            <p id="work-error-message" style="color: #FF5555; margin-top: 10px; display: none;">Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).</p>
         </div>
         <div id="work-results">
             <div class="result-item show-on-scroll" id="work-hours-total"><span class="label">Heures totales de travail :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
@@ -750,7 +750,7 @@
             updateResult('full-moons', 'Nombre de pleines lunes vues :', Math.floor(totalFullMoons).toLocaleString('fr-FR'), false);
             updateResult('holidays-lived', 'Nombre de jours fériés vécus :', Math.floor(totalHolidaysLived).toLocaleString('fr-FR'), false);
             updateResult('weekends-lived', 'Nombre de weekends vécus :', `${Math.floor(totalWeekendsLived).toLocaleString('fr-FR')} (${percentageWeekends}%)`, false);
-            updateResult('sitting-hours', 'Nombre d'heures passées assis :', `${Math.floor(totalSittingHours).toLocaleString('fr-FR')} heures`, true);
+            updateResult('sitting-hours', 'Nombre d\'heures passées assis :', `${Math.floor(totalSittingHours).toLocaleString('fr-FR')} heures`, true);
             // NOUVEAU: Affichage Nombre de lavages de dents
             updateResult('teeth-brush-count', 'Nombre de lavages de dents :', Math.floor(teethBrushCount).toLocaleString('fr-FR'), false);
 
@@ -1009,3 +1009,195 @@
                 workErrorMessage.style.display = 'block';
                 workErrorMessage.textContent = 'Veuillez d\'abord entrer une date de naissance valide.';
                 updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            }
+
+            if (isNaN(workHoursPerWeek) || isNaN(workStartAge) || isNaN(workEndAge) ||
+                workHoursPerWeek < 0 || workHoursPerWeek > 168 || workStartAge < 0 || workEndAge < 0 || workStartAge >= workEndAge) {
+                workErrorMessage.style.display = 'block';
+                workErrorMessage.textContent = 'Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).';
+                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            } else {
+                workErrorMessage.style.display = 'none';
+            }
+
+            const currentDate = new Date();
+            const currentAgeInYears = currentDate.getFullYear() - birthDate.getFullYear();
+            if (currentDate.getMonth() < birthDate.getMonth() || (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())) {
+                // currentAgeInYears--; // No need to decrement here, currentAge will be precise enough
+            }
+
+            let effectiveWorkEndAge = Math.min(workEndAge, currentAgeInYears);
+
+            if (effectiveWorkEndAge <= workStartAge) {
+                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                return;
+            }
+
+            const yearsWorking = effectiveWorkEndAge - workStartAge;
+            const workWeeksPerYear = 47; // Assuming 52 weeks - 5 weeks holiday
+            let totalWorkHours = yearsWorking * workWeeksPerYear * workHoursPerWeek;
+
+            updateResult('work-hours-total', 'Heures totales de travail :', Math.floor(totalWorkHours).toLocaleString('fr-FR'), true);
+
+            animateResultsOnScroll();
+        }
+
+
+        function updateResult(elementId, labelText, valueText, showPercentage) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                return;
+            }
+
+            let labelSpan = element.querySelector('.label');
+            let valueContainer = element.querySelector('.value-container');
+            let strongElement = valueContainer ? valueContainer.querySelector('strong') : null;
+            let percentageElement = valueContainer ? valueContainer.querySelector('.percentage') : null;
+
+            if (!labelSpan) {
+                labelSpan = document.createElement('span');
+                labelSpan.classList.add('label');
+                element.prepend(labelSpan);
+            }
+            labelSpan.textContent = labelText;
+
+            if (!valueContainer) {
+                valueContainer = document.createElement('div');
+                valueContainer.classList.add('value-container');
+                element.appendChild(valueContainer);
+            }
+
+            if (!strongElement) {
+                strongElement = document.createElement('strong');
+                valueContainer.appendChild(strongElement);
+            }
+            strongElement.textContent = valueText;
+
+            if (showPercentage && totalHoursLivedPrecise > 0) {
+                if (!percentageElement) {
+                    percentageElement = document.createElement('span');
+                    percentageElement.classList.add('percentage');
+                    valueContainer.prepend(percentageElement);
+                }
+
+                let calculatedPercentage;
+                if (elementId === 'weekends-lived') {
+                    const match = valueText.match(/\(([^%]+)%\)/);
+                    calculatedPercentage = match ? parseFloat(match[1]).toFixed(2) : '0.00';
+                } else if (elementId === 'result-hours') {
+                    calculatedPercentage = '100.00';
+                } else {
+                    const valueMatch = valueText.match(/(\d[\d\s\.,]*)/); // Extract number from valueText
+                    const numericalValue = valueMatch ? parseFloat(valueMatch[1].replace(/\s/g, '').replace(',', '.')) : 0;
+                    calculatedPercentage = totalHoursLivedPrecise > 0 ? ((numericalValue / totalHoursLivedPrecise) * 100).toFixed(2) : '0.00';
+                }
+                percentageElement.textContent = `${calculatedPercentage}%`;
+
+            } else if (percentageElement) {
+                percentageElement.remove();
+            }
+        }
+
+
+        function resetResults() {
+            const results = document.querySelectorAll('.result-item');
+            results.forEach(item => {
+                const strongElement = item.querySelector('strong');
+                if (strongElement) {
+                    if (['result-seconds', 'result-minutes', 'result-days', 'result-months', 'result-years', 'steps-count', 'heart-beats', 'holidays-lived', 'full-moons', 'deaths-since-birth', 'meals-count', 'teeth-brush-count'].includes(item.id)) {
+                        strongElement.textContent = '0';
+                    } else if (['result-hours', 'sleep-hours-result', 'school-hours-total', 'toilet-time-hours', 'sitting-hours', 'work-hours-total', 'total-game-time'].includes(item.id)) {
+                        strongElement.textContent = '0 heures';
+                    } else if (item.id === 'km-walked') {
+                        strongElement.textContent = '0 km';
+                    } else if (item.id === 'shower-time-hours') {
+                        strongElement.textContent = '0 heures';
+                    } else if (item.id === 'shower-water-consumption') {
+                        strongElement.textContent = '0 litres';
+                    } else if (item.id === 'food-kg') {
+                        strongElement.textContent = '0 kg';
+                    } else if (item.id === 'food-tonnes') {
+                        strongElement.textContent = '0 tonnes';
+                    } else if (item.id === 'population-growth') {
+                         strongElement.textContent = '0 personnes';
+                    } else if (item.id === 'water-liters-drunk' || item.id === 'air-breathed') {
+                         strongElement.textContent = '0 litres';
+                    } else if (item.id === 'weekends-lived') {
+                         strongElement.textContent = '0 (0.00%)';
+                    } else if (item.id === 'sun-distance') {
+                        strongElement.textContent = '0 km';
+                    } else if (item.id === 'cells-regenerated') {
+                        strongElement.textContent = '0 milliards';
+                    } else if (item.id === 'total-money-earned') {
+                        strongElement.textContent = '0 €';
+                    } else if (item.id === 'stool-weight') { // NEW
+                        strongElement.textContent = '0 kg';
+                    } else if (item.id === 'salt-ingested') { // NEW
+                        strongElement.textContent = '0 g';
+                    }
+                }
+
+                const percentageSpan = item.querySelector('.percentage');
+                if (percentageSpan) {
+                    percentageSpan.textContent = '';
+                }
+            });
+            // Reset all results sections visibility
+            document.querySelectorAll('.results-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            dobError.style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('game-input-error').style.display = 'none';
+            document.getElementById('salary-input-error').style.display = 'none';
+            document.getElementById('school-error-message').style.display = 'none';
+            document.getElementById('work-error-message').style.display = 'none';
+
+
+            // Clear all dynamically added game input rows
+            document.getElementById('game-inputs-container').innerHTML = '';
+            const gameResultsDiv = document.getElementById('game-results');
+            Array.from(gameResultsDiv.children).filter(child => child.id && child.id.startsWith('game-result-')).forEach(child => child.remove());
+
+            // Clear all dynamically added salary input rows
+            document.getElementById('salary-inputs-container').innerHTML = '';
+            const salaryResultsDiv = document.getElementById('salary-results');
+            Array.from(salaryResultsDiv.children).filter(child => child.id && child.id.startsWith('salary-result-')).forEach(child => child.remove());
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                } else {
+                    entry.target.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+
+        function animateResultsOnScroll() {
+            const results = document.querySelectorAll('.show-on-scroll');
+            results.forEach(item => {
+                observer.observe(item);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            resetResults();
+
+            // Add event listeners for the input fields for work and school to trigger recalculations
+            document.getElementById('school-start-age').addEventListener('input', calculateSchoolTime);
+            document.getElementById('school-end-age').addEventListener('input', calculateSchoolTime);
+            document.getElementById('school-hours-per-day').addEventListener('input', calculateSchoolTime);
+
+            document.getElementById('work-hours-per-week').addEventListener('input', calculateWorkTime);
+            document.getElementById('work-start-age').addEventListener('input', calculateWorkTime);
+            document.getElementById('work-end-age').addEventListener('input', calculateWorkTime);
+        });
+    </script>
+</body>
+</html>
