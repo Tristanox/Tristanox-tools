@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Vie en Chiffres</title>
+    <title data-lang-key="pageTitle">My Life in Numbers</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #1E2124; /* Changed */
-            color: #f4f7f6; /* Changed */
+            background-color: #1e2124; /* Updated to palette color */
+            color: #dbeaf0; /* Light grey for readability on dark background */
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-            background: linear-gradient(135deg, #1E2124 0%, #282B30 100%); /* Changed */
+            /* Removed linear-gradient as per new dark theme, keeping background-color */
         }
 
         .container {
-            background-color: #36393E; /* Changed */
+            background-color: #282b30; /* Updated to palette color */
             padding: 30px 40px;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Changed */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Adjusted shadow for dark theme */
             max-width: 800px;
             width: 100%;
             text-align: center;
@@ -43,7 +43,7 @@
         }
 
         h1 {
-            color: #55FF75; /* Changed */
+            color: #55ff75; /* Updated to palette color */
             margin-bottom: 25px;
             font-size: 2.2em;
             position: relative;
@@ -58,7 +58,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background-color: #72DA72; /* Changed */
+            background-color: #55ff75; /* Updated to palette color */
             border-radius: 2px;
         }
 
@@ -71,7 +71,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #f4f7f6; /* Changed */
+            color: #aed6f1; /* Adjusted for better visibility on dark background */
             font-size: 1.1em;
         }
 
@@ -80,25 +80,25 @@
             width: calc(100% - 20px);
             padding: 12px;
             margin-bottom: 15px;
-            border: 1px solid #424549; /* Changed */
+            border: 1px solid #424549; /* Updated to palette color */
             border-radius: 8px;
             font-size: 1.1em;
             box-sizing: border-box;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            background-color: #282B30; /* Changed */
-            color: #f4f7f6; /* Changed */
+            background-color: #282b30; /* Match container background for input fields */
+            color: #dbeaf0; /* Text color for input fields */
         }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
-            border-color: #72DA72; /* Changed */
-            box-shadow: 0 0 8px rgba(114, 218, 114, 0.4); /* Changed */
+            border-color: #55ff75; /* Updated to palette color */
+            box-shadow: 0 0 8px rgba(85, 255, 117, 0.4); /* Adjusted shadow for green focus */
             outline: none;
         }
 
         button {
-            background-color: #72DA72; /* Changed */
-            color: #1E2124; /* Changed */
+            background-color: #55ff75; /* Updated to palette color */
+            color: #1e2124; /* Text color for contrast */
             padding: 14px 25px;
             border: none;
             border-radius: 8px;
@@ -109,7 +109,7 @@
         }
 
         button:hover {
-            background-color: #55FF75; /* Changed */
+            background-color: #47d162; /* Slightly darker green on hover */
             transform: translateY(-2px);
         }
 
@@ -121,15 +121,15 @@
         }
 
         .results-section h2 {
-            color: #55FF75; /* Changed */
+            color: #55ff75; /* Updated to palette color */
             margin-bottom: 20px;
             font-size: 1.8em;
-            border-bottom: 2px solid #424549; /* Changed */
+            border-bottom: 2px solid #72da72; /* Updated to palette color */
             padding-bottom: 10px;
         }
 
         .result-item {
-            background-color: #282B30; /* Changed */
+            background-color: #36393e; /* Updated to palette color */
             padding: 15px;
             margin-bottom: 15px;
             border-radius: 8px;
@@ -141,17 +141,17 @@
             transition: transform 0.3s ease, background-color 0.3s ease;
             opacity: 0; /* Hidden initially for scroll animation */
             transform: translateY(20px);
+            color: #dbeaf0; /* Text color for result items */
         }
 
         .result-item:hover {
             transform: translateY(-3px);
-            background-color: #424549; /* Changed */
+            background-color: #424549; /* Updated to palette color */
         }
 
         .result-item .label {
             flex-grow: 1;
             text-align: left;
-            color: #f4f7f6; /* Changed */
         }
 
         .result-item .value-container {
@@ -161,27 +161,31 @@
         }
 
         .result-item .value-container strong {
-            color: #55FF75; /* Changed */
+            color: #72da72; /* Updated to palette color */
             font-size: 1.2em;
             white-space: nowrap;
         }
 
         .result-item .percentage {
             font-size: 0.9em;
-            color: #72DA72; /* Changed */
+            color: #999; /* Kept for general purpose grey */
             margin-right: 10px;
             white-space: nowrap;
             font-weight: bold;
         }
 
-        #error-message, #dob-error, .game-error, .salary-error, #school-error-message, #work-error-message {
-            color: #FF5555; /* Changed from red, assuming a bright error color */
+        #error-message {
+            color: #e74c3c; /* Kept red for error visibility */
             margin-top: 15px;
             font-weight: bold;
             display: none;
+        }
+        #dob-error {
+            color: #e74c3c; /* Kept red for error visibility */
+            margin-top: 5px;
+            font-weight: bold;
+            display: none;
             font-size: 0.9em;
-            width: 100%;
-            text-align: left;
         }
 
         .school-input-group, .work-input-group {
@@ -229,17 +233,25 @@
             min-width: 80px;
         }
         .game-input-row button.remove-game, .salary-input-row button.remove-item {
-            background-color: #FF5555; /* Changed */
+            background-color: #e74c3c; /* Kept red for remove action */
             padding: 8px 12px;
             font-size: 0.9em;
             border-radius: 5px;
             box-shadow: none;
             transition: background-color 0.2s ease;
-            color: #f4f7f6; /* Changed */
         }
         .game-input-row button.remove-game:hover, .salary-input-row button.remove-item:hover {
-            background-color: #CC4444; /* Changed */
+            background-color: #c0392b; /* Darker red on hover */
             transform: translateY(0);
+        }
+        .game-error, .salary-error, #school-error-message, #work-error-message {
+            color: #e74c3c; /* Kept red for error visibility */
+            font-size: 0.9em;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            display: none;
+            width: 100%;
+            text-align: left;
         }
 
         .show-on-scroll {
@@ -256,8 +268,37 @@
         .footer {
             margin-top: 40px;
             font-size: 0.9em;
-            color: #999; /* Changed */
+            color: #aaa; /* Lighter grey for footer text */
         }
+
+        /* Language Switch Styles */
+        .language-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .language-switch img {
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .language-switch img.active {
+            border-color: #55ff75; /* Active flag border */
+            transform: scale(1.1);
+        }
+
+        .language-switch img:hover {
+            opacity: 0.8;
+        }
+
 
         @media (max-width: 600px) {
             .container {
@@ -293,171 +334,184 @@
                 width: 100%;
                 flex: none;
             }
+            .language-switch {
+                top: 10px;
+                right: 10px;
+                gap: 5px;
+            }
+            .language-switch img {
+                width: 25px;
+                height: 25px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="language-switch">
+        <img id="flag-en" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png" alt="English" onclick="setLanguage('en')">
+        <img id="flag-fr" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France.png" alt="Français" onclick="setLanguage('fr')">
+    </div>
 
     <div class="container">
-        <h1>Combien de temps avez-vous vécu ?</h1>
+        <h1 data-lang-key="mainTitle">How long have you lived?</h1>
 
         <div class="input-group">
-            <label for="dob">Votre date de naissance (JJ/MM/AAAA) :</label>
-            <input type="text" id="dob" placeholder="JJ/MM/AAAA" maxlength="10" required>
-            <p id="dob-error">Veuillez entrer une date valide au format JJ/MM/AAAA.</p>
+            <label for="dob" data-lang-key="dobLabel">Your date of birth (DD/MM/YYYY):</label>
+            <input type="text" id="dob" placeholder="DD/MM/YYYY" maxlength="10" required>
+            <p id="dob-error" data-lang-key="dobError">Please enter a valid date in DD/MM/YYYY format.</p>
         </div>
 
         <div class="input-group">
-            <label for="sleep-hours">Heures de sommeil moyennes par jour :</label>
+            <label for="sleep-hours" data-lang-key="sleepHoursLabel">Average hours of sleep per day:</label>
             <input type="number" id="sleep-hours" min="0" max="24" step="0.5" value="8" required>
         </div>
 
         <div class="input-group">
-            <label for="shower-minutes">Temps moyen passé sous la douche par jour (en minutes) :</label>
+            <label for="shower-minutes" data-lang-key="showerMinutesLabel">Average time spent in the shower per day (in minutes):</label>
             <input type="number" id="shower-minutes" min="0" max="120" step="1" value="10" required>
         </div>
 
-        <button onclick="calculateLifeStatistics()">Calculer ma Vie</button>
+        <button onclick="calculateLifeStatistics()" data-lang-key="calculateButton">Calculate My Life</button>
 
-        <p id="error-message">Veuillez remplir tous les champs correctement.</p>
+        <p id="error-message" data-lang-key="fillAllFieldsError">Please fill in all fields correctly.</p>
     </div>
 
     <div class="container results-section" id="life-lived-section">
-        <h2>Votre Vie Passée</h2>
+        <h2 data-lang-key="yourPastLifeTitle">Your Past Life</h2>
         <div id="life-results">
-            <div class="result-item show-on-scroll" id="result-seconds"><span class="label">Secondes vécues :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="result-minutes"><span class="label">Minutes vécues :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="result-hours"><span class="label">Heures vécues :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="result-days"><span class="label">Jours vécus :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="result-months"><span class="label">Mois calendaires vécus :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="result-years"><span class="label">Années calendaires vécues :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-seconds"><span class="label" data-lang-key="secondsLivedLabel">Seconds lived:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-minutes"><span class="label" data-lang-key="minutesLivedLabel">Minutes lived:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-hours"><span class="label" data-lang-key="hoursLivedLabel">Hours lived:</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-days"><span class="label" data-lang-key="daysLivedLabel">Days lived:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-months"><span class="label" data-lang-key="monthsLivedLabel">Calendar months lived:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="result-years"><span class="label" data-lang-key="yearsLivedLabel">Calendar years lived:</span> <div class="value-container"><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="sleep-section">
-        <h2>Temps Passé à Dormir</h2>
+        <h2 data-lang-key="timeSleepingTitle">Time Spent Sleeping</h2>
         <div id="sleep-results">
-            <div class="result-item show-on-scroll" id="sleep-hours-result"><span class="label">Heures passées à dormir :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="sleep-days-result"><span class="label">Jours passés à dormir :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="sleep-months-result"><span class="label">Mois passés à dormir (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="sleep-years-result"><span class="label">Années passées à dormir (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-hours-result"><span class="label" data-lang-key="sleepHoursResultLabel">Hours spent sleeping:</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-days-result"><span class="label" data-lang-key="sleepDaysResultLabel">Days spent sleeping:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-months-result"><span class="label" data-lang-key="sleepMonthsResultLabel">Months spent sleeping (estimation):</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sleep-years-result"><span class="label" data-lang-key="sleepYearsResultLabel">Years spent sleeping (estimation):</span> <div class="value-container"><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="school-section">
-        <h2>Temps Passé à l'École</h2>
+        <h2 data-lang-key="timeInSchoolTitle">Time Spent in School</h2>
         <div class="input-group">
-            <label>J'ai été à l'école de
-                <input type="number" id="school-start-age" min="0" value="6" class="school-age-input"> à
-                <input type="number" id="school-end-age" min="0" value="18" class="school-age-input"> ans, pendant
-                <input type="number" id="school-hours-per-day" min="0" max="24" step="0.5" value="6" class="school-age-input"> heures par jour (jours d'école).
+            <label data-lang-key="schoolAgeLabel">I went to school from
+                <input type="number" id="school-start-age" min="0" value="6" class="school-age-input"> to
+                <input type="number" id="school-end-age" min="0" value="18" class="school-age-input"> years old, for
+                <input type="number" id="school-hours-per-day" min="0" max="24" step="0.5" value="6" class="school-age-input"> hours per day (school days).
             </label>
-            <button onclick="calculateSchoolTime()" style="margin-top: 15px;">Calculer le temps d'école</button>
-            <p id="school-error-message" style="color: #FF5555; margin-top: 10px; display: none;">Veuillez entrer des âges valides (début < fin) et des heures d'école.</p>
+            <button onclick="calculateSchoolTime()" style="margin-top: 15px;" data-lang-key="calculateSchoolButton">Calculate School Time</button>
+            <p id="school-error-message" data-lang-key="schoolError" style="color: #e74c3c; margin-top: 10px; display: none;">Please enter valid ages (start &lt; end) and school hours.</p>
         </div>
         <div id="school-results">
-            <div class="result-item show-on-scroll" id="school-hours-total"><span class="label">Heures totales d'école :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="school-hours-total"><span class="label" data-lang-key="totalSchoolHoursLabel">Total school hours:</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="shower-section">
-        <h2>Temps Passé Sous la Douche</h2>
+        <h2 data-lang-key="timeInShowerTitle">Time Spent in Shower</h2>
         <div id="shower-results">
-            <div class="result-item show-on-scroll" id="shower-time-hours"><span class="label">Temps passé sous la douche :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
-            <div class="result-item show-on-scroll" id="shower-water-consumption"><span class="label">Consommation d'eau totale pour la douche :</span> <div class="value-container"><strong>0 litres</strong></div></div>
+            <div class="result-item show-on-scroll" id="shower-time-hours"><span class="label" data-lang-key="showerTimeLabel">Time spent in shower:</span> <div class="value-container"><span class="percentage"></span><strong>0 hours</strong></div></div>
+            <div class="result-item show-on-scroll" id="shower-water-consumption"><span class="label" data-lang-key="showerWaterConsumptionLabel">Total water consumption for shower:</span> <div class="value-container"><strong>0 litres</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="work-section">
-        <h2>Temps Passé au Travail</h2>
+        <h2 data-lang-key="timeAtWorkTitle">Time Spent at Work</h2>
         <div class="input-group work-input-group">
-            <label>J'ai travaillé
-                <input type="number" id="work-hours-per-week" min="0" max="168" step="0.5" value="35" class="work-age-input"> heures par semaine, de
-                <input type="number" id="work-start-age" min="0" value="20" class="work-age-input"> à
-                <input type="number" id="work-end-age" min="0" value="60" class="work-age-input"> ans.
+            <label data-lang-key="workHoursLabel">I worked
+                <input type="number" id="work-hours-per-week" min="0" max="168" step="0.5" value="35" class="work-age-input"> hours per week, from
+                <input type="number" id="work-start-age" min="0" value="20" class="work-age-input"> to
+                <input type="number" id="work-end-age" min="0" value="60" class="work-age-input"> years old.
             </label>
-            <button onclick="calculateWorkTime()" style="margin-top: 15px;">Calculer le temps de travail</button>
-            <p id="work-error-message" style="color: #FF5555; margin-top: 10px; display: none;">Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).</p>
+            <button onclick="calculateWorkTime()" style="margin-top: 15px;" data-lang-key="calculateWorkButton">Calculate Work Time</button>
+            <p id="work-error-message" data-lang-key="workError" style="color: #e74c3c; margin-top: 10px; display: none;">Please enter hours per week and valid career start/end ages (start &lt; end).</p>
         </div>
         <div id="work-results">
-            <div class="result-item show-on-scroll" id="work-hours-total"><span class="label">Heures totales de travail :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="work-hours-total"><span class="label" data-lang-key="totalWorkHoursLabel">Total work hours:</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="screen-time-section">
-        <h2>Temps d'écran :</h2>
+        <h2 data-lang-key="screenTimeTitle">Screen Time:</h2>
         <div class="input-group">
-            <h3>Temps passé sur les jeux :</h3>
+            <h3 data-lang-key="timeOnGamesTitle">Time spent on games:</h3>
             <div id="game-inputs-container">
-                </div>
-            <button onclick="addGameInput()" style="margin-top: 15px; margin-bottom: 10px;">Ajouter un jeu</button>
+            </div>
+            <button onclick="addGameInput()" style="margin-top: 15px; margin-bottom: 10px;" data-lang-key="addGameButton">Add a game</button>
         </div>
         <div id="game-results">
-            <div class="result-item show-on-scroll" id="total-game-time"><span class="label">Temps total de jeu :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
-            </div>
-        <p id="game-input-error" class="game-error" style="display: none;">Veuillez entrer un nom et des heures valides pour chaque jeu.</p>
+            <div class="result-item show-on-scroll" id="total-game-time"><span class="label" data-lang-key="totalGameTimeLabel">Total game time:</span> <div class="value-container"><span class="percentage"></span><strong>0 hours</strong></div></div>
+        </div>
+        <p id="game-input-error" class="game-error" style="display: none;" data-lang-key="gameInputError">Please enter a valid name and hours for each game.</p>
     </div>
 
     <div class="container results-section" id="money-earned-section">
-        <h2>Argent Gagné</h2>
+        <h2 data-lang-key="moneyEarnedTitle">Money Earned</h2>
         <div class="input-group">
-            <h3>Détails des Salaires :</h3>
+            <h3 data-lang-key="salaryDetailsTitle">Salary Details:</h3>
             <div id="salary-inputs-container">
-                </div>
-            <button onclick="addSalaryInput()" style="margin-top: 15px; margin-bottom: 10px;">Ajouter un métier</button>
+            </div>
+            <button onclick="addSalaryInput()" style="margin-top: 15px; margin-bottom: 10px;" data-lang-key="addJobButton">Add a job</button>
         </div>
         <div id="salary-results">
-            <div class="result-item show-on-scroll" id="total-money-earned"><span class="label">Argent total gagné :</span> <div class="value-container"><strong>0 €</strong></div></div>
-            </div>
-        <p id="salary-input-error" class="salary-error" style="display: none;">Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide pour chaque métier.</p>
+            <div class="result-item show-on-scroll" id="total-money-earned"><span class="label" data-lang-key="totalMoneyEarnedLabel">Total money earned:</span> <div class="value-container"><strong>0 €</strong></div></div>
+        </div>
+        <p id="salary-input-error" class="salary-error" style="display: none;" data-lang-key="salaryInputError">Please enter a job title, net monthly salary, and valid duration for each job.</p>
     </div>
 
     <div class="container results-section" id="body-stats-section">
-        <h2>Votre corps</h2>
+        <h2 data-lang-key="yourBodyTitle">Your Body</h2>
         <div id="body-stats-results">
-            <div class="result-item show-on-scroll" id="heart-beats"><span class="label">Total de battements de cœur :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="cells-regenerated"><span class="label">Nombre de cellules régénérées :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="air-breathed"><span class="label">Nombre de litres d’air respirés :</span> <div class="value-container"><strong>0 litres</strong></div></div>
-            <div class="result-item show-on-scroll" id="steps-count"><span class="label">Nombre de pas (estimation) :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="km-walked"><span class="label">Distance parcourue (estimation) :</span> <div class="value-container"><strong>0 km</strong></div></div>
+            <div class="result-item show-on-scroll" id="heart-beats"><span class="label" data-lang-key="heartBeatsLabel">Total heartbeats:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="cells-regenerated"><span class="label" data-lang-key="cellsRegeneratedLabel">Number of cells regenerated:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="air-breathed"><span class="label" data-lang-key="airBreathedLabel">Liters of air breathed:</span> <div class="value-container"><strong>0 litres</strong></div></div>
+            <div class="result-item show-on-scroll" id="steps-count"><span class="label" data-lang-key="stepsCountLabel">Number of steps (estimation):</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="km-walked"><span class="label" data-lang-key="kmWalkedLabel">Distance covered (estimation):</span> <div class="value-container"><strong>0 km</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="food-drink-section">
-        <h2>Nourriture et boisson</h2>
+        <h2 data-lang-key="foodDrinkTitle">Food and Drink</h2>
         <div id="food-drink-results">
-            <div class="result-item show-on-scroll" id="food-kg"><span class="label">Nombre de kilos de nourriture ingérés :</span> <div class="value-container"><strong>0 kg</strong></div></div>
-            <div class="result-item show-on-scroll" id="food-tonnes"><span class="label">Nombre de tonnes de nourriture ingérées :</span> <div class="value-container"><strong>0 tonnes</strong></div></div>
-            <div class="result-item show-on-scroll" id="toilet-time-hours"><span class="label">Temps passé aux toilettes :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
-            <div class="result-item show-on-scroll" id="water-liters-drunk"><span class="label">Nombre de litres d'eau bus :</span> <div class="value-container"><strong>0 litres</strong></div></div>
-            <div class="result-item show-on-scroll" id="meals-count"><span class="label">Nombre de repas :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="stool-weight"><span class="label">Poids total des selles :</span> <div class="value-container"><strong>0 kg</strong></div></div>
-            <div class="result-item show-on-scroll" id="salt-ingested"><span class="label">Poids de sel ingéré :</span> <div class="value-container"><strong>0 g</strong></div></div>
+            <div class="result-item show-on-scroll" id="food-kg"><span class="label" data-lang-key="foodKgLabel">Kilograms of food ingested:</span> <div class="value-container"><strong>0 kg</strong></div></div>
+            <div class="result-item show-on-scroll" id="food-tonnes"><span class="label" data-lang-key="foodTonnesLabel">Tons of food ingested:</span> <div class="value-container"><strong>0 tonnes</strong></div></div>
+            <div class="result-item show-on-scroll" id="toilet-time-hours"><span class="label" data-lang-key="toiletTimeLabel">Time spent in the restroom:</span> <div class="value-container"><span class="percentage"></span><strong>0 hours</strong></div></div>
+            <div class="result-item show-on-scroll" id="water-liters-drunk"><span class="label" data-lang-key="waterLitersDrunkLabel">Liters of water drunk:</span> <div class="value-container"><strong>0 litres</strong></div></div>
+            <div class="result-item show-on-scroll" id="meals-count"><span class="label" data-lang-key="mealsCountLabel">Number of meals:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="stool-weight"><span class="label" data-lang-key="stoolWeightLabel">Total stool weight:</span> <div class="value-container"><strong>0 kg</strong></div></div>
+            <div class="result-item show-on-scroll" id="salt-ingested"><span class="label" data-lang-key="saltIngestedLabel">Weight of salt ingested:</span> <div class="value-container"><strong>0 g</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="world-change-section">
-        <h2>Le monde aussi a changé</h2>
+        <h2 data-lang-key="worldChangeTitle">The World Has Also Changed</h2>
         <div id="world-change-results">
-            <div class="result-item show-on-scroll" id="population-growth"><span class="label">Augmentation de la population mondiale :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="sun-distance"><span class="label">Distance parcourue autour du soleil :</span> <div class="value-container"><strong>0 km</strong></div></div>
-            <div class="result-item show-on-scroll" id="deaths-since-birth"><span class="label">Nombre de décès depuis ta naissance :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="population-growth"><span class="label" data-lang-key="populationGrowthLabel">World population increase:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sun-distance"><span class="label" data-lang-key="sunDistanceLabel">Distance traveled around the sun:</span> <div class="value-container"><strong>0 km</strong></div></div>
+            <div class="result-item show-on-scroll" id="deaths-since-birth"><span class="label" data-lang-key="deathsSinceBirthLabel">Number of deaths since your birth:</span> <div class="value-container"><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="container results-section" id="other-life-stats-section">
-        <h2>Autres Statistiques de Vie</h2>
+        <h2 data-lang-key="otherStatsTitle">Other Life Statistics</h2>
         <div id="other-life-stats-results">
-            <div class="result-item show-on-scroll" id="full-moons"><span class="label">Nombre de pleines lunes vues :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="holidays-lived"><span class="label">Nombre de jours fériés vécus :</span> <div class="value-container"><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="weekends-lived"><span class="label">Nombre de weekends vécus :</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
-            <div class="result-item show-on-scroll" id="sitting-hours"><span class="label">Nombre d'heures passées assis :</span> <div class="value-container"><span class="percentage"></span><strong>0 heures</strong></div></div>
-            <div class="result-item show-on-scroll" id="teeth-brush-count"><span class="label">Nombre de lavages de dents :</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="full-moons"><span class="label" data-lang-key="fullMoonsLabel">Number of full moons seen:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="holidays-lived"><span class="label" data-lang-key="holidaysLivedLabel">Number of holidays lived:</span> <div class="value-container"><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="weekends-lived"><span class="label" data-lang-key="weekendsLivedLabel">Number of weekends lived:</span> <div class="value-container"><span class="percentage"></span><strong>0</strong></div></div>
+            <div class="result-item show-on-scroll" id="sitting-hours"><span class="label" data-lang-key="sittingHoursLabel">Number of hours spent sitting:</span> <div class="value-container"><span class="percentage"></span><strong>0 hours</strong></div></div>
+            <div class="result-item show-on-scroll" id="teeth-brush-count"><span class="label" data-lang-key="teethBrushCountLabel">Number of teeth brushings:</span> <div class="value-container"><strong>0</strong></div></div>
         </div>
     </div>
 
     <div class="footer">
-        <p>&copy; 2025 Ma Vie en Chiffres. Tous droits réservés.</p>
+        <p data-lang-key="footerText">&copy; 2025 My Life in Numbers. All rights reserved.</p>
     </div>
 
     <script>
@@ -632,7 +686,7 @@
             const waterConsumptionPerMinute = 1020 / 60;
             const totalWaterConsumptionLiters = totalShowerMinutes * waterConsumptionPerMinute;
 
-            // --- Votre corps Calculations ---
+            // --- Your Body Calculations ---
             const heartRatePerMinute = 80;
             const totalHeartBeats = Math.floor(heartRatePerMinute * minutesLivedPrecise);
 
@@ -648,7 +702,7 @@
             const metersPerStep = 0.8;
             const totalKmWalked = (totalSteps * metersPerStep) / 1000;
 
-            // --- Nourriture et boisson Calculations ---
+            // --- Food and Drink Calculations ---
             const kgFoodIngestedPerDay = 2.9;
             const totalKgFoodIngested = daysLivedPrecise * kgFoodIngestedPerDay;
             const totalTonnesFoodIngested = totalKgFoodIngested * 0.001;
@@ -659,16 +713,16 @@
             const waterLitersPerDay = 1.1; // Litres of water (pure water, not including drinks/food)
             const totalWaterLitersDrunk = daysLivedPrecise * waterLitersPerDay;
 
-            // NOUVEAU: Nombre de repas
+            // NEW: Number of meals
             const totalMeals = daysLivedPrecise * 3;
 
-            // NOUVEAU: Poids total des selles
+            // NEW: Total stool weight
             const totalStoolWeightKg = yearsLivedPrecise * 46.7;
 
-            // NOUVEAU: Poids de sel ingéré
+            // NEW: Weight of salt ingested
             const totalSaltIngestedGrams = daysLivedPrecise * 9;
 
-            // --- Le monde aussi a changé Calculations ---
+            // --- The World Has Also Changed Calculations ---
             const currentWorldPopulation = getPopulationAtYear(currentDate.getFullYear());
             const birthYearPopulation = getPopulationAtYear(birthDate.getFullYear());
             const worldPopulationGrowth = currentWorldPopulation - birthYearPopulation;
@@ -679,7 +733,7 @@
             const averageDeathsPerDayGlobal = 160000;
             const totalDeathsSinceBirth = daysLivedPrecise * averageDeathsPerDayGlobal;
 
-            // --- Autres Statistiques de Vie Calculations (remaining from old 'other-metrics') ---
+            // --- Other Life Statistics Calculations (remaining from old 'other-metrics') ---
             const lunarCycleDays = 29.5;
             const totalFullMoons = totalMillisecondsLived / (1000 * 60 * 60 * 24 * lunarCycleDays); // More precise
 
@@ -693,66 +747,66 @@
             const sittingHoursPerDay = 7.5;
             const totalSittingHours = daysLivedPrecise * sittingHoursPerDay;
 
-            // NOUVEAU: Nombre de lavages de dents
+            // NEW: Number of teeth brushings
             const teethBrushCount = Math.floor(yearsLivedPrecise * 730);
 
 
-            // --- Call other calculation functions here to ensure they run with "Calculer ma Vie" ---
+            // --- Call other calculation functions here to ensure they run with "Calculate My Life" ---
             calculateSchoolTime();
             calculateWorkTime(); // Added this line
             updateTotalGameTimeDisplay(); // Ensures games are updated
             updateTotalMoneyEarnedDisplay(); // Ensures salaries are updated
 
             // --- Display Life Results ---
-            updateResult('result-seconds', 'Secondes vécues :', secondsLived.toLocaleString('fr-FR'), false);
-            updateResult('result-minutes', 'Minutes vécues :', minutesLived.toLocaleString('fr-FR'), false);
-            updateResult('result-hours', 'Heures vécues :', hoursLived.toLocaleString('fr-FR'), true);
-            updateResult('result-days', 'Jours vécus :', daysLived.toLocaleString('fr-FR'), false);
-            updateResult('result-months', 'Mois calendaires vécus :', (yearsLived * 12 + monthsLived).toLocaleString('fr-FR'), false);
-            updateResult('result-years', 'Années calendaires vécues :', yearsLived.toLocaleString('fr-FR'), false);
+            updateResult('result-seconds', translations[currentLang].secondsLivedLabel, secondsLived.toLocaleString('fr-FR'), false);
+            updateResult('result-minutes', translations[currentLang].minutesLivedLabel, minutesLived.toLocaleString('fr-FR'), false);
+            updateResult('result-hours', translations[currentLang].hoursLivedLabel, hoursLived.toLocaleString('fr-FR'), true);
+            updateResult('result-days', translations[currentLang].daysLivedLabel, daysLived.toLocaleString('fr-FR'), false);
+            updateResult('result-months', translations[currentLang].monthsLivedLabel, (yearsLived * 12 + monthsLived).toLocaleString('fr-FR'), false);
+            updateResult('result-years', translations[currentLang].yearsLivedLabel, yearsLived.toLocaleString('fr-FR'), false);
 
             // --- Display Sleep Results ---
-            updateResult('sleep-hours-result', 'Heures passées à dormir :', sleepHours.toLocaleString('fr-FR'), true);
-            updateResult('sleep-days-result', 'Jours passés à dormir :', sleepDays.toLocaleString('fr-FR'), false);
-            updateResult('sleep-months-result', 'Mois passés à dormir (estimation) :', sleepMonths.toLocaleString('fr-FR'), false);
-            updateResult('sleep-years-result', 'Années passées à dormir (estimation) :', sleepYears.toLocaleString('fr-FR'), false);
+            updateResult('sleep-hours-result', translations[currentLang].sleepHoursResultLabel, sleepHours.toLocaleString('fr-FR'), true);
+            updateResult('sleep-days-result', translations[currentLang].sleepDaysResultLabel, sleepDays.toLocaleString('fr-FR'), false);
+            updateResult('sleep-months-result', translations[currentLang].sleepMonthsResultLabel, sleepMonths.toLocaleString('fr-FR'), false);
+            updateResult('sleep-years-result', translations[currentLang].sleepYearsResultLabel, sleepYears.toLocaleString('fr-FR'), false);
 
             // --- Display Shower Results ---
-            updateResult('shower-time-hours', 'Temps passé sous la douche :', Math.floor(totalShowerHours).toLocaleString('fr-FR') + ' heures', true);
-            updateResult('shower-water-consumption', 'Consommation d\'eau totale pour la douche :', Math.floor(totalWaterConsumptionLiters).toLocaleString('fr-FR') + ' litres', false);
+            updateResult('shower-time-hours', translations[currentLang].showerTimeLabel, Math.floor(totalShowerHours).toLocaleString('fr-FR') + ' heures', true);
+            updateResult('shower-water-consumption', translations[currentLang].showerWaterConsumptionLabel, Math.floor(totalWaterConsumptionLiters).toLocaleString('fr-FR') + ' litres', false);
 
-            // --- Display Votre corps ---
-            updateResult('heart-beats', 'Total de battements de cœur :', Math.floor(totalHeartBeats).toLocaleString('fr-FR'), false);
-            updateResult('cells-regenerated', 'Nombre de cellules régénérées :', `${totalCellsRegenerated.toLocaleString('fr-FR')} milliards`, false);
-            updateResult('air-breathed', 'Nombre de litres d’air respirés :', `${Math.floor(totalAirBreathed).toLocaleString('fr-FR')} litres`, false);
-            updateResult('steps-count', 'Nombre de pas (estimation) :', Math.floor(totalSteps).toLocaleString('fr-FR'), false);
-            updateResult('km-walked', 'Distance parcourue (estimation) :', totalKmWalked.toFixed(2).toLocaleString('fr-FR') + ' km', false);
+            // --- Display Your Body ---
+            updateResult('heart-beats', translations[currentLang].heartBeatsLabel, Math.floor(totalHeartBeats).toLocaleString('fr-FR'), false);
+            updateResult('cells-regenerated', translations[currentLang].cellsRegeneratedLabel, `${totalCellsRegenerated.toLocaleString('fr-FR')} milliards`, false);
+            updateResult('air-breathed', translations[currentLang].airBreathedLabel, `${Math.floor(totalAirBreathed).toLocaleString('fr-FR')} litres`, false);
+            updateResult('steps-count', translations[currentLang].stepsCountLabel, Math.floor(totalSteps).toLocaleString('fr-FR'), false);
+            updateResult('km-walked', translations[currentLang].kmWalkedLabel, totalKmWalked.toFixed(2).toLocaleString('fr-FR') + ' km', false);
 
-            // --- Display Nourriture et boisson ---
-            updateResult('food-kg', 'Nombre de kilos de nourriture ingérés :', Math.floor(totalKgFoodIngested).toLocaleString('fr-FR') + ' kg', false);
-            updateResult('food-tonnes', 'Nombre de tonnes de nourriture ingérées :', totalTonnesFoodIngested.toFixed(2).toLocaleString('fr-FR') + ' tonnes', false);
-            updateResult('toilet-time-hours', 'Temps passé aux toilettes :', Math.floor(toiletHours).toLocaleString('fr-FR') + ' heures', true);
-            updateResult('water-liters-drunk', 'Nombre de litres d\'eau bus :', `${Math.floor(totalWaterLitersDrunk).toLocaleString('fr-FR')} litres`, false);
-            // NOUVEAU: Affichage Nombre de repas
-            updateResult('meals-count', 'Nombre de repas :', Math.floor(totalMeals).toLocaleString('fr-FR'), false);
-            // NOUVEAU: Affichage Poids total des selles
-            updateResult('stool-weight', 'Poids total des selles :', totalStoolWeightKg.toFixed(2).toLocaleString('fr-FR') + ' kg', false);
-            // NOUVEAU: Affichage Poids de sel ingéré
-            updateResult('salt-ingested', 'Poids de sel ingéré :', Math.floor(totalSaltIngestedGrams).toLocaleString('fr-FR') + ' g', false);
+            // --- Display Food and Drink ---
+            updateResult('food-kg', translations[currentLang].foodKgLabel, Math.floor(totalKgFoodIngested).toLocaleString('fr-FR') + ' kg', false);
+            updateResult('food-tonnes', translations[currentLang].foodTonnesLabel, totalTonnesFoodIngested.toFixed(2).toLocaleString('fr-FR') + ' tonnes', false);
+            updateResult('toilet-time-hours', translations[currentLang].toiletTimeLabel, Math.floor(toiletHours).toLocaleString('fr-FR') + ' heures', true);
+            updateResult('water-liters-drunk', translations[currentLang].waterLitersDrunkLabel, `${Math.floor(totalWaterLitersDrunk).toLocaleString('fr-FR')} litres`, false);
+            // NEW: Display Number of meals
+            updateResult('meals-count', translations[currentLang].mealsCountLabel, Math.floor(totalMeals).toLocaleString('fr-FR'), false);
+            // NEW: Display Total stool weight
+            updateResult('stool-weight', translations[currentLang].stoolWeightLabel, totalStoolWeightKg.toFixed(2).toLocaleString('fr-FR') + ' kg', false);
+            // NEW: Display Weight of salt ingested
+            updateResult('salt-ingested', translations[currentLang].saltIngestedLabel, Math.floor(totalSaltIngestedGrams).toLocaleString('fr-FR') + ' g', false);
 
 
-            // --- Le monde aussi a changé ---
-            updateResult('population-growth', 'Augmentation de la population mondiale :', Math.floor(worldPopulationGrowth).toLocaleString('fr-FR') + ' personnes', false);
-            updateResult('sun-distance', 'Distance parcourue autour du soleil :', `${Math.floor(totalSunDistance).toLocaleString('fr-FR')} km`, false);
-            updateResult('deaths-since-birth', 'Nombre de décès depuis ta naissance :', Math.floor(totalDeathsSinceBirth).toLocaleString('fr-FR'), false);
+            // --- The World Has Also Changed ---
+            updateResult('population-growth', translations[currentLang].populationGrowthLabel, Math.floor(worldPopulationGrowth).toLocaleString('fr-FR') + ' personnes', false);
+            updateResult('sun-distance', translations[currentLang].sunDistanceLabel, `${Math.floor(totalSunDistance).toLocaleString('fr-FR')} km`, false);
+            updateResult('deaths-since-birth', translations[currentLang].deathsSinceBirthLabel, Math.floor(totalDeathsSinceBirth).toLocaleString('fr-FR'), false);
 
-            // --- Autres Statistiques de Vie ---
-            updateResult('full-moons', 'Nombre de pleines lunes vues :', Math.floor(totalFullMoons).toLocaleString('fr-FR'), false);
-            updateResult('holidays-lived', 'Nombre de jours fériés vécus :', Math.floor(totalHolidaysLived).toLocaleString('fr-FR'), false);
-            updateResult('weekends-lived', 'Nombre de weekends vécus :', `${Math.floor(totalWeekendsLived).toLocaleString('fr-FR')} (${percentageWeekends}%)`, false);
-            updateResult('sitting-hours', 'Nombre d\'heures passées assis :', `${Math.floor(totalSittingHours).toLocaleString('fr-FR')} heures`, true);
-            // NOUVEAU: Affichage Nombre de lavages de dents
-            updateResult('teeth-brush-count', 'Nombre de lavages de dents :', Math.floor(teethBrushCount).toLocaleString('fr-FR'), false);
+            // --- Other Life Statistics ---
+            updateResult('full-moons', translations[currentLang].fullMoonsLabel, Math.floor(totalFullMoons).toLocaleString('fr-FR'), false);
+            updateResult('holidays-lived', translations[currentLang].holidaysLivedLabel, Math.floor(totalHolidaysLived).toLocaleString('fr-FR'), false);
+            updateResult('weekends-lived', translations[currentLang].weekendsLivedLabel, `${Math.floor(totalWeekendsLived).toLocaleString('fr-FR')} (${percentageWeekends}%)`, false);
+            updateResult('sitting-hours', translations[currentLang].sittingHoursLabel, `${Math.floor(totalSittingHours).toLocaleString('fr-FR')} heures`, true);
+            // NEW: Display Number of teeth brushings
+            updateResult('teeth-brush-count', translations[currentLang].teethBrushCountLabel, Math.floor(teethBrushCount).toLocaleString('fr-FR'), false);
 
 
             // Show all results sections and trigger scroll animation for new content
@@ -783,10 +837,10 @@
             const rowId = `game-row-${gameInputCounter++}`;
             newRow.id = rowId;
             newRow.innerHTML = `
-                <input type="text" class="game-name-input" placeholder="Nom du jeu" required>
-                <input type="number" class="game-hours-input" min="0" step="1" placeholder="Heures de jeu" required>
+                <input type="text" class="game-name-input" placeholder="${translations[currentLang].gameNamePlaceholder}" required>
+                <input type="number" class="game-hours-input" min="0" step="1" placeholder="${translations[currentLang].gameHoursPlaceholder}" required>
                 <button type="button" class="remove-game remove-item" onclick="removeGameInput('${rowId}')">X</button>
-                <p class="game-error" style="display: none;">Veuillez entrer un nom et des heures valides.</p>
+                <p class="game-error" style="display: none;" data-lang-key="gameRowError">${translations[currentLang].gameRowError}</p>
             `;
             container.appendChild(newRow);
 
@@ -839,15 +893,16 @@
                     gameResultItem.classList.add('result-item', 'show-on-scroll');
                     gameResultItem.id = `game-result-${index}`; // Use index for unique ID
                     gameResultItem.innerHTML = `
-                        <span class="label">Temps passé sur ${gameName || 'Jeu Inconnu'} :</span>
+                        <span class="label">${translations[currentLang].timeSpentOnLabel.replace('{gameName}', gameName || translations[currentLang].unknownGame)}:</span>
                         <div class="value-container">
                             <span class="percentage"></span>
-                            <strong>${Math.floor(gameHours).toLocaleString('fr-FR')} heures</strong>
+                            <strong>${Math.floor(gameHours).toLocaleString('fr-FR')} ${translations[currentLang].hoursUnit}</strong>
                         </div>
                     `;
                     const totalGameTimeDiv = document.getElementById('total-game-time');
                     gameResultsDiv.insertBefore(gameResultItem, totalGameTimeDiv);
-                    updateResult(`game-result-${index}`, `Temps passé sur ${gameName || 'Jeu Inconnu'} :`, `${Math.floor(gameHours).toLocaleString('fr-FR')} heures`, true);
+                    // No need to call updateResult here as we're directly inserting HTML with translations
+                    // updateResult(`game-result-${index}`, `Temps passé sur ${gameName || 'Jeu Inconnu'} :`, `${Math.floor(gameHours).toLocaleString('fr-FR')} heures`, true);
                 }
             });
 
@@ -857,7 +912,7 @@
                 gameInputError.style.display = 'none';
             }
 
-            updateResult('total-game-time', 'Temps total de jeu :', `${Math.floor(totalGameHours).toLocaleString('fr-FR')} heures`, totalHoursLivedPrecise > 0);
+            updateResult('total-game-time', translations[currentLang].totalGameTimeLabel, `${Math.floor(totalGameHours).toLocaleString('fr-FR')} ${translations[currentLang].hoursUnit}`, totalHoursLivedPrecise > 0);
             animateResultsOnScroll(); // Re-animate newly added result items
         }
 
@@ -868,11 +923,11 @@
             const rowId = `salary-row-${salaryInputCounter++}`;
             newRow.id = rowId;
             newRow.innerHTML = `
-                <input type="text" class="job-name-input" placeholder="Nom du métier" required>
-                <input type="number" class="net-salary-input" min="0" step="1" placeholder="Salaire net mensuel (€)" required>
-                <input type="number" class="duration-months-input duration-input" min="0" step="1" placeholder="Durée (mois)" required>
+                <input type="text" class="job-name-input" placeholder="${translations[currentLang].jobTitlePlaceholder}" required>
+                <input type="number" class="net-salary-input" min="0" step="1" placeholder="${translations[currentLang].netMonthlySalaryPlaceholder}" required>
+                <input type="number" class="duration-months-input duration-input" min="0" step="1" placeholder="${translations[currentLang].durationMonthsPlaceholder}" required>
                 <button type="button" class="remove-salary remove-item" onclick="removeSalaryInput('${rowId}')">X</button>
-                <p class="salary-error" style="display: none;">Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide.</p>
+                <p class="salary-error" style="display: none;" data-lang-key="salaryRowError">${translations[currentLang].salaryRowError}</p>
             `;
             container.appendChild(newRow);
 
@@ -928,7 +983,7 @@
                     salaryResultItem.classList.add('result-item', 'show-on-scroll');
                     salaryResultItem.id = `salary-result-${index}`; // Use index for unique ID
                     salaryResultItem.innerHTML = `
-                        <span class="label">Argent gagné avec ${jobName || 'Métier Inconnu'} :</span>
+                        <span class="label">${translations[currentLang].moneyEarnedWithLabel.replace('{jobName}', jobName || translations[currentLang].unknownJob)}:</span>
                         <div class="value-container">
                             <strong>${earnedForThisJob.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</strong>
                         </div>
@@ -944,7 +999,7 @@
                 salaryInputError.style.display = 'none';
             }
 
-            updateResult('total-money-earned', 'Argent total gagné :', totalMoneyEarned.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }), false);
+            updateResult('total-money-earned', translations[currentLang].totalMoneyEarnedLabel, totalMoneyEarned.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' }), false);
             animateResultsOnScroll(); // Re-animate newly added result items
         }
 
@@ -958,16 +1013,16 @@
 
             if (!birthDate) { // Check birthDate first
                  schoolErrorMessage.style.display = 'block';
-                 schoolErrorMessage.textContent = 'Veuillez d\'abord entrer une date de naissance valide.';
-                 updateResult('school-hours-total', 'Heures totales d\'école :', '0', false);
+                 schoolErrorMessage.textContent = translations[currentLang].dobRequiredForSchool;
+                 updateResult('school-hours-total', translations[currentLang].totalSchoolHoursLabel, '0', false);
                  return;
             }
 
             if (isNaN(schoolStartAge) || isNaN(schoolEndAge) || isNaN(schoolHoursPerDay) ||
                 schoolStartAge < 0 || schoolEndAge < 0 || schoolStartAge >= schoolEndAge || schoolHoursPerDay < 0 || schoolHoursPerDay > 24) {
                 schoolErrorMessage.style.display = 'block';
-                schoolErrorMessage.textContent = 'Veuillez entrer des âges valides (début < fin) et des heures d\'école.';
-                updateResult('school-hours-total', 'Heures totales d\'école :', '0', false);
+                schoolErrorMessage.textContent = translations[currentLang].schoolError;
+                updateResult('school-hours-total', translations[currentLang].totalSchoolHoursLabel, '0', false);
                 return;
             } else {
                 schoolErrorMessage.style.display = 'none';
@@ -993,7 +1048,7 @@
             const schoolDaysPerYear = 180; // Approximate number of school days in a year
             let totalSchoolHours = actualYearsInSchool * schoolDaysPerYear * schoolHoursPerDay;
 
-            updateResult('school-hours-total', 'Heures totales d\'école :', Math.floor(totalSchoolHours).toLocaleString('fr-FR'), true);
+            updateResult('school-hours-total', translations[currentLang].totalSchoolHoursLabel, Math.floor(totalSchoolHours).toLocaleString('fr-FR'), true);
 
             animateResultsOnScroll();
         }
@@ -1007,16 +1062,16 @@
 
             if (!birthDate) { // Check birthDate first
                 workErrorMessage.style.display = 'block';
-                workErrorMessage.textContent = 'Veuillez d\'abord entrer une date de naissance valide.';
-                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                workErrorMessage.textContent = translations[currentLang].dobRequiredForWork;
+                updateResult('work-hours-total', translations[currentLang].totalWorkHoursLabel, '0', false);
                 return;
             }
 
             if (isNaN(workHoursPerWeek) || isNaN(workStartAge) || isNaN(workEndAge) ||
                 workHoursPerWeek < 0 || workHoursPerWeek > 168 || workStartAge < 0 || workEndAge < 0 || workStartAge >= workEndAge) {
                 workErrorMessage.style.display = 'block';
-                workErrorMessage.textContent = 'Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).';
-                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                workErrorMessage.textContent = translations[currentLang].workError;
+                updateResult('work-hours-total', translations[currentLang].totalWorkHoursLabel, '0', false);
                 return;
             } else {
                 workErrorMessage.style.display = 'none';
@@ -1031,7 +1086,7 @@
             let effectiveWorkEndAge = Math.min(workEndAge, currentAgeInYears);
 
             if (effectiveWorkEndAge <= workStartAge) {
-                updateResult('work-hours-total', 'Heures totales de travail :', '0', false);
+                updateResult('work-hours-total', translations[currentLang].totalWorkHoursLabel, '0', false);
                 return;
             }
 
@@ -1039,7 +1094,7 @@
             const workWeeksPerYear = 47; // Assuming 52 weeks - 5 weeks holiday
             let totalWorkHours = yearsWorking * workWeeksPerYear * workHoursPerWeek;
 
-            updateResult('work-hours-total', 'Heures totales de travail :', Math.floor(totalWorkHours).toLocaleString('fr-FR'), true);
+            updateResult('work-hours-total', translations[currentLang].totalWorkHoursLabel, Math.floor(totalWorkHours).toLocaleString('fr-FR'), true);
 
             animateResultsOnScroll();
         }
@@ -1106,36 +1161,45 @@
             results.forEach(item => {
                 const strongElement = item.querySelector('strong');
                 if (strongElement) {
+                    // Reset to generic 0 or 0 units based on type
+                    const unit = translations[currentLang].hoursUnit;
+                    const litersUnit = translations[currentLang].litersUnit;
+                    const kmUnit = translations[currentLang].kmUnit;
+                    const kgUnit = translations[currentLang].kgUnit;
+                    const tonnesUnit = translations[currentLang].tonnesUnit;
+                    const personsUnit = translations[currentLang].personsUnit;
+                    const gramsUnit = translations[currentLang].gramsUnit;
+
                     if (['result-seconds', 'result-minutes', 'result-days', 'result-months', 'result-years', 'steps-count', 'heart-beats', 'holidays-lived', 'full-moons', 'deaths-since-birth', 'meals-count', 'teeth-brush-count'].includes(item.id)) {
                         strongElement.textContent = '0';
                     } else if (['result-hours', 'sleep-hours-result', 'school-hours-total', 'toilet-time-hours', 'sitting-hours', 'work-hours-total', 'total-game-time'].includes(item.id)) {
-                        strongElement.textContent = '0 heures';
+                        strongElement.textContent = `0 ${unit}`;
                     } else if (item.id === 'km-walked') {
-                        strongElement.textContent = '0 km';
+                        strongElement.textContent = `0 ${kmUnit}`;
                     } else if (item.id === 'shower-time-hours') {
-                        strongElement.textContent = '0 heures';
+                        strongElement.textContent = `0 ${unit}`;
                     } else if (item.id === 'shower-water-consumption') {
-                        strongElement.textContent = '0 litres';
+                        strongElement.textContent = `0 ${litersUnit}`;
                     } else if (item.id === 'food-kg') {
-                        strongElement.textContent = '0 kg';
+                        strongElement.textContent = `0 ${kgUnit}`;
                     } else if (item.id === 'food-tonnes') {
-                        strongElement.textContent = '0 tonnes';
+                        strongElement.textContent = `0 ${tonnesUnit}`;
                     } else if (item.id === 'population-growth') {
-                         strongElement.textContent = '0 personnes';
+                         strongElement.textContent = `0 ${personsUnit}`;
                     } else if (item.id === 'water-liters-drunk' || item.id === 'air-breathed') {
-                         strongElement.textContent = '0 litres';
+                         strongElement.textContent = `0 ${litersUnit}`;
                     } else if (item.id === 'weekends-lived') {
                          strongElement.textContent = '0 (0.00%)';
                     } else if (item.id === 'sun-distance') {
-                        strongElement.textContent = '0 km';
+                        strongElement.textContent = `0 ${kmUnit}`;
                     } else if (item.id === 'cells-regenerated') {
-                        strongElement.textContent = '0 milliards';
+                        strongElement.textContent = `0 ${translations[currentLang].billionsUnit}`;
                     } else if (item.id === 'total-money-earned') {
                         strongElement.textContent = '0 €';
                     } else if (item.id === 'stool-weight') { // NEW
-                        strongElement.textContent = '0 kg';
+                        strongElement.textContent = `0 ${kgUnit}`;
                     } else if (item.id === 'salt-ingested') { // NEW
-                        strongElement.textContent = '0 g';
+                        strongElement.textContent = `0 ${gramsUnit}`;
                     }
                 }
 
@@ -1186,7 +1250,322 @@
             });
         }
 
+        // --- Language Translation Logic ---
+        const translations = {
+            en: {
+                pageTitle: "My Life in Numbers",
+                mainTitle: "How long have you lived?",
+                dobLabel: "Your date of birth (DD/MM/YYYY):",
+                dobPlaceholder: "DD/MM/YYYY",
+                dobError: "Please enter a valid date in DD/MM/YYYY format.",
+                sleepHoursLabel: "Average hours of sleep per day:",
+                showerMinutesLabel: "Average time spent in the shower per day (in minutes):",
+                calculateButton: "Calculate My Life",
+                fillAllFieldsError: "Please fill in all fields correctly.",
+
+                yourPastLifeTitle: "Your Past Life",
+                secondsLivedLabel: "Seconds lived:",
+                minutesLivedLabel: "Minutes lived:",
+                hoursLivedLabel: "Hours lived:",
+                daysLivedLabel: "Days lived:",
+                monthsLivedLabel: "Calendar months lived:",
+                yearsLivedLabel: "Calendar years lived:",
+
+                timeSleepingTitle: "Time Spent Sleeping",
+                sleepHoursResultLabel: "Hours spent sleeping:",
+                sleepDaysResultLabel: "Days spent sleeping:",
+                sleepMonthsResultLabel: "Months spent sleeping (estimation):",
+                sleepYearsResultLabel: "Years spent sleeping (estimation):",
+
+                timeInSchoolTitle: "Time Spent in School",
+                schoolAgeLabel: "I went to school from {start} to {end} years old, for {hours} hours per day (school days).",
+                calculateSchoolButton: "Calculate School Time",
+                schoolError: "Please enter valid ages (start < end) and school hours.",
+                dobRequiredForSchool: "Please enter a valid date of birth first.",
+                totalSchoolHoursLabel: "Total school hours:",
+
+                timeInShowerTitle: "Time Spent in Shower",
+                showerTimeLabel: "Time spent in shower:",
+                showerWaterConsumptionLabel: "Total water consumption for shower:",
+
+                timeAtWorkTitle: "Time Spent at Work",
+                workHoursLabel: "I worked {hours} hours per week, from {start} to {end} years old.",
+                calculateWorkButton: "Calculate Work Time",
+                workError: "Please enter hours per week and valid career start/end ages (start < end).",
+                dobRequiredForWork: "Please enter a valid date of birth first.",
+                totalWorkHoursLabel: "Total work hours:",
+
+                screenTimeTitle: "Screen Time:",
+                timeOnGamesTitle: "Time spent on games:",
+                gameNamePlaceholder: "Game name",
+                gameHoursPlaceholder: "Hours played",
+                addGameButton: "Add a game",
+                totalGameTimeLabel: "Total game time:",
+                gameInputError: "Please enter a valid name and hours for each game.",
+                gameRowError: "Please enter a valid name and hours.",
+                timeSpentOnLabel: "Time spent on {gameName}",
+                unknownGame: "Unknown Game",
+
+                moneyEarnedTitle: "Money Earned",
+                salaryDetailsTitle: "Salary Details:",
+                jobTitlePlaceholder: "Job title",
+                netMonthlySalaryPlaceholder: "Net monthly salary (€)",
+                durationMonthsPlaceholder: "Duration (months)",
+                addJobButton: "Add a job",
+                totalMoneyEarnedLabel: "Total money earned:",
+                salaryInputError: "Please enter a job title, net monthly salary, and valid duration for each job.",
+                salaryRowError: "Please enter a job title, net monthly salary, and valid duration.",
+                moneyEarnedWithLabel: "Money earned with {jobName}",
+                unknownJob: "Unknown Job",
+
+                yourBodyTitle: "Your Body",
+                heartBeatsLabel: "Total heartbeats:",
+                cellsRegeneratedLabel: "Number of cells regenerated:",
+                airBreathedLabel: "Liters of air breathed:",
+                stepsCountLabel: "Number of steps (estimation):",
+                kmWalkedLabel: "Distance covered (estimation):",
+
+                foodDrinkTitle: "Food and Drink",
+                foodKgLabel: "Kilograms of food ingested:",
+                foodTonnesLabel: "Tons of food ingested:",
+                toiletTimeLabel: "Time spent in the restroom:",
+                waterLitersDrunkLabel: "Liters of water drunk:",
+                mealsCountLabel: "Number of meals:",
+                stoolWeightLabel: "Total stool weight:",
+                saltIngestedLabel: "Weight of salt ingested:",
+
+                worldChangeTitle: "The World Has Also Changed",
+                populationGrowthLabel: "World population increase:",
+                sunDistanceLabel: "Distance traveled around the sun:",
+                deathsSinceBirthLabel: "Number of deaths since your birth:",
+
+                otherStatsTitle: "Other Life Statistics",
+                fullMoonsLabel: "Number of full moons seen:",
+                holidaysLivedLabel: "Number of holidays lived:",
+                weekendsLivedLabel: "Number of weekends lived:",
+                sittingHoursLabel: "Number of hours spent sitting:",
+                teethBrushCountLabel: "Number of teeth brushings:",
+
+                footerText: "&copy; 2025 My Life in Numbers. All rights reserved.",
+
+                // Units
+                hoursUnit: "hours",
+                litersUnit: "liters",
+                kmUnit: "km",
+                kgUnit: "kg",
+                tonnesUnit: "tonnes",
+                personsUnit: "people",
+                gramsUnit: "g",
+                billionsUnit: "billions",
+
+                // Date format placeholder for consistency
+                dateFormatPlaceholder: "DD/MM/YYYY"
+
+            },
+            fr: {
+                pageTitle: "Ma Vie en Chiffres",
+                mainTitle: "Combien de temps avez-vous vécu ?",
+                dobLabel: "Votre date de naissance (JJ/MM/AAAA) :",
+                dobPlaceholder: "JJ/MM/AAAA",
+                dobError: "Veuillez entrer une date valide au format JJ/MM/AAAA.",
+                sleepHoursLabel: "Heures de sommeil moyennes par jour :",
+                showerMinutesLabel: "Temps moyen passé sous la douche par jour (en minutes) :",
+                calculateButton: "Calculer ma Vie",
+                fillAllFieldsError: "Veuillez remplir tous les champs correctement.",
+
+                yourPastLifeTitle: "Votre Vie Passée",
+                secondsLivedLabel: "Secondes vécues :",
+                minutesLivedLabel: "Minutes vécues :",
+                hoursLivedLabel: "Heures vécues :",
+                daysLivedLabel: "Jours vécus :",
+                monthsLivedLabel: "Mois calendaires vécus :",
+                yearsLivedLabel: "Années calendaires vécues :",
+
+                timeSleepingTitle: "Temps Passé à Dormir",
+                sleepHoursResultLabel: "Heures passées à dormir :",
+                sleepDaysResultLabel: "Jours passés à dormir :",
+                sleepMonthsResultLabel: "Mois passés à dormir (estimation) :",
+                sleepYearsResultLabel: "Années passées à dormir (estimation) :",
+
+                timeInSchoolTitle: "Temps Passé à l'École",
+                schoolAgeLabel: "J'ai été à l'école de {start} à {end} ans, pendant {hours} heures par jour (jours d'école).",
+                calculateSchoolButton: "Calculer le temps d'école",
+                schoolError: "Veuillez entrer des âges valides (début < fin) et des heures d'école.",
+                dobRequiredForSchool: "Veuillez d'abord entrer une date de naissance valide.",
+                totalSchoolHoursLabel: "Heures totales d'école :",
+
+                timeInShowerTitle: "Temps Passé Sous la Douche",
+                showerTimeLabel: "Temps passé sous la douche :",
+                showerWaterConsumptionLabel: "Consommation d'eau totale pour la douche :",
+
+                timeAtWorkTitle: "Temps Passé au Travail",
+                workHoursLabel: "J'ai travaillé {hours} heures par semaine, de {start} à {end} ans.",
+                calculateWorkButton: "Calculer le temps de travail",
+                workError: "Veuillez entrer des heures par semaine et des âges de début/fin de carrière valides (début < fin).",
+                dobRequiredForWork: "Veuillez d'abord entrer une date de naissance valide.",
+                totalWorkHoursLabel: "Heures totales de travail :",
+
+                screenTimeTitle: "Temps d'écran :",
+                timeOnGamesTitle: "Temps passé sur les jeux :",
+                gameNamePlaceholder: "Nom du jeu",
+                gameHoursPlaceholder: "Heures de jeu",
+                addGameButton: "Ajouter un jeu",
+                totalGameTimeLabel: "Temps total de jeu :",
+                gameInputError: "Veuillez entrer un nom et des heures valides pour chaque jeu.",
+                gameRowError: "Veuillez entrer un nom et des heures valides.",
+                timeSpentOnLabel: "Temps passé sur {gameName}",
+                unknownGame: "Jeu Inconnu",
+
+                moneyEarnedTitle: "Argent Gagné",
+                salaryDetailsTitle: "Détails des Salaires :",
+                jobTitlePlaceholder: "Nom du métier",
+                netMonthlySalaryPlaceholder: "Salaire net mensuel (€)",
+                durationMonthsPlaceholder: "Durée (mois)",
+                addJobButton: "Ajouter un métier",
+                totalMoneyEarnedLabel: "Argent total gagné :",
+                salaryInputError: "Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide pour chaque métier.",
+                salaryRowError: "Veuillez entrer un nom de métier, un salaire net mensuel et une durée valide.",
+                moneyEarnedWithLabel: "Argent gagné avec {jobName}",
+                unknownJob: "Métier Inconnu",
+
+                yourBodyTitle: "Votre corps",
+                heartBeatsLabel: "Total de battements de cœur :",
+                cellsRegeneratedLabel: "Nombre de cellules régénérées :",
+                airBreathedLabel: "Nombre de litres d’air respirés :",
+                stepsCountLabel: "Nombre de pas (estimation) :",
+                kmWalkedLabel: "Distance parcourue (estimation) :",
+
+                foodDrinkTitle: "Nourriture et boisson",
+                foodKgLabel: "Nombre de kilos de nourriture ingérés :",
+                foodTonnesLabel: "Nombre de tonnes de nourriture ingérées :",
+                toiletTimeLabel: "Temps passé aux toilettes :",
+                waterLitersDrunkLabel: "Nombre de litres d'eau bus :",
+                mealsCountLabel: "Nombre de repas :",
+                stoolWeightLabel: "Poids total des selles :",
+                saltIngestedLabel: "Poids de sel ingéré :",
+
+                worldChangeTitle: "Le monde aussi a changé",
+                populationGrowthLabel: "Augmentation de la population mondiale :",
+                sunDistanceLabel: "Distance parcourue autour du soleil :",
+                deathsSinceBirthLabel: "Nombre de décès depuis ta naissance :",
+
+                otherStatsTitle: "Autres Statistiques de Vie",
+                fullMoonsLabel: "Nombre de pleines lunes vues :",
+                holidaysLivedLabel: "Nombre de jours fériés vécus :",
+                weekendsLivedLabel: "Nombre de weekends vécus :",
+                sittingHoursLabel: "Nombre d'heures passées assis :",
+                teethBrushCountLabel: "Nombre de lavages de dents :",
+
+                footerText: "&copy; 2025 Ma Vie en Chiffres. Tous droits réservés.",
+
+                // Units
+                hoursUnit: "heures",
+                litersUnit: "litres",
+                kmUnit: "km",
+                kgUnit: "kg",
+                tonnesUnit: "tonnes",
+                personsUnit: "personnes",
+                gramsUnit: "g",
+                billionsUnit: "milliards",
+
+                // Date format placeholder for consistency
+                dateFormatPlaceholder: "JJ/MM/AAAA"
+            }
+        };
+
+        let currentLang = localStorage.getItem('lang') || 'en'; // Default to English
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('lang', lang);
+            document.documentElement.lang = lang; // Set HTML lang attribute
+
+            // Update page title
+            document.querySelector('title').textContent = translations[lang].pageTitle;
+
+
+            // Update elements with data-lang-key
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[lang][key]) {
+                    if (element.tagName === 'INPUT' && (element.type === 'text' || element.type === 'number')) {
+                        // For placeholder, use the specific placeholder key
+                        if (key.includes('Placeholder')) {
+                            element.placeholder = translations[lang][key];
+                        } else if (key === 'dobLabel') { // Special handling for DOB label, as it's not a simple textContent
+                            // The actual text content is handled by the overall label, not the input itself.
+                            // The placeholder on the input should be updated separately.
+                            element.placeholder = translations[lang].dateFormatPlaceholder;
+                        }
+                    } else if (key === 'schoolAgeLabel' || key === 'workHoursLabel') {
+                         // Special handling for labels with embedded inputs
+                        let text = translations[lang][key];
+                        const startInput = element.querySelector('.school-age-input#school-start-age') || element.querySelector('.work-age-input#work-start-age');
+                        const endInput = element.querySelector('.school-age-input#school-end-age') || element.querySelector('.work-age-input#work-end-age');
+                        const hoursInput = element.querySelector('.school-age-input#school-hours-per-day') || element.querySelector('.work-age-input#work-hours-per-week');
+
+                        const startVal = startInput ? startInput.value : '';
+                        const endVal = endInput ? endInput.value : '';
+                        const hoursVal = hoursInput ? hoursInput.value : '';
+
+                        text = text.replace('{start}', `<input type="number" id="${startInput.id}" min="0" value="${startVal}" class="school-age-input" />`);
+                        text = text.replace('{end}', `<input type="number" id="${endInput.id}" min="0" value="${endVal}" class="school-age-input" />`);
+                        text = text.replace('{hours}', `<input type="number" id="${hoursInput.id}" min="0" max="24" step="0.5" value="${hoursVal}" class="school-age-input" />`);
+                        element.innerHTML = text; // Set innerHTML for complex labels
+
+                         // Re-attach event listeners after innerHTML update
+                         if (startInput && startInput.id === 'school-start-age') {
+                            document.getElementById('school-start-age').addEventListener('input', calculateSchoolTime);
+                            document.getElementById('school-end-age').addEventListener('input', calculateSchoolTime);
+                            document.getElementById('school-hours-per-day').addEventListener('input', calculateSchoolTime);
+                        } else if (startInput && startInput.id === 'work-start-age') {
+                            document.getElementById('work-hours-per-week').addEventListener('input', calculateWorkTime);
+                            document.getElementById('work-start-age').addEventListener('input', calculateWorkTime);
+                            document.getElementById('work-end-age').addEventListener('input', calculateWorkTime);
+                        }
+
+
+                    } else if (key === 'timeSpentOnLabel') {
+                        // This template is handled in updateTotalGameTimeDisplay, so skip here
+                        // The {gameName} placeholder means it's dynamic
+                    } else if (key === 'moneyEarnedWithLabel') {
+                        // This template is handled in updateTotalMoneyEarnedDisplay, so skip here
+                        // The {jobName} placeholder means it's dynamic
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+
+            // Update placeholders for dynamically added inputs (game/salary)
+            document.querySelectorAll('.game-name-input').forEach(input => input.placeholder = translations[lang].gameNamePlaceholder);
+            document.querySelectorAll('.game-hours-input').forEach(input => input.placeholder = translations[lang].gameHoursPlaceholder);
+            document.querySelectorAll('.game-error').forEach(p => p.textContent = translations[lang].gameRowError); // Update dynamic error messages
+
+            document.querySelectorAll('.job-name-input').forEach(input => input.placeholder = translations[lang].jobTitlePlaceholder);
+            document.querySelectorAll('.net-salary-input').forEach(input => input.placeholder = translations[lang].netMonthlySalaryPlaceholder);
+            document.querySelectorAll('.duration-months-input').forEach(input => input.placeholder = translations[lang].durationMonthsPlaceholder);
+            document.querySelectorAll('.salary-error').forEach(p => p.textContent = translations[lang].salaryRowError); // Update dynamic error messages
+
+            // Update dob input placeholder
+            document.getElementById('dob').placeholder = translations[lang].dateFormatPlaceholder;
+
+            // Update active flag
+            document.getElementById('flag-en').classList.remove('active');
+            document.getElementById('flag-fr').classList.remove('active');
+            document.getElementById(`flag-${lang}`).classList.add('active');
+
+            // Re-run calculations to update displayed units/percentages (e.g., "hours" vs "heures")
+            // This is only if values are already displayed; otherwise, the sections are hidden.
+            if (document.getElementById('life-lived-section').style.display !== 'none') {
+                calculateLifeStatistics();
+            }
+        }
+
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize language first
+            setLanguage(currentLang);
             resetResults();
 
             // Add event listeners for the input fields for work and school to trigger recalculations
@@ -1197,6 +1576,14 @@
             document.getElementById('work-hours-per-week').addEventListener('input', calculateWorkTime);
             document.getElementById('work-start-age').addEventListener('input', calculateWorkTime);
             document.getElementById('work-end-age').addEventListener('input', calculateWorkTime);
+
+             // Add initial game and salary input rows if needed (e.g., one empty row by default)
+             if (document.getElementById('game-inputs-container').children.length === 0) {
+                // addGameInput(); // Removed as per default state, user can add explicitly
+             }
+             if (document.getElementById('salary-inputs-container').children.length === 0) {
+                // addSalaryInput(); // Removed as per default state, user can add explicitly
+             }
         });
     </script>
 </body>
