@@ -13,20 +13,30 @@
                Exemple si le fichier est à la racine de votre dépôt : src: url('babynotes.ttf') format('truetype'); */
         }
 
-        body {
-            font-family: Arial, sans-serif;
+        /* Réinitialisation globale et fond sur html pour une couverture complète */
+        html, body {
             margin: 0;
-            padding: 20px;
-            background: radial-gradient(circle at center, #282b30 0%, #1e2124 100%); /* Dégradé radial pour le fond */
-            background-size: 200% 200%; /* Pour permettre l'animation du fond */
-            animation: subtleBackgroundPulse 20s ease-in-out infinite alternate; /* Animation du fond */
-            color: lightgray;
-            text-align: center;
+            padding: 0;
+            height: 100%; /* Assure que html prend toute la hauteur du viewport */
+            width: 100%;  /* Assure que html prend toute la largeur du viewport */
+            overflow: hidden; /* Empêche les barres de défilement indésirables */
         }
 
-        @keyframes subtleBackgroundPulse {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 100%; }
+        html {
+            background-color: #1E2124; /* Fond gris pour toute la page */
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: lightgray;
+            text-align: center;
+            display: flex; /* Utilise Flexbox pour centrer le contenu */
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            overflow-y: auto; /* Permet le défilement si le contenu dépasse */
+            justify-content: flex-start;
+            align-items: center;
         }
 
         header {
@@ -45,16 +55,16 @@
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr); /* Fixé à 3 colonnes de taille égale */
             gap: 40px;
-            max-width: 1000px;
+            width: 100%;
             margin: 0 auto;
             padding: 30px;
             background-color: #1e2124;
             border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-            /* Ajout d'une légère transition pour l'ombre du cadre si jamais activé */
             transition: box-shadow 0.3s ease-in-out;
+            flex-shrink: 0;
         }
 
         .game-item {
@@ -67,15 +77,14 @@
             padding: 0;
             background-color: transparent;
             box-shadow: none;
-            border: 2px solid transparent; /* Bordure transparente par défaut */
+            border: 2px solid transparent;
 
-            /* Transitions pour tous les effets interactifs */
             transition: transform 0.3s ease-out, box-shadow 0.3s ease-out,
                         border-color 0.3s ease-out, filter 0.3s ease-out, opacity 0.5s ease-out;
 
-            opacity: 0; /* Commence caché pour l'animation d'apparition */
-            transform: translateY(20px); /* Commence légèrement en dessous pour l'animation */
-            animation: itemFadeIn 0.6s ease-out forwards; /* Animation d'apparition */
+            opacity: 0;
+            transform: translateY(20px);
+            animation: itemFadeIn 0.6s ease-out forwards;
         }
 
         /* Délais d'animation pour un effet d'apparition en cascade */
@@ -92,7 +101,6 @@
         .games-grid .game-item:nth-child(11) { animation-delay: 1.1s; }
         .games-grid .game-item:nth-child(12) { animation-delay: 1.2s; }
         .games-grid .game-item:nth-child(13) { animation-delay: 1.3s; }
-        /* Ajoutez d'autres nth-child si vous avez plus de jeux */
 
 
         @keyframes itemFadeIn {
@@ -101,20 +109,20 @@
         }
 
         .game-item:hover {
-            transform: translateY(-12px) scale(1.02); /* Soulève et zoome légèrement */
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 15px #9eff9e; /* Ombre plus forte + lueur verte */
-            border-color: #9eff9e; /* Bordure verte au survol */
-            filter: brightness(1.1); /* Rend l'image légèrement plus lumineuse */
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 15px #9eff9e;
+            border-color: #9eff9e;
+            filter: brightness(1.1);
         }
 
         .game-item:active {
-            transform: translateY(-4px) scale(0.99); /* S'enfonce légèrement au clic */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Réduit l'ombre au clic */
+            transform: translateY(-4px) scale(0.99);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
 
         .game-item img {
-            width: 300px;
-            height: 170px;
+            width: 700px; /* Miniatures deux fois plus grandes */
+            height: 400px; /* Hauteur ajustée proportionnellement */
             object-fit: cover;
             border-radius: 8px;
             border: none;
@@ -124,8 +132,11 @@
 
         /* Styles pour les petits écrans (mobiles) */
         @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
             .games-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr; /* Reviens à 1 colonne sur mobile */
                 gap: 20px;
                 padding: 15px;
             }
@@ -133,9 +144,9 @@
                 max-width: 250px;
             }
             .game-item img {
-                width: 100%;
-                height: auto;
-                max-height: 200px;
+                width: 100%; /* S'adapte à la largeur du mobile */
+                height: auto; /* Hauteur automatique pour préserver le ratio */
+                max-height: 200px; /* Limite la hauteur sur mobile */
             }
         }
     </style>
