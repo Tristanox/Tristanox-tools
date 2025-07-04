@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e2124; /* Noir très foncé de la palette */
+            color: #f0f2f5; /* Texte clair pour contraste avec le fond sombre */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #282b30; /* Gris-noir de la palette */
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée */
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .io-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Espace entre les boutons */
+            margin-bottom: 20px;
+        }
+
+        .io-buttons button {
+            background-color: #424549; /* Couleur de base des boutons */
+            color: #f0f2f5;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .io-buttons button:hover {
+            background-color: #36393e;
+            transform: translateY(-1px);
+        }
+
+        h1 {
+            color: #55ff75; /* Vert vif de la palette pour le titre */
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        p {
+            color: #bdc3c7; /* Gris clair pour les paragraphes */
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .grid-item {
+            background-color: #36393e; /* Gris foncé bleuté de la palette */
+            border: 1px solid #424549; /* Gris foncé de la palette pour la bordure */
+            border-radius: 8px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px 10px 10px 35px; /* Ajusté pour le rectangle de statut */
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-item:hover {
+            background-color: #424549; /* Gris foncé au survol de la case */
+            border-color: #55ff75; /* Bordure verte au survol */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .grid-item.active {
+            border-color: #55ff75; /* Vert vif quand la case est active */
+            box-shadow: 0 0 0 3px rgba(85, 255, 117, 0.5); /* Ombre verte vive */
+        }
+
+        .grid-item textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 1em;
+            color: #f0f2f5; /* Texte clair dans le textarea */
+            padding: 5px;
+            box-sizing: border-box;
+            outline: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+        }
+
+        .grid-item .placeholder {
+            color: #888; /* Gris légèrement plus foncé pour le placeholder */
+            font-style: italic;
+            pointer-events: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: calc(90% - 25px);
+            left: calc(50% + 12.5px);
+            font-size: 0.9em;
+        }
+
+        .status-button {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 25px; /* Largeur augmentée pour être plus facile à cliquer */
+            height: 100%;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            cursor: pointer;
+            background-color: #e74c3c; /* Rouge conservé pour "non complété" si pas de couleur rouge dans palette */
+            transition: background-color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .status-button.completed {
+            background-color: #55ff75; /* Vert vif de la palette pour "complété" */
+        }
+
+        .status-button:hover {
+            opacity: 0.8;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 30px;
+            box-sizing: border-box;
+        }
+
+        /* Styles généraux pour tous les boutons du bas */
+        .button-group button {
+            background-color: #424549; /* Gris foncé de la palette pour les boutons génériques */
+            color: #f0f2f5;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .button-group button:hover {
+            background-color: #36393e;
+            transform: translateY(-1px);
+        }
+
+        .button-group button:active {
+            transform: translateY(0);
+        }
+
+        #add-item-button {
+            background-color: #55ff75; /* Vert vif de la palette pour le bouton "+" */
+            color: #1e2124; /* Texte noir sur bouton vert vif */
+            font-size: 1.5em;
+            padding: 8px 15px;
+        }
+
+        #add-item-button:hover {
+            background-color: #72da72; /* Vert pâle au survol du bouton "+" */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="checklist-container"> <div class="io-buttons">
+            <button id="import-json-button">Importer JSON</button>
+            <button id="export-json-button">Exporter JSON</button>
+            <button id="export-png-button">Exporter en PNG</button>
+            <input type="file" id="json-file-input" accept=".json" style="display: none;">
+        </div>
+
+        <h1>Checklist</h1>
+        <p>Cliquez sur une case pour ajouter ou modifier un élément.</p>
+        <div id="grid-container" class="grid-container">
+            </div>
+        <div class="button-group">
+            <button id="clear-grid">Effacer la grille</button>
+            <button id="add-item-button">+</button>
+        </div>
+    </div>
+
+    <script>
+        const gridContainer = document.getElementById('grid-container');
+        const clearGridButton = document.getElementById('clear-grid');
+        const addItemButton = document.getElementById('add-item-button');
+        
+        const importJsonButton = document.getElementById('import-json-button');
+        const exportJsonButton = document.getElementById('export-json-button');
+        const jsonFileInput = document.getElementById('json-file-input');
+        // NOUVEAU: Bouton d'exportation PNG et le conteneur principal à capturer
+        const exportPngButton = document.getElementById('export-png-button');
+        const checklistContainer = document.getElementById('checklist-container');
+
+
+        // Fonction pour sauvegarder le contenu de la grille
+        function saveGridContent() {
+            const items = {};
+            document.querySelectorAll('.grid-item').forEach((itemDiv, index) => {
+                const textarea = itemDiv.querySelector('textarea');
+                const isCompleted = itemDiv.querySelector('.status-button').classList.contains('completed');
+                items[`item-${index}`] = {
+                    text: textarea.value,
+                    completed: isCompleted
+                };
+            });
+            localStorage.setItem('checklistGrid', JSON.stringify(items));
+        }
+
+        // Fonction pour charger le contenu de la grille
+        function loadGridContent() {
+            const savedItems = localStorage.getItem('checklistGrid');
+            if (savedItems) {
+                const parsed = JSON.parse(savedItems);
+                const newFormat = {};
+                let needsConversion = false;
+
+                if (typeof parsed['item-0'] === 'string' || (typeof parsed['item-0'] === 'object' && parsed['item-0'] !== null && parsed['item-0'].hasOwnProperty('icon'))) {
+                    needsConversion = true;
+                }
+
+                if (needsConversion) {
+                    for (const key in parsed) {
+                        if (parsed.hasOwnProperty(key)) {
+                            newFormat[key] = {
+                                text: typeof parsed[key] === 'string' ? parsed[key] : (parsed[key].text || ''),
+                                completed: false 
+                            };
+                        }
+                    }
+                    return newFormat;
+                }
+                return parsed;
+            }
+            return {};
+        }
+
+        // Fonction pour créer une case de la grille
+        function createGridItem(index, content = {text: '', completed: false}) {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('grid-item');
+            itemDiv.dataset.index = index;
+
+            const statusButton = document.createElement('div');
+            statusButton.classList.add('status-button');
+            if (content.completed) {
+                statusButton.classList.add('completed');
+            }
+            statusButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                statusButton.classList.toggle('completed');
+                saveGridContent();
+            });
+            itemDiv.appendChild(statusButton);
+
+            const textarea = document.createElement('textarea');
+            textarea.value = content.text;
+            textarea.setAttribute('rows', '3');
+            textarea.setAttribute('maxlength', '200');
+
+            const placeholderSpan = document.createElement('span');
+            placeholderSpan.classList.add('placeholder');
+            placeholderSpan.textContent = "Cliquez pour écrire...";
+
+            const updateTextareaPlaceholder = () => {
+                if (textarea.value.trim() === '') {
+                    placeholderSpan.style.display = 'block';
+                } else {
+                    placeholderSpan.style.display = 'none';
+                }
+            };
+
+            textarea.addEventListener('input', () => {
+                saveGridContent();
+                updateTextareaPlaceholder();
+            });
+
+            textarea.addEventListener('focus', () => {
+                itemDiv.classList.add('active');
+                placeholderSpan.style.display = 'none';
+            });
+
+            textarea.addEventListener('blur', () => {
+                itemDiv.classList.remove('active');
+                saveGridContent();
+                updateTextareaPlaceholder();
+            });
+
+            itemDiv.addEventListener('click', (event) => {
+                if (!statusButton.contains(event.target)) {
+                    textarea.focus();
+                }
+            });
+            
+            itemDiv.appendChild(textarea);
+            itemDiv.appendChild(placeholderSpan);
+            updateTextareaPlaceholder();
+
+            return itemDiv;
+        }
+
+        clearGridButton.addEventListener('click', () => {
+            if (confirm("Voulez-vous vraiment effacer toute la checklist ? Cette action est irréversible.")) {
+                localStorage.removeItem('checklistGrid');
+                initializeGrid();
+            }
+        });
+
+        addItemButton.addEventListener('click', () => {
+            const newIndex = gridContainer.children.length;
+            const newItem = createGridItem(newIndex, {text: '', completed: false});
+            gridContainer.appendChild(newItem);
+            saveGridContent();
+            newItem.querySelector('textarea').focus();
+        });
+
+        function initializeGrid() {
+            gridContainer.innerHTML = '';
+            const loadedItems = loadGridContent();
+            
+            const itemKeys = Object.keys(loadedItems).sort((a, b) => {
+                const indexA = parseInt(a.split('-')[1]);
+                const indexB = parseInt(b.split('-')[1]);
+                return indexA - indexB;
+            });
+
+            const initialNumItems = Math.max(4, itemKeys.length);
+
+            for (let i = 0; i < initialNumItems; i++) {
+                const content = loadedItems[`item-${i}`] || {text: '', completed: false};
+                gridContainer.appendChild(createGridItem(i, content));
+            }
+        }
+
+        // Logique d'exportation JSON
+        exportJsonButton.addEventListener('click', () => {
+            const itemsToExport = {};
+            document.querySelectorAll('.grid-item').forEach((itemDiv, index) => {
+                const textarea = itemDiv.querySelector('textarea');
+                const isCompleted = itemDiv.querySelector('.status-button').classList.contains('completed');
+                if (textarea.value.trim() !== '' || isCompleted) {
+                    itemsToExport[`item-${index}`] = {
+                        text: textarea.value,
+                        completed: isCompleted
+                    };
+                }
+            });
+
+            const jsonString = JSON.stringify(itemsToExport, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'checklist.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Logique d'importation JSON
+        importJsonButton.addEventListener('click', () => {
+            jsonFileInput.click();
+        });
+
+        jsonFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            if (!confirm("Importer un fichier JSON remplacera la checklist actuelle. Voulez-vous continuer ?")) {
+                jsonFileInput.value = ''; 
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importedItems = JSON.parse(e.target.result);
+                    localStorage.removeItem('checklistGrid'); 
+                    localStorage.setItem('checklistGrid', JSON.stringify(importedItems));
+                    
+                    initializeGrid();
+                    alert("Checklist importée avec succès !");
+
+                } catch (error) {
+                    console.error("Erreur lors de l'importation du JSON:", error);
+                    alert("Erreur lors de l'importation du fichier. Assurez-vous qu'il s'agit d'un JSON valide.");
+                } finally {
+                    jsonFileInput.value = ''; 
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // NOUVEAU: Logique d'exportation PNG
+        exportPngButton.addEventListener('click', () => {
+            // Désactive temporairement le curseur "pointer" sur les items pour une meilleure capture visuelle
+            document.querySelectorAll('.grid-item').forEach(item => {
+                item.style.cursor = 'default';
+            });
+             document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.style.cursor = 'default';
+            });
+
+
+            html2canvas(checklistContainer, { 
+                scale: 2, // Augmente la résolution pour une meilleure qualité d'image
+                useCORS: true, // Important si des images externes sont utilisées (pas le cas ici, mais bonne pratique)
+                backgroundColor: null // Pour que le fond transparent reste transparent si le body a un fond
+            }).then(canvas => {
+                // Rétablit le curseur "pointer" après la capture
+                document.querySelectorAll('.grid-item').forEach(item => {
+                    item.style.cursor = 'pointer';
+                });
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.style.cursor = 'text'; /* ou auto, selon votre préférence */
+                });
+
+                const link = document.createElement('a');
+                link.download = 'checklist.png';
+                link.href = canvas.toDataURL('image/png'); // Convertit le canvas en URL de données PNG
+                link.click();
+            }).catch(error => {
+                console.error("Erreur lors de l'exportation en PNG:", error);
+                alert("Impossible d'exporter en PNG. Une erreur est survenue.");
+                // Assurez-vous de rétablir le curseur même en cas d'erreur
+                 document.querySelectorAll('.grid-item').forEach(item => {
+                    item.style.cursor = 'pointer';
+                });
+                document.querySelectorAll('textarea').forEach(textarea => {
+                    textarea.style.cursor = 'text';
+                });
+            });
+        });
+
+
+        document.addEventListener('DOMContentLoaded', initializeGrid);
+    </script>
+</body>
+</html>

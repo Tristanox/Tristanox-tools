@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker d'Artefacts Rares</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #1E2124; /* Dark background */
+            color: #E0E0E0; /* Light text for contrast */
+            overflow: hidden; /* Prevents body scrolling */
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE 10+ */
+            user-select: none; /* Standard syntax */
+        }
+
+        #game-container {
+            width: calc(100vw / 0.75);
+            height: calc(100vh / 0.75);
+            transform: scale(0.75);
+            transform-origin: top left;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex; /* Maintient le flexbox pour les panneaux */
+            justify-content: space-between;
+            align-items: flex-start;
+            box-sizing: border-box;
+            overflow: hidden; /* Empêche le contenu de déborder pendant les transitions */
+        }
+
+        /* Conteneur principal pour le panneau de gauche et ses onglets */
+        #left-panel-wrapper {
+            display: flex;
+            height: 100%; /* Prend toute la hauteur de game-container */
+            position: relative; /* Pour le positionnement du bouton de bascule */
+            transition: transform 0.3s ease-in-out; /* Transition pour cacher/afficher */
+            z-index: 100; /* Assurez-vous qu'il est au-dessus de game-area */
+        }
+
+        #left-panel-wrapper.hidden-left {
+            transform: translateX(calc(-100% + 30px)); /* Cache le panneau, laissant juste le bouton visible */
+        }
+
+        /* Barre latérale des onglets */
+        #sidebar-tabs {
+            display: flex;
+            flex-direction: column; /* Onglets verticaux */
+            background-color: #282B30; /* Même fond que les panneaux */
+            border-right: 1px solid #36393E;
+            padding: 10px 0; /* Padding vertical */
+            flex-shrink: 0; /* Ne pas rétrécir */
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3); /* Ombre pour la profondeur */
+        }
+
+        /* Styles des boutons d'onglet */
+        .tab-button {
+            background: none;
+            border: none;
+            color: #A0A0A0; /* Couleur des emojis inactifs */
+            font-size: 2.5em; /* Taille plus grande pour les emojis seuls */
+            cursor: pointer;
+            padding: 15px 10px; /* Plus de padding pour les boutons verticaux */
+            transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease; /* Ajout d'opacité */
+            display: flex; /* Pour centrer l'emoji */
+            justify-content: center;
+            align-items: center;
+            line-height: 1; /* Supprime l'espace vertical supplémentaire autour de l'emoji */
+            position: relative; /* Pour le texte caché et la pastille de notification */
+            width: 60px; /* Largeur fixe pour les boutons d'onglet */
+            height: 60px; /* Hauteur fixe pour les boutons d'onglet */
+            margin-bottom: 5px; /* Espace entre les onglets */
+        }
+
+        /* Masque le texte mais pas l'emoji */
+        .tab-button span {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .tab-button.active {
+            color: #7289DA; /* Couleur active pour l'emoji */
+            background-color: #36393E; /* Fond de l'onglet actif */
+            border-right: 3px solid #7289DA; /* Petite barre active sur le côté */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: #424549;
+            color: #E0E0E0; /* Emojis plus brillants au survol */
+        }
+
+        /* Pastille de notification */
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 12px;
+            height: 12px;
+            background-color: #FF4444; /* Rouge vif */
+            border-radius: 50%;
+            border: 1px solid #282B30; /* Bordure pour le contraste */
+            display: none; /* Masqué par défaut */
+            z-index: 10;
+        }
+
+        .tab-button.has-notification .notification-badge {
+            display: block; /* Affiché quand la classe est présente */
+        }
+
+
+        #upgrades-panel {
+            flex-grow: 1; /* Prend l'espace restant après la barre d'onglets */
+            width: 400px; /* Largeur fixe pour le contenu du panneau - AUGMENTÉ ICI */
+            height: 100%; /* Prend toute la hauteur du parent #left-panel-wrapper */
+            background-color: #282B30; /* Darker panel background */
+            padding: 20px;
+            overflow-y: hidden; /* Empêche le défilement global du panneau */
+            box-sizing: border-box;
+            color: #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            border-right: none;
+            box-shadow: none;
+        }
+
+        /* Conteneur pour le contenu des onglets (améliorations, succès) */
+        #tab-content {
+            flex-grow: 1; /* Permet au contenu de prendre l'espace disponible */
+            display: flex; /* Permet de masquer/afficher facilement les sous-contenus */
+            flex-direction: column;
+            overflow-y: hidden; /* Empêche le défilement du conteneur de tab */
+        }
+
+        /* Chaque liste de contenu d'onglet doit être masquée par défaut */
+        #upgrades-list, #achievements-list, #super-shop-list, #settings-list {
+            flex-grow: 1;
+            overflow-y: auto; /* Permet le défilement uniquement pour la liste des améliorations/succès */
+            padding-right: 10px; /* Empêche la scrollbar de cacher du contenu */
+            display: none; /* Masqué par default, JavaScript gérera l'affichage */
+        }
+
+        /* Affiche uniquement la liste de l'onglet actif */
+        #upgrades-list.active, #achievements-list.active, #super-shop-list.active, #settings-list.active {
+            display: block;
+        }
+
+        /* Message de déblocage pour le super-shop */
+        #super-shop-locked-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.5em; /* Plus grand pour l'emoji cadenas */
+            color: #A0A0A0;
+            padding: 20px;
+            background-color: #1E2124;
+            border-radius: 8px;
+            border: 1px dashed #36393E;
+            margin: 20px;
+            gap: 10px; /* Espace entre le texte et l'emoji */
+        }
+
+        /* Styles génériques pour les items (upgrades, achievements, super-shop) */
+        .item-card {
+            background-color: #1E2124;
+            border: 1px solid #36393E;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+            position: relative;
+        }
+
+        .item-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 1.2em;
+            color: #E0E0E0;
+        }
+
+        .item-card p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #A0A0A0;
+        }
+
+        /* Styles spécifiques pour les améliorations (upgrades) */
+        .upgrade-item {
+            cursor: pointer;
+        }
+        .upgrade-item:hover:not(.locked):not(.purchased) {
+            background-color: #36393E;
+            transform: translateY(-2px);
+        }
+        .upgrade-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #1A1C1F;
+        }
+        .upgrade-item.purchased {
+            background-color: #4CAF50; /* Vert pour les améliorations achetées */
+            border-color: #2E7D32;
+            cursor: default;
+            opacity: 0.8;
+        }
+        .upgrade-item .requirement {
+            font-size: 0.8em;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #FFC107; /* Jaune pour les exigences */
+        }
+        .upgrade-item.purchased .requirement {
+            color: #1E2124; /* Texte plus sombre sur fond vert */
+        }
+        .upgrade-item.legendary {
+            background-color: #8A2BE2; /* Violet pour le palier légendaire */
+            border-color: #4B0082;
+            color: #FFFFFF; /* Texte blanc */
+            box-shadow: 0 0 15px rgba(138,43,226,0.7); /* Lueur violette */
+        }
+        .upgrade-item.legendary h3, .upgrade-item.legendary p, .upgrade-item.legendary .requirement {
+            color: #FFFFFF;
+        }
+
+
+        /* Styles spécifiques pour le Super-Shop */
+        .super-shop-item {
+            cursor: pointer;
+        }
+        .super-shop-item:hover:not(.locked):not(.purchased) {
+            background-color: #36393E;
+            transform: translateY(-2px);
+        }
+        .super-shop-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #1A1C1F;
+        }
+        .super-shop-item.purchased {
+            background-color: #7289DA; /* Bleu pour les super-achats */
+            border-color: #5B6FB3;
+            cursor: default;
+            opacity: 0.8;
+        }
+        .super-shop-item .gold-cost {
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #FFD700; /* Or */
+        }
+        .super-shop-item.purchased .gold-cost {
+            color: #FFFFFF; /* Texte blanc sur fond bleu */
+        }
+
+
+        /* Styles des éléments de succès */
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .achievement-item.unlocked {
+            background-color: #387D38; /* Vert plus foncé pour débloqué */
+            border-color: #2A5E2A;
+        }
+
+        /* Style pour les succès éligibles à la validation (non encore validés) */
+        .achievement-item.claimable {
+            background-color: #7289DA; /* Couleur d'accentuation (Discord blue) */
+            border-color: #5B6FB3;
+            cursor: pointer;
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(114, 137, 218, 0.7);
+        }
+
+        .achievement-item.claimable:hover {
+            background-color: #677BC4;
+        }
+
+        .achievement-item.claimable .achievement-emoji,
+        .achievement-item.claimable h3,
+        .achievement-item.claimable p,
+        .achievement-item.claimable .achievement-level {
+            color: #FFFFFF; /* Texte blanc pour meilleure lisibilité sur fond bleu */
+        }
+
+
+        .achievement-item .achievement-emoji {
+            font-size: 2em;
+            opacity: 0.5; /* Plus transparent si non débloqué */
+            flex-shrink: 0; /* Ne pas rétrécir l'emoji */
+        }
+
+        .achievement-item.unlocked .achievement-emoji {
+            opacity: 1; /* Opaque si débloqué */
+        }
+
+        .achievement-item .achievement-details {
+            flex-grow: 1;
+        }
+
+        .achievement-item .achievement-details h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #E0E0E0;
+        }
+
+        .achievement-item .achievement-details p {
+            margin: 0;
+            font-size: 0.9em;
+            color: #A0A0A0;
+        }
+
+        .achievement-item.unlocked .achievement-details p {
+            color: #FFFFFF; /* Texte blanc pour débloqué */
+        }
+
+        .achievement-item .achievement-level {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #7289DA; /* Couleur du niveau */
+            background-color: rgba(0,0,0,0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #424549;
+        }
+
+        /* Style pour l'or gagné par le succès */
+        .achievement-item .gold-reward {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #FFD700; /* Or */
+            margin-top: 5px;
+        }
+
+
+        /* Styles de la scrollbar pour les listes */
+        #upgrades-list::-webkit-scrollbar, #achievements-list::-webkit-scrollbar, #super-shop-list::-webkit-scrollbar, #settings-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #upgrades-list::-webkit-scrollbar-track, #achievements-list::-webkit-scrollbar-track, #super-shop-list::-webkit-scrollbar-track, #settings-list::-webkit-scrollbar-track {
+            background: #1E2124;
+            border-radius: 10px;
+        }
+        #upgrades-list::-webkit-scrollbar-thumb, #achievements-list::-webkit-scrollbar-thumb, #super-shop-list::-webkit-scrollbar-thumb, #settings-list::-webkit-scrollbar-thumb {
+            background-color: #424549;
+            border-radius: 10px;
+            border: 2px solid #1E2124;
+        }
+        #upgrades-list::-webkit-scrollbar-thumb:hover, #achievements-list::-webkit-scrollbar-thumb:hover, #super-shop-list::-webkit-scrollbar-thumb:hover, #settings-list::-webkit-scrollbar-thumb:hover {
+            background-color: #5a5e66;
+        }
+
+        /* Styles spécifiques pour le panneau des paramètres */
+        #settings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Espace entre les éléments des paramètres */
+            padding-top: 20px;
+        }
+
+        #settings-list h2 {
+            text-align: center;
+            color: #E0E0E0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            border-bottom: 1px solid #36393E;
+            padding-bottom: 10px;
+        }
+
+        #settings-list button {
+            background-color: #7289DA; /* Couleur d'accentuation */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 20px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            width: 100%; /* Prend toute la largeur disponible */
+            box-sizing: border-box; /* Inclut le padding dans la largeur */
+        }
+
+        #settings-list button:hover {
+            background-color: #5B6FB3;
+            transform: translateY(-1px);
+        }
+
+        #settings-list button:active {
+            transform: translateY(0);
+        }
+
+        #settings-list input[type="file"] {
+            display: none; /* Cache l'input de fichier par default */
+        }
+
+
+        #game-area {
+            flex-grow: 1; /* Prend l'espace restant entre les deux panneaux */
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column; /* Pour empiler les stats et le texte */
+            justify-content: center;
+            align-items: center;
+            height: 100%; /* Prend toute la hauteur du parent #game-container */
+            transition: margin-left 0.3s ease-in-out, margin-right 0.3s ease-in-out; /* Transition pour l'ajustement des marges */
+        }
+
+        #game-stats {
+            position: absolute;
+            top: 20px; /* Position en haut de la zone de jeu */
+            left: 50%;
+            transform: translateX(-50%); /* Centre horizontalement par rapport à son parent */
+            display: flex;
+            flex-direction: column; /* Pour empiler les lignes de stats */
+            gap: 10px; /* Espace entre les lignes de stats */
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #E0E0E0;
+            background-color: rgba(40, 43, 48, 0.7); /* Fond semi-transparent */
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 1px solid #36393E;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 10; /* S'assure qu'il est au-dessus du texte de clic */
+            width: auto; /* Ajuste la largeur au contenu */
+            white-space: nowrap; /* Empêche le texte de se casser */
+        }
+
+        .stats-line {
+            display: flex;
+            justify-content: space-around; /* Répartit les éléments sur la ligne */
+            gap: 20px; /* Espace entre les stats sur une même ligne */
+        }
+
+        #game-stats span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #click-text {
+            font-size: 4em;
+            font-weight: bold;
+            color: rgba(224, 224, 224, 0.5);
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        /* Panneau de droite */
+        #right-panel-wrapper {
+            display: flex;
+            height: 100%;
+            position: relative;
+            transition: transform 0.3s ease-in-out;
+            z-index: 100;
+        }
+
+        #right-panel-wrapper.hidden-right {
+            transform: translateX(calc(100% - 30px)); /* Cache le panneau de droite */
+        }
+
+
+        #artifact-panel {
+            width: 700px; /* Largeur du panneau d'artefacts */
+            height: 100%; /* Prend toute la hauteur du parent #game-container */
+            background-color: #282B30;
+            border-left: 1px solid #36393E;
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+            overflow-y: hidden;
+            box-sizing: border-box;
+            color: #E0E0E0;
+            display: flex;
+            flex-direction: column;
+            position: relative; /* TRÈS IMPORTANT: Pour le positionnement absolu du bouton */
+            z-index: 100; /* Assurez-vous qu'il est au-dessus de game-area */
+        }
+
+        #artifact-panel h2 {
+            text-align: center;
+            color: #55FF75;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #36393E;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        #artifact-list {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 colonnes de largeur égale */
+            gap: 15px;
+            justify-content: center;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 10px;
+        }
+
+        /* Styles de la scrollbar pour le panneau d'artefacts */
+        #artifact-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        #artifact-list::-webkit-scrollbar-track {
+            background: #1E2124;
+            border-radius: 10px;
+        }
+        #artifact-list::-webkit-scrollbar-thumb {
+            background-color: #424549;
+            border-radius: 10px;
+            border: 2px solid #1E2124;
+        }
+        #artifact-list::-webkit-scrollbar-thumb:hover {
+            background-color: #5a5e66;
+        }
+
+
+        .artifact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #36393E;
+            border-radius: 8px;
+            background-color: #1E2124;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: background-color 0.1s ease-out, transform 0.1s ease-out, box-shadow 0.1s ease-out; /* Plus court pour le flash */
+        }
+
+        .artifact-item:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Classe pour la lumière verte temporaire */
+        .artifact-item.flash-green {
+            background-color: #55FF75 !important; /* Vert vif, force l'application */
+            color: #1E2124 !important; /* Texte sombre sur vert, force l'application */
+            box-shadow: 0 0 20px rgba(85,255,117,1); /* Effet de lueur plus intense */
+            transform: scale(1.15); /* Léger zoom plus prononcé */
+            transition: background-color 0.1s ease-in, transform 0.1s ease-in, box-shadow 0.1s ease-in; /* Transitions rapides */
+        }
+
+        .artifact-item .emoji {
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .artifact-item .details {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .artifact-item .count {
+            font-weight: bold;
+            color: #55FF75;
+            font-size: 1.2em;
+        }
+
+        .artifact-item .rarity {
+            font-size: 0.8em;
+            color: #A0A0A0;
+        }
+
+        #total-clicks {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #55FF75;
+            padding-top: 20px;
+            border-top: 2px solid #36393E;
+            flex-shrink: 0;
+        }
+
+        /* Styles pour l'emoji flottant */
+        .floating-emoji {
+            position: absolute;
+            font-size: 3.5em; /* Taille de l'emoji - AUGMENTÉ ICI */
+            opacity: 1;
+            pointer-events: none; /* Ne doit pas bloquer les clics */
+            animation: floatAndFade 1s ease-out forwards; /* Animation de chute et fondu */
+            z-index: 9999; /* Toujours au-dessus */
+        }
+
+        @keyframes floatAndFade {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(50px) scale(0.8); /* Tombe de 50px */
+                opacity: 0;
+            }
+        }
+
+        /* Styles pour les boutons de bascule des panneaux (TRAPÈZE) */
+        .toggle-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0; /* La largeur sera donnée par les bordures */
+            height: 60px; /* Hauteur du bouton */
+            background-color: transparent; /* Le fond est donné par les bordures */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out; /* Transition pour le bouton lui-même */
+            z-index: 101; /* Pour être au-dessus des panneaux */
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        /* Flèche en CSS */
+        .toggle-button::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        /* Spécifique au bouton de gauche (Améliorations) */
+        #toggle-left-panel {
+            right: -30px; /* Positionné à l'extérieur du panneau de gauche */
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 30px solid #282B30; /* La base large du trapèze */
+        }
+
+        #toggle-left-panel::after {
+            left: -15px; /* Position de la flèche par rapport au bouton */
+            border-left: 8px solid #7289DA; /* Flèche pointant vers la droite */
+        }
+
+        #left-panel-wrapper.hidden-left #toggle-left-panel {
+            border-left: none; /* Supprime l'ancienne bordure */
+            border-right: 30px solid #282B30; /* Nouvelle bordure pour l'autre sens */
+            right: -30px; /* Conserve la position sur le bord droit du panneau caché */
+        }
+
+        #left-panel-wrapper.hidden-left #toggle-left-panel::after {
+            left: auto; /* Réinitialise la position de la flèche */
+            right: -15px; /* Position de la flèche par rapport au bouton */
+            border-left: none; /* Supprime l'ancienne direction de flèche */
+            border-right: 8px solid #7289DA; /* Nouvelle flèche pointant vers la gauche */
+        }
+
+        /* Spécifique au bouton de droite (Artefacts / Paramètres) */
+        #toggle-right-panel {
+            left: -30px; /* Positionné à l'extérieur du panneau de droite */
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 30px solid #282B30; /* La base large du trapèze */
+        }
+
+        #toggle-right-panel::after {
+            right: -15px; /* Position de la flèche par rapport au bouton */
+            border-right: 8px solid #7289DA; /* Flèche pointant vers la gauche */
+        }
+
+        #right-panel-wrapper.hidden-right #toggle-right-panel {
+            border-right: none; /* Supprime l'ancienne bordure */
+            border-left: 30px solid #282B30; /* Nouvelle bordure pour l'autre sens */
+            left: -30px; /* Conserve la position sur le bord gauche du panneau caché */
+        }
+
+        #right-panel-wrapper.hidden-right #toggle-right-panel::after {
+            right: auto; /* Réinitialise la position de la flèche */
+            left: -15px; /* Position de la flèche par rapport au bouton */
+            border-right: none; /* Supprime l'ancienne direction de flèche */
+            border-left: 8px solid #7289DA; /* Nouvelle flèche pointant vers la droite */
+        }
+
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        
+<div id="left-panel-wrapper">
+            
+<div id="sidebar-tabs">
+                <button class="tab-button active" id="upgrades-tab">
+                    ⬆️<span>Améliorations</span>
+                    <span class="notification-badge"></span>
+                </button>
+                <button class="tab-button" id="achievements-tab">
+                    🪙<span>Succès</span>
+                    <span class="notification-badge"></span>
+                </button>
+                <button class="tab-button" id="super-shop-tab">
+                    🔄<span>Super-Shop</span>
+                    <span class="notification-badge"></span>
+                </button>
+                <button class="tab-button" id="settings-tab">
+                    ⚙️<span>Paramètres</span>
+                </button>
+            </div>
+
+            <div id="upgrades-panel">
+                
+<div id="tab-content">
+                    <div id="upgrades-list" class="active">
+                        
+</div>
+                    <div id="achievements-list">
+                        
+</div>
+                    <div id="super-shop-list">
+                        
+</div>
+                    <div id="settings-list">
+                        <h2>Paramètres</h2>
+                        <button id="export-json-button">Exporter la progression (JSON)</button>
+                        <input type="file" id="import-json-file" accept=".json" style="display: none;">
+                        <button id="import-json-button">Importer la progression (JSON)</button>
+                    </div>
+                </div>
+            </div>
+            
+<div class="toggle-button" id="toggle-left-panel"></div>
+        </div>
+
+        <div id="game-area">
+            <div id="game-stats">
+                <div class="stats-line">
+                    <span>🍀 Chance: <span id="stat-luck">100%</span></span>
+                    <span>⏰ CPS: <span id="stat-cps">0</span></span>
+                    <span>⚡️ Puissance: <span id="stat-power">1</span></span>
+                </div>
+                <div class="stats-line">
+                    <span>💰 Or: <span id="stat-gold">0</span></span>
+                </div>
+            </div>
+            <div id="click-text">Cliquez ici</div>
+        </div>
+
+        <div id="right-panel-wrapper">
+            <div id="artifact-panel">
+                <h2>Vos Artefacts</h2>
+                <div id="artifact-list">
+                    
+</div>
+                <div id="total-clicks">
+                    Clics totaux : <span id="clicks-counter">0</span>
+                </div>
+                
+</div>
+            <div class="toggle-button" id="toggle-right-panel"></div>
+        </div>
+    </div>
+
+    <script>
+        // Définition des artefacts avec leurs probabilités
+        const artifacts = [
+            { emoji: '👽', chance: 1 / 1.5 },
+            { emoji: '🤖', chance: 1 / 2 },
+            { emoji: '📀', chance: 1 / 3 },
+            { emoji: '🎃', chance: 1 / 4 },
+            { emoji: '🚀', chance: 1 / 6 },
+            { emoji: '😈', chance: 1 / 8 },
+            { emoji: '🧱', chance: 1 / 11 },
+            { emoji: '⭐️', chance: 1 / 16 },
+            { emoji: '⚓️', chance: 1 / 22 },
+            { emoji: '🌵', chance: 1 / 32 },
+            { emoji: '💥', chance: 1 / 45 },
+            { emoji: '🍔', chance: 1 / 64 },
+            { emoji: '🔥', chance: 1 / 80 },
+            { emoji: '🥩', chance: 1 / 128 },
+            { emoji: '🌸', chance: 1 / 200 },
+            { emoji: '💔', chance: 1 / 256 },
+            { emoji: '🌚', chance: 1 / 430 },
+            { emoji: '🌎', chance: 1 / 512 },
+            { emoji: '🥝', chance: 1 / 833 },
+            { emoji: '🧠', chance: 1 / 1024 },
+            { emoji: '🪐', chance: 1 / 1666 },
+            { emoji: '🪲', chance: 1 / 2048 },
+            { emoji: '🌽', chance: 1 / 3471 },
+            { emoji: '🎗', chance: 1 / 4096 },
+            { emoji: '🍪', chance: 1 / 6430 },
+            { emoji: '🧲', chance: 1 / 8192 },
+            { emoji: '🍑', chance: 1 / 12064 },
+            { emoji: '🥀', chance: 1 / 16384 },
+            { emoji: '🪖', chance: 1 / 50000 } // Secret
+        ];
+
+        // Définition des améliorations
+        const upgrades = [
+            { id: 'cps1', name: '⏰ Clicks par secondes +1', effect: { cps: 1 }, requirement: 100, purchased: false },
+            { id: 'cp1_1', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 150, purchased: false },
+            { id: 'luck1', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 200, purchased: false },
+            { id: 'cp1_2', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 300, purchased: false },
+            { id: 'luck2', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 400, purchased: false },
+            { id: 'cps2_1', name: '⏰ Clicks par secondes +2', effect: { cps: 2 }, requirement: 500, purchased: false },
+            { id: 'cp1_3', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 700, purchased: false },
+            { id: 'luck3', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 800, purchased: false },
+            { id: 'cps2_2', name: '⏰ Clicks par secondes +2', effect: { cps: 2 }, requirement: 1000, purchased: false },
+            { id: 'cp1_4', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 1500, purchased: false },
+            { id: 'luck4', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 1800, purchased: false },
+            { id: 'cps2_3', name: '⏰ Clicks par secondes +2', effect: { cps: 2 }, requirement: 2200, purchased: false },
+            { id: 'cp1_5', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 2700, purchased: false },
+            { id: 'luck5', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 3300, purchased: false },
+            { id: 'cps2_4', name: '⏰ Clicks par secondes +2', effect: { cps: 2 }, requirement: 4000, purchased: false },
+            { id: 'cp1_6', name: '⚡️ Puissance de click +1', effect: { power: 1 }, requirement: 4800, purchased: false },
+            { id: 'luck6', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 5700, purchased: false },
+            { id: 'cps3_1', name: '⏰ Clicks par secondes +3', effect: { cps: 3 }, requirement: 6700, purchased: false },
+            { id: 'cp2_1', name: '⚡️ Puissance de click +2', effect: { power: 2 }, requirement: 7800, purchased: false },
+            { id: 'luck7', name: '🍀 Chance +2%', effect: { luck: 0.02 }, requirement: 9000, purchased: false },
+            { id: 'cps3_2', name: '⏰ Clicks par secondes +3', effect: { cps: 3 }, requirement: 10500, purchased: false },
+            { id: 'cp2_2', name: '⚡️ Puissance de click +2', effect: { power: 2 }, requirement: 12100, purchased: false },
+            { id: 'luck8', name: '🍀 Chance +3%', effect: { luck: 0.03 }, requirement: 13800, purchased: false },
+            { id: 'cps3_3', name: '⏰ Clicks par secondes +3', effect: { cps: 3 }, requirement: 15600, purchased: false },
+            { id: 'cp2_3', name: '⚡️ Puissance de click +2', effect: { power: 2 }, requirement: 17500, purchased: false },
+            { id: 'luck9', name: '🍀 Chance +3%', effect: { luck: 0.03 }, requirement: 19500, purchased: false },
+            { id: 'cps4_1', name: '⏰ Clicks par secondes +4', effect: { cps: 4 }, requirement: 21600, purchased: false },
+            { id: 'cp3_1', name: '⚡️ Puissance de click +3', effect: { power: 3 }, requirement: 23800, purchased: false },
+            { id: 'luck10', name: '🍀 Chance +3%', effect: { luck: 0.03 }, requirement: 25500, purchased: false },
+            { id: 'cps4_2', name: '⏰ Clicks par secondes +4', effect: { cps: 4 }, requirement: 27300, purchased: false },
+            { id: 'cp3_2', name: '⚡️ Puissance de click +3', effect: { power: 3 }, requirement: 29200, purchased: false },
+            { id: 'luck11', name: '🍀 Chance +4%', effect: { luck: 0.04 }, requirement: 31200, purchased: false },
+            { id: 'cps4_3', name: '⏰ Clicks par secondes +4', effect: { cps: 4 }, requirement: 33300, purchased: false },
+            { id: 'cp4_1', name: '⚡️ Puissance de click +4', effect: { power: 4 }, requirement: 35500, purchased: false },
+            { id: 'luck12', name: '🍀 Chance +4%', effect: { luck: 0.04 }, requirement: 37800, purchased: false },
+            { id: 'cps5_1', name: '⏰ Clicks par secondes +5', effect: { cps: 5 }, requirement: 40200, purchased: false },
+            { id: 'cp4_2', name: '⚡️ Puissance de click +4', effect: { power: 4 }, requirement: 42700, purchased: false },
+            { id: 'luck13', name: '🍀 Chance +5%', effect: { luck: 0.05 }, requirement: 45300, purchased: false },
+            { id: 'cps6_1', name: '⏰ Clicks par secondes +6', effect: { cps: 6 }, requirement: 48000, purchased: false },
+            { id: 'cp5_1', name: '⚡️ Puissance de click +5', effect: { power: 5 }, requirement: 50800, purchased: false },
+            { id: 'luck14', name: '🍀 Chance +5%', effect: { luck: 0.05 }, requirement: 53700, purchased: false },
+            { id: 'cps6_2', name: '⏰ Clicks par secondes +6', effect: { cps: 6 }, requirement: 56700, purchased: false },
+            { id: 'cp5_2', name: '⚡️ Puissance de click +5', effect: { power: 5 }, requirement: 59800, purchased: false },
+            { id: 'luck15', name: '🍀 Chance +6%', effect: { luck: 0.06 }, requirement: 63000, purchased: false },
+            { id: 'cps7_1', name: '⏰ Clicks par secondes +7', effect: { cps: 7 }, requirement: 66300, purchased: false },
+            { id: 'cp6_1', name: '⚡️ Puissance de click +6', effect: { power: 6 }, requirement: 69700, purchased: false },
+            { id: 'luck16', name: '🍀 Chance +6%', effect: { luck: 0.06 }, requirement: 73200, purchased: false },
+            { id: 'cps8_1', name: '⏰ Clicks par secondes +8', effect: { cps: 8 }, requirement: 76800, purchased: false },
+            { id: 'cp6_2', name: '⚡️ Puissance de click +6', effect: { power: 6 }, requirement: 80500, purchased: false },
+            { id: 'luck17', name: '🍀 Chance +7%', effect: { luck: 0.07 }, requirement: 84300, purchased: false },
+            { id: 'cps9_1', name: '⏰ Clicks par secondes +9', effect: { cps: 9 }, requirement: 88200, purchased: false },
+            { id: 'cp7_1', name: '⚡️ Puissance de click +7', effect: { power: 7 }, requirement: 92200, purchased: false },
+            { id: 'luck18', name: '🍀 Chance +8%', effect: { luck: 0.08 }, requirement: 96300, purchased: false },
+            // Palier légendaire
+            { id: 'legendary', name: '🌟 PALIER LÉGENDAIRE: CPS +100 & Puissance +50', effect: { cps: 100, power: 50 }, requirement: 100000, purchased: false, isLegendary: true }
+        ];
+
+        // NOUVEAU: Définition des améliorations du Super-Shop
+        const superShopUpgrades = [
+            { id: 'anti_clock', name: '⚠️ Horloge d\'antimatière', description: '+ 10 CPS', effect: { cps: 10 }, goldCost: 400, purchased: false },
+            { id: 'space_time_rift', name: '⚠️ Faille spatio-temporelle', description: '+10% de chance', effect: { luckMultiplier: 1.1 }, goldCost: 1000, purchased: false },
+            { id: 'atomic_desert', name: '⚠️ Désert atomique', description: 'x1,5 CPS', effect: { cpsMultiplier: 1.5 }, goldCost: 1500, purchased: false },
+            { id: 'quantum_gauntlet', name: '⚠️ Gantelet quantique', description: 'x2 puissance de click', effect: { powerMultiplier: 2 }, goldCost: 2000, purchased: false },
+            { id: 'strauss_hollow', name: '⚠️ Creux de Strauss', description: 'x1,1 de chance', effect: { luckMultiplier: 1.1 }, goldCost: 3000, purchased: false },
+            { id: 'neutron_transmitter', name: '⚠️ Transmetteur à neutrons', description: 'x1.5 chance', effect: { luckMultiplier: 1.5 }, goldCost: 6000, purchased: false },
+            { id: 'von_binh_integral', name: '⚠️ Intégrale de Von Binh', description: '+100 de puissance de click', effect: { power: 100 }, goldCost: 10000, purchased: false },
+            { id: 'full_metal_baguette', name: '⚠️ Full metal baguette', description: 'x1,3 de toutes les stats', effect: { allStatsMultiplier: 1.3 }, goldCost: 15000, purchased: false }
+        ];
+
+
+        // NOUVEAU: Définition des succès avec gestion des niveaux et des récompenses en OR
+        const achievements = [
+            // Succès à niveaux basés sur les artefacts
+            {
+                id: 'invasion_started',
+                name: 'L\'invasion a commencé !',
+                emoji: '👽',
+                levels: [
+                    { description: 'Obtenez 1.000 aliens', condition: (stats) => artifactCounts['👽'] >= 1000, goldReward: 10 },
+                    { description: 'Obtenez 10.000 aliens', condition: (stats) => artifactCounts['👽'] >= 10000, goldReward: 20 }
+                ],
+                currentLevel: 0, // Niveau le plus élevé dont la condition est remplie
+                validatedLevels: 0 // Niveaux que le joueur a validés en cliquant
+            },
+            {
+                id: 'daft_punk',
+                name: 'Daft Punk',
+                emoji: '🤖',
+                levels: [
+                    { description: 'Obtenez 1.000 robots', condition: (stats) => artifactCounts['🤖'] >= 1000, goldReward: 15 },
+                    { description: 'Obtenez 10.000 robots', condition: (stats) => artifactCounts['🤖'] >= 10000, goldReward: 30 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'golden_record',
+                name: 'Disque d\'or !',
+                emoji: '📀',
+                levels: [
+                    { description: 'Obtenez 1.000 disques', condition: (stats) => artifactCounts['📀'] >= 1000, goldReward: 20 },
+                    { description: 'Obtenez 5.000 disques', condition: (stats) => artifactCounts['📀'] >= 5000, goldReward: 40 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'evil_genius',
+                name: 'Génie du mal',
+                emoji: '😈',
+                levels: [
+                    { description: 'Obtenez 500 diables', condition: (stats) => artifactCounts['😈'] >= 500, goldReward: 40 },
+                    { description: 'Obtenez 1.000 diables', condition: (stats) => artifactCounts['😈'] >= 1000, goldReward: 80 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'building_king',
+                name: 'Roi du bâtiment',
+                emoji: '🧱',
+                levels: [
+                    { description: 'Obtenez 500 briques', condition: (stats) => artifactCounts['🧱'] >= 500, goldReward: 60 },
+                    { description: 'Obtenez 1.000 briques', condition: (stats) => artifactCounts['🧱'] >= 1000, goldReward: 120 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'to_infinity',
+                name: 'Vers l\'infini et au-delà !',
+                emoji: '⭐️',
+                levels: [
+                    { description: 'Obtenez 500 étoiles', condition: (stats) => artifactCounts['⭐️'] >= 500, goldReward: 80 },
+                    { description: 'Obtenez 1.000 étoiles', condition: (stats) => artifactCounts['⭐️'] >= 1000, goldReward: 160 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'sea_king',
+                name: 'Roi des mers',
+                emoji: '⚓️',
+                levels: [
+                    { description: 'Obtenez 500 ancres', condition: (stats) => artifactCounts['⚓️'] >= 500, goldReward: 100 },
+                    { description: 'Obtenez 1.000 ancres', condition: (stats) => artifactCounts['⚓️'] >= 1000, goldReward: 200 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'spike_cactus_king',
+                name: 'Spike, roi des cactus',
+                emoji: '🌵',
+                levels: [
+                    { description: 'Obtenez 500 cactus', condition: (stats) => artifactCounts['🌵'] >= 500, goldReward: 120 },
+                    { description: 'Obtenez 1.000 cactus', condition: (stats) => artifactCounts['🌵'] >= 1000, goldReward: 240 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'terrorist',
+                name: 'Terroriste !',
+                emoji: '💥',
+                levels: [
+                    { description: 'Obtenez 500 explosions', condition: (stats) => artifactCounts['💥'] >= 500, goldReward: 150 },
+                    { description: 'Obtenez 1.000 explosions', condition: (stats) => artifactCounts['💥'] >= 1000, goldReward: 300 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'big_eater',
+                name: 'Gros mangeur',
+                emoji: '🍔',
+                levels: [
+                    { description: 'Obtenez 500 burgers', condition: (stats) => artifactCounts['🍔'] >= 500, goldReward: 180 },
+                    { description: 'Obtenez 1.000 burgers', condition: (stats) => artifactCounts['🍔'] >= 1000, goldReward: 360 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'all_flames',
+                name: 'Tout feu tout flammes',
+                emoji: '🔥',
+                levels: [
+                    { description: 'Obtenez 500 flammes', condition: (stats) => artifactCounts['🔥'] >= 500, goldReward: 200 },
+                    { description: 'Obtenez 1.000 flammes', condition: (stats) => artifactCounts['🔥'] >= 1000, goldReward: 400 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'carnivore',
+                name: 'Carnivore',
+                emoji: '🥩',
+                levels: [
+                    { description: 'Obtenez 250 viandes', condition: (stats) => artifactCounts['🥩'] >= 250, goldReward: 250 },
+                    { description: 'Obtenez 500 viandes', condition: (stats) => artifactCounts['🥩'] >= 500, goldReward: 500 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'child_soul',
+                name: 'Âme d\'enfant',
+                emoji: '🌸',
+                levels: [
+                    { description: 'Obtenez 250 lotus', condition: (stats) => artifactCounts['🌸'] >= 250, goldReward: 300 },
+                    { description: 'Obtenez 500 lotus', condition: (stats) => artifactCounts['🌸'] >= 500, goldReward: 600 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'broken_heart',
+                name: 'Coeur brisé',
+                emoji: '💔',
+                levels: [
+                    { description: 'Obtenez 250 coeurs', condition: (stats) => artifactCounts['💔'] >= 250, goldReward: 350 },
+                    { description: 'Obtenez 500 coeurs', condition: (stats) => artifactCounts['💔'] >= 500, goldReward: 700 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'werewolf',
+                name: 'Loup-garou !',
+                emoji: '🌚',
+                levels: [
+                    { description: 'Obtenez 250 lunes', condition: (stats) => artifactCounts['🌚'] >= 250, goldReward: 400 },
+                    { description: 'Obtenez 500 lunes', condition: (stats) => artifactCounts['🌚'] >= 500, goldReward: 800 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'global_glory',
+                name: 'Gloire mondiale',
+                emoji: '🌎',
+                levels: [
+                    { description: 'Obtenez 200 planètes', condition: (stats) => artifactCounts['🌎'] >= 200, goldReward: 450 },
+                    { description: 'Obtenez 400 planètes', condition: (stats) => artifactCounts['🌎'] >= 400, goldReward: 900 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'jungle_king',
+                name: 'Roi de la jungle',
+                emoji: '🥝',
+                levels: [
+                    { description: 'Obtenez 200 kiwis', condition: (stats) => artifactCounts['🥝'] >= 200, goldReward: 500 },
+                    { description: 'Obtenez 400 kiwis', condition: (stats) => artifactCounts['🥝'] >= 400, goldReward: 1000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'albert_einstein',
+                name: 'Albert Einstein',
+                emoji: '🧠',
+                levels: [
+                    { description: 'Obtenez 200 cerveaux', condition: (stats) => artifactCounts['🧠'] >= 200, goldReward: 550 },
+                    { description: 'Obtenez 400 cerveaux', condition: (stats) => artifactCounts['🧠'] >= 400, goldReward: 1100 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'saturnian_glory',
+                name: 'Gloire saturnienne !',
+                emoji: '🪐',
+                levels: [
+                    { description: 'Obtenez 100 Saturnes', condition: (stats) => artifactCounts['🪐'] >= 100, goldReward: 600 },
+                    { description: 'Obtenez 200 Saturnes', condition: (stats) => artifactCounts['🪐'] >= 200, goldReward: 1200 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'lucky_charm',
+                name: 'Porte-bonheur',
+                emoji: '🪲',
+                levels: [
+                    { description: 'Obtenez 75 scarabées', condition: (stats) => artifactCounts['🪲'] >= 75, goldReward: 650 },
+                    { description: 'Obtenez 150 scarabées', condition: (stats) => artifactCounts['🪲'] >= 150, goldReward: 1300 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'corn_cob',
+                name: 'Epi de maïs',
+                emoji: '🌽',
+                levels: [
+                    { description: 'Obtenez 50 épis', condition: (stats) => artifactCounts['🌽'] >= 50, goldReward: 700 },
+                    { description: 'Obtenez 100 épis', condition: (stats) => artifactCounts['🌽'] >= 100, goldReward: 1400 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'interstellar_duke',
+                name: 'Duc interstellaire',
+                emoji: '🎗',
+                levels: [
+                    { description: 'Obtenez 25 rubans', condition: (stats) => artifactCounts['🎗'] >= 25, goldReward: 750 },
+                    { description: 'Obtenez 50 rubans', condition: (stats) => artifactCounts['🎗'] >= 50, goldReward: 1500 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'accept_cookies',
+                name: 'Acceptez les cookies !',
+                emoji: '🍪',
+                levels: [
+                    { description: 'Obtenez 20 cookies', condition: (stats) => artifactCounts['🍪'] >= 20, goldReward: 800 },
+                    { description: 'Obtenez 40 cookies', condition: (stats) => artifactCounts['🍪'] >= 40, goldReward: 1600 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'heavy_metal',
+                name: 'Heavy métal !',
+                emoji: '🧲',
+                levels: [
+                    { description: 'Obtenez 10 aimants', condition: (stats) => artifactCounts['🧲'] >= 10, goldReward: 850 },
+                    { description: 'Obtenez 20 aimants', condition: (stats) => artifactCounts['🧲'] >= 20, goldReward: 1700 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'little_rascal',
+                name: 'Petit coquin !',
+                emoji: '🍑',
+                levels: [
+                    { description: 'Obtenez 5 pêches', condition: (stats) => artifactCounts['🍑'] >= 5, goldReward: 900 },
+                    { description: 'Obtenez 10 pêches', condition: (stats) => artifactCounts['🍑'] >= 10, goldReward: 1800 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'lost_love',
+                name: 'Amour perdu',
+                emoji: '🥀',
+                levels: [
+                    { description: 'Obtenez 1 rose', condition: (stats) => artifactCounts['🥀'] >= 1, goldReward: 950 },
+                    { description: 'Obtenez 2 roses', condition: (stats) => artifactCounts['🥀'] >= 2, goldReward: 1900 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'full_metal_jacket',
+                name: 'Full métal jacket',
+                emoji: '🪖',
+                levels: [
+                    { description: 'Obtenez 1 casque', condition: (stats) => artifactCounts['🪖'] >= 1, goldReward: 5000 },
+                    { description: 'Obtenez 2 casques', condition: (stats) => artifactCounts['🪖'] >= 2, goldReward: 10000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            // Succès spéciaux/globaux
+            {
+                id: 'platinum_trophy',
+                name: 'Trophée de platine',
+                emoji: '🌟',
+                levels: [
+                    { description: 'Finissez le jeu ! (Toutes les améliorations achetées)', condition: (stats) => upgrades.every(up => up.purchased), goldReward: 10000 },
+                    { description: 'Obtenez 1 de chaque artefact !', condition: (stats) => artifacts.every(art => artifactCounts[art.emoji] > 0), goldReward: 15000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'one_punch_man',
+                name: 'One punch man',
+                emoji: '⚡️',
+                levels: [
+                    { description: 'Atteignez 50 de puissance', condition: (stats) => stats.clickPower >= 50, goldReward: 1000 },
+                    { description: 'Atteignez 100 de puissance', condition: (stats) => stats.clickPower >= 100, goldReward: 2000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'master_of_time',
+                name: 'Maître du temps',
+                emoji: '⏰',
+                levels: [
+                    { description: 'Atteignez 50 clicks par sec', condition: (stats) => stats.clicksPerSecond >= 50, goldReward: 1000 },
+                    { description: 'Atteignez 120 clicks par sec', condition: (stats) => stats.clicksPerSecond >= 120, goldReward: 2000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'gontran_happiness',
+                name: 'Gontran bonheur !',
+                emoji: '🍀',
+                levels: [
+                    { description: 'Atteignez 115% de chance', condition: (stats) => Math.round((1 + stats.luck) * 100) >= 115, goldReward: 1000 },
+                    { description: 'Atteignez 140% de chance', condition: (stats) => Math.round((1 + stats.luck) * 100) >= 140, goldReward: 2000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'little_green_men',
+                name: 'Les petits hommes verts',
+                emoji: '👽',
+                levels: [
+                    { description: 'Obtenez 100.000 aliens', condition: (stats) => artifactCounts['👽'] >= 100000, goldReward: 200 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'touch_grass',
+                name: 'Touch grass',
+                emoji: '🪖',
+                levels: [
+                    { description: 'Obtenez 10 casques', condition: (stats) => artifactCounts['🪖'] >= 10, goldReward: 8000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            },
+            {
+                id: 'poor_mouse',
+                name: 'Pauvre souris',
+                emoji: '🎮',
+                levels: [
+                    { description: 'Cliquez 10.000 fois', condition: (stats) => stats.totalClicks >= 10000, goldReward: 500 },
+                    { description: 'Cliquez 100.000 fois', condition: (stats) => stats.totalClicks >= 100000, goldReward: 1500 },
+                    { description: 'Cliquez 1.000.000 fois', condition: (stats) => stats.totalClicks >= 1000000, goldReward: 5000 }
+                ],
+                currentLevel: 0,
+                validatedLevels: 0
+            }
+        ];
+
+
+        // Stats du jeu
+        const gameStats = {
+            totalClicks: 0,
+            baseClicksPerSecond: 0, // Nouveau: CPS sans multiplicateurs
+            clicksPerSecond: 0,
+            baseClickPower: 1, // Nouveau: Puissance de clic sans multiplicateurs
+            clickPower: 1,
+            baseLuck: 0, // Nouveau: Chance de base sans multiplicateurs
+            luck: 0,
+            gold: 0,
+            // Nouveaux multiplicateurs
+            cpsMultiplier: 1,
+            powerMultiplier: 1,
+            luckMultiplier: 1,
+            allStatsMultiplier: 1 // Multiplicateur qui affecte tout
+        };
+
+        // Objet pour stocker le compte de chaque artefact
+        const artifactCounts = {};
+        artifacts.forEach(art => artifactCounts[art.emoji] = 0);
+
+        // Références aux éléments du DOM
+        const gameArea = document.getElementById('game-area');
+        const artifactListDiv = document.getElementById('artifact-list');
+        const clicksCounterSpan = document.getElementById('clicks-counter');
+        const upgradesListDiv = document.getElementById('upgrades-list');
+        const statLuckSpan = document.getElementById('stat-luck');
+        const statCpsSpan = document.getElementById('stat-cps');
+        const statPowerSpan = document.getElementById('stat-power');
+        const statGoldSpan = document.getElementById('stat-gold'); 
+
+        // Références aux éléments des onglets
+        const achievementsListDiv = document.getElementById('achievements-list');
+        const superShopListDiv = document.getElementById('super-shop-list'); 
+        const settingsListDiv = document.getElementById('settings-list'); 
+        
+        const upgradesTabButton = document.getElementById('upgrades-tab');
+        const achievementsTabButton = document.getElementById('achievements-tab');
+        const superShopTabButton = document.getElementById('super-shop-tab'); 
+        const settingsTabButton = document.getElementById('settings-tab'); 
+
+
+        // Références aux boutons de bascule des panneaux
+        const leftPanelWrapper = document.getElementById('left-panel-wrapper');
+        const toggleLeftButton = document.getElementById('toggle-left-panel');
+        const rightPanelWrapper = document.getElementById('right-panel-wrapper'); 
+        const toggleRightButton = document.getElementById('toggle-right-panel'); 
+
+        // Références aux boutons d'export/import
+        const exportJsonButton = document.getElementById('export-json-button');
+        const importJsonButton = document.getElementById('import-json-button');
+        const importJsonFile = document.getElementById('import-json-file');
+
+
+        // Fonction pour appliquer l'effet de lumière verte sur un artefact
+        function flashArtifact(emoji) {
+            const itemDiv = document.querySelector(`.artifact-item[data-emoji="${emoji}"]`);
+            if (itemDiv) {
+                itemDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                itemDiv.classList.add('flash-green');
+                setTimeout(() => {
+                    itemDiv.classList.remove('flash-green');
+                }, 300);
+            }
+        }
+
+        // Fonction pour afficher un emoji flottant sous le curseur
+        function showFloatingEmoji(emoji, x, y) {
+            const floatingEmoji = document.createElement('div');
+            floatingEmoji.classList.add('floating-emoji');
+            floatingEmoji.textContent = emoji;
+            
+            // Correction des coordonnées pour tenir compte du zoom
+            floatingEmoji.style.left = `${(x / 0.75) - 20}px`; 
+            floatingEmoji.style.top = `${(y / 0.75) - 20}px`;  
+            document.getElementById('game-container').appendChild(floatingEmoji);
+
+            // Supprime l'emoji après la fin de son animation
+            floatingEmoji.addEventListener('animationend', () => {
+                floatingEmoji.remove();
+            });
+        }
+
+        // Fonction pour recalculer les stats effectives après un changement de base ou de multiplicateur
+        function recalculateEffectiveStats() {
+            gameStats.clicksPerSecond = Math.floor(gameStats.baseClicksPerSecond * gameStats.cpsMultiplier * gameStats.allStatsMultiplier);
+            gameStats.clickPower = Math.floor(gameStats.baseClickPower * gameStats.powerMultiplier * gameStats.allStatsMultiplier);
+            // La chance est additive à la base, puis multipliée
+            gameStats.luck = (gameStats.baseLuck + (gameStats.luckMultiplier - 1)) * gameStats.allStatsMultiplier;
+        }
+
+        // Fonction pour mettre à jour l'affichage des statistiques en haut
+        function updateGameStatsDisplay() {
+            recalculateEffectiveStats(); // Recalcule les stats avant de les afficher
+            statLuckSpan.textContent = `${Math.round((1 + gameStats.luck) * 100)}%`;
+            statCpsSpan.textContent = gameStats.clicksPerSecond;
+            statPowerSpan.textContent = gameStats.clickPower;
+            statGoldSpan.textContent = gameStats.gold.toLocaleString('fr-FR'); 
+        }
+
+        // Fonction pour mettre à jour l'affichage des artefacts (reconstruit la liste)
+        function updateArtifactDisplay() {
+            artifactListDiv.innerHTML = '';
+            artifacts.forEach(art => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('artifact-item');
+                itemDiv.dataset.emoji = art.emoji;
+
+                itemDiv.innerHTML = `
+                    <span class="emoji">${art.emoji}</span>
+                    <div class="details">
+                        <span class="rarity">1/${Math.round(1 / art.chance)}</span>
+                    </div>
+                    <span class="count">${artifactCounts[art.emoji]}</span>
+                `;
+                artifactListDiv.appendChild(itemDiv);
+            });
+            clicksCounterSpan.textContent = gameStats.totalClicks.toLocaleString('fr-FR'); // Formatage pour les milliers
+        }
+
+        // Fonction pour vérifier si des améliorations standards sont disponibles (pour la pastille)
+        function checkForAvailableUpgrades() {
+            return upgrades.some(upgrade => !upgrade.purchased && gameStats.totalClicks >= upgrade.requirement);
+        }
+
+        // Fonction pour mettre à jour l'affichage des améliorations standards
+        function updateUpgradesDisplay() {
+            upgradesListDiv.innerHTML = ''; // Nettoie la liste actuelle
+            upgrades.forEach((upgrade, index) => {
+                const upgradeDiv = document.createElement('div');
+                upgradeDiv.classList.add('item-card', 'upgrade-item'); // Ajout de item-card
+                if (upgrade.purchased) {
+                    upgradeDiv.classList.add('purchased');
+                } else if (gameStats.totalClicks < upgrade.requirement) {
+                    upgradeDiv.classList.add('locked');
+                }
+                if (upgrade.isLegendary) {
+                    upgradeDiv.classList.add('legendary');
+                }
+
+                let effectText = '';
+                if (upgrade.effect.cps) effectText += `CPS +${upgrade.effect.cps}`;
+                if (upgrade.effect.power) effectText += `${effectText ? ', ' : ''}Puissance +${upgrade.effect.power}`;
+                if (upgrade.effect.luck) effectText += `${effectText ? ', ' : ''}Chance +${Math.round(upgrade.effect.luck * 100)}%`;
+
+                upgradeDiv.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>Effet : ${effectText}</p>
+                    <p class="requirement">Débloqué à : ${upgrade.requirement.toLocaleString('fr-FR')} Clics</p>
+                `;
+
+                // Modification ici: l'achat ne déduit plus les clics. Il suffit que la condition soit remplie.
+                if (!upgrade.purchased && gameStats.totalClicks >= upgrade.requirement) {
+                    upgradeDiv.addEventListener('click', () => purchaseUpgrade(index));
+                }
+                upgradesListDiv.appendChild(upgradeDiv);
+            });
+
+            // Gérer la pastille de notification pour les améliorations
+            const hasAvailableUpgrades = checkForAvailableUpgrades();
+            const isUpgradesTabActive = upgradesListDiv.classList.contains('active');
+            const isLeftPanelHidden = leftPanelWrapper.classList.contains('hidden-left'); 
+
+            if (hasAvailableUpgrades && (!isUpgradesTabActive || isLeftPanelHidden)) { 
+                upgradesTabButton.classList.add('has-notification');
+            } else {
+                upgradesTabButton.classList.remove('has-notification');
+            }
+        }
+
+
+        // Fonction pour valider un niveau de succès par clic
+        function validateAchievement(achievement) {
+            // Vérifier si le niveau actuel du succès est supérieur aux niveaux validés
+            if (achievement.currentLevel > achievement.validatedLevels) {
+                // Le niveau à valider est le prochain niveau qui n'a pas encore été validé
+                const levelToValidateIndex = achievement.validatedLevels;
+                const goldEarned = achievement.levels[levelToValidateIndex].goldReward;
+                
+                gameStats.gold += goldEarned; // Ajouter l'or aux stats du joueur
+                achievement.validatedLevels++; // Incrémenter le nombre de niveaux validés
+                
+                updateGameStatsDisplay(); // Mettre à jour l'affichage de l'or
+                updateAchievementsDisplay(); // Re-render pour refléter la validation et mettre à jour la pastille
+                updateSuperShopDisplay(); // Met à jour le super shop au cas où l'or débloque un achat
+                console.log(`Succès validé : ${achievement.name} - Niveau ${achievement.validatedLevels}/${achievement.levels.length}. Gain : ${goldEarned} Or.`);
+            }
+        }
+
+        // Fonction pour vérifier si des succès sont "claimable" (pour la pastille)
+        function checkForClaimableAchievements() {
+            return achievements.some(achievement => achievement.currentLevel > achievement.validatedLevels);
+        }
+
+        // Fonction pour mettre à jour l'affichage des succès
+        function updateAchievementsDisplay() {
+            achievementsListDiv.innerHTML = ''; // Nettoie la liste actuelle
+            let hasClaimableAchievements = false; 
+
+            achievements.forEach((achievement, index) => {
+                let eligibleLevel = 0; // Niveau le plus élevé dont la condition est remplie
+
+                // Vérifier les niveaux de succès éligibles
+                for (let i = 0; i < achievement.levels.length; i++) {
+                    // Les conditions sont vérifiées avec les gameStats et artifactCounts actuels
+                    if (achievement.levels[i].condition(gameStats)) {
+                        eligibleLevel = i + 1; // Niveau éligible (1-indexé)
+                    } else {
+                        break; // Les niveaux doivent être débloqués dans l'ordre
+                    }
+                }
+                
+                // Mettre à jour le currentLevel de l'objet achievement (niveau max atteint pour le déblocage)
+                achievement.currentLevel = eligibleLevel;
+
+                const achievementDiv = document.createElement('div');
+                achievementDiv.classList.add('item-card', 'achievement-item'); // Ajout de item-card
+                
+                const isFullyValidated = achievement.validatedLevels === achievement.levels.length;
+                const isClaimable = achievement.currentLevel > achievement.validatedLevels;
+
+                if (isClaimable) {
+                    hasClaimableAchievements = true; 
+                }
+
+                if (achievement.validatedLevels > 0) { // Si au moins un niveau est validé
+                    achievementDiv.classList.add('unlocked');
+                }
+                if (isClaimable) {
+                    achievementDiv.classList.add('claimable');
+                    achievementDiv.addEventListener('click', () => validateAchievement(achievement));
+                } else if (isFullyValidated) {
+                    // Si tous les niveaux sont validés, s'assurer que c'est bien "unlocked" et non cliquable
+                    achievementDiv.classList.add('unlocked');
+                    achievementDiv.style.cursor = 'default';
+                }
+
+                let descriptionText = "";
+                let goldRewardText = "";
+                // Afficher la description du prochain niveau à débloquer/valider
+                if (achievement.validatedLevels < achievement.levels.length) {
+                    descriptionText = achievement.levels[achievement.validatedLevels].description;
+                    goldRewardText = `💰 ${achievement.levels[achievement.validatedLevels].goldReward}`;
+                } else {
+                    // Si tous les niveaux sont validés, afficher la description du dernier niveau et "Validé !"
+                    descriptionText = achievement.levels[achievement.levels.length - 1].description + " (Validé !)";
+                }
+
+                // Pour l'affichage du niveau N/Total
+                let displayLevel = achievement.validatedLevels;
+                if (isClaimable) { 
+                    displayLevel = achievement.validatedLevels + 1;
+                } else if (isFullyValidated) { 
+                    displayLevel = achievement.levels.length;
+                } else if (displayLevel === 0 && eligibleLevel > 0) { 
+                     displayLevel = 1;
+                }
+
+
+                achievementDiv.innerHTML = `
+                    <span class="achievement-emoji">${achievement.emoji}</span>
+                    <div class="achievement-details">
+                        <h3>${achievement.name}</h3>
+                        <p>${descriptionText}</p>
+                        ${goldRewardText ? `<p class="gold-reward">${goldRewardText}</p>` : ''}
+                    </div>
+                    ${achievement.levels.length > 1 ? `<span class="achievement-level">Niv. ${displayLevel}/${achievement.levels.length}</span>` : ''}
+                `;
+                achievementsListDiv.appendChild(achievementDiv);
+            });
+
+            // Gérer l'affichage de la pastille de notification
+            const isAchievementsTabActive = achievementsListDiv.classList.contains('active');
+            const isLeftPanelHidden = leftPanelWrapper.classList.contains('hidden-left'); 
+
+            if (hasClaimableAchievements && (!isAchievementsTabActive || isLeftPanelHidden)) { 
+                achievementsTabButton.classList.add('has-notification');
+            } else {
+                achievementsTabButton.classList.remove('has-notification');
+            }
+        }
+
+        // NOUVEAU: Fonction pour vérifier si des améliorations du Super-Shop sont disponibles (pour la pastille)
+        function checkForAvailableSuperShopUpgrades() {
+            // Pas de notification si le Super Shop est verrouillé
+            if (gameStats.clicksPerSecond < 100) return false; 
+            return superShopUpgrades.some(upgrade => !upgrade.purchased && gameStats.gold >= upgrade.goldCost);
+        }
+
+        // NOUVEAU: Fonction pour mettre à jour l'affichage du Super-Shop
+        function updateSuperShopDisplay() {
+            superShopListDiv.innerHTML = ''; // Nettoie la liste actuelle
+
+            // CONDITION DU SUPER SHOP : DÉBLOQUÉ À 100 CPS
+            if (gameStats.clicksPerSecond < 100) {
+                superShopListDiv.innerHTML = `
+                    <div id="super-shop-locked-message">
+                        Super Shop : débloqué à 100 CPS 🔒
+                    </div>
+                `;
+                // Assurez-vous que la pastille est retirée si le shop est verrouillé
+                superShopTabButton.classList.remove('has-notification');
+                return; // Arrête la fonction ici si verrouillé
+            } 
+
+
+            let hasAvailableSuperShopUpgrades = false; // Indicateur pour la pastille de notification
+
+            superShopUpgrades.forEach((upgrade, index) => {
+                const upgradeDiv = document.createElement('div');
+                upgradeDiv.classList.add('item-card', 'super-shop-item'); // Ajout de item-card
+                if (upgrade.purchased) {
+                    upgradeDiv.classList.add('purchased');
+                } else if (gameStats.gold < upgrade.goldCost) {
+                    upgradeDiv.classList.add('locked');
+                }
+
+                if (!upgrade.purchased && gameStats.gold >= upgrade.goldCost) {
+                    hasAvailableSuperShopUpgrades = true; // Il y a au moins un achat possible
+                }
+
+                upgradeDiv.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>${upgrade.description}</p>
+                    <p class="gold-cost">Coût : 💰 ${upgrade.goldCost.toLocaleString('fr-FR')}</p>
+                `;
+
+                if (!upgrade.purchased) {
+                    upgradeDiv.addEventListener('click', () => purchaseSuperShopUpgrade(index));
+                }
+                superShopListDiv.appendChild(upgradeDiv);
+            });
+
+            // Gérer l'affichage de la pastille de notification pour le Super-Shop
+            const isSuperShopTabActive = superShopListDiv.classList.contains('active');
+            const isLeftPanelHidden = leftPanelWrapper.classList.contains('hidden-left'); 
+
+            if (hasAvailableSuperShopUpgrades && (!isSuperShopTabActive || isLeftPanelHidden)) { 
+                superShopTabButton.classList.add('has-notification');
+            } else {
+                superShopTabButton.classList.remove('has-notification');
+            }
+        }
+
+
+        // Fonction d'achat d'amélioration standard
+        function purchaseUpgrade(index) {
+            const upgrade = upgrades[index];
+            // Condition de déblocage seulement, pas de déduction de clics
+            if (!upgrade.purchased && gameStats.totalClicks >= upgrade.requirement) {
+                upgrade.purchased = true;
+
+                // Appliquer les effets de l'amélioration
+                if (upgrade.effect.cps) {
+                    gameStats.baseClicksPerSecond += upgrade.effect.cps;
+                }
+                if (upgrade.effect.power) {
+                    gameStats.baseClickPower += upgrade.effect.power;
+                }
+                if (upgrade.effect.luck) {
+                    gameStats.baseLuck += upgrade.effect.luck;
+                }
+
+                updateUpgradesDisplay();      // Mettre à jour les améliorations et la pastille
+                updateGameStatsDisplay();     // Mettre à jour les stats
+                updateAchievementsDisplay();  // Vérifier les succès après l'achat et la pastille
+                updateSuperShopDisplay();     // Vérifier le super shop si les stats affectent le déblocage
+            }
+        }
+
+        // NOUVEAU: Fonction d'achat d'amélioration du Super-Shop
+        function purchaseSuperShopUpgrade(index) {
+            const upgrade = superShopUpgrades[index];
+            if (!upgrade.purchased && gameStats.gold >= upgrade.goldCost) {
+                upgrade.purchased = true;
+
+                // Appliquer les effets de l'amélioration du Super-Shop
+                if (upgrade.effect.cps) {
+                    gameStats.baseClicksPerSecond += upgrade.effect.cps;
+                }
+                if (upgrade.effect.power) {
+                    gameStats.baseClickPower += upgrade.effect.power;
+                }
+                if (upgrade.effect.luckMultiplier) {
+                    gameStats.luckMultiplier *= upgrade.effect.luckMultiplier;
+                }
+                if (upgrade.effect.cpsMultiplier) {
+                    gameStats.cpsMultiplier *= upgrade.effect.cpsMultiplier;
+                }
+                if (upgrade.effect.powerMultiplier) {
+                    gameStats.powerMultiplier *= upgrade.effect.powerMultiplier;
+                }
+                if (upgrade.effect.allStatsMultiplier) {
+                    gameStats.allStatsMultiplier *= upgrade.effect.allStatsMultiplier;
+                }
+
+                gameStats.gold -= upgrade.goldCost; // Déduit le coût en or
+
+                updateSuperShopDisplay();     // Mettre à jour le Super-Shop et la pastille
+                updateGameStatsDisplay();     // Mettre à jour les stats
+                updateAchievementsDisplay();  // Vérifier les succès après l'achat et la pastille
+                updateUpgradesDisplay();      // Mettre à jour les améliorations normales au cas où des multiplicateurs les affectent
+            }
+        }
+
+
+        // Fonction pour obtenir un artefact basé sur les probabilités et la chance
+        // Retourne l'objet artefact complet pour accéder à sa chance
+        function getArtifact() {
+            const rand = Math.random();
+            let cumulativeChance = 0;
+            
+            // Recalculer la chance effective de chaque artefact
+            const totalProbabilities = artifacts.reduce((sum, art) => {
+                return sum + (art.chance * (1 + gameStats.luck));
+            }, 0);
+
+            for (const art of artifacts) {
+                const adjustedChance = art.chance * (1 + gameStats.luck);
+                cumulativeChance += adjustedChance / totalProbabilities;
+                if (rand < cumulativeChance) {
+                    return art; // Retourne l'objet artefact complet
+                }
+            }
+            return null;
+        }
+
+        // Fonction pour gérer la logique de découverte d'artefacts pour un nombre donné de "clics"
+        function performClickActions(numberOfAttempts, event = null) {
+            updateArtifactDisplay(); 
+
+            let rarestArtifactFound = null;
+            // Initialiser rarestChance avec une valeur très grande pour qu'elle soit facilement remplacée
+            let rarestChance = Infinity; 
+
+            for (let i = 0; i < numberOfAttempts; i++) {
+                const obtainedArtifact = getArtifact();
+                if (obtainedArtifact) {
+                    artifactCounts[obtainedArtifact.emoji]++;
+                    flashArtifact(obtainedArtifact.emoji);
+                    
+                    // Vérifie si cet artefact est plus rare que le précédent plus rare trouvé dans cette salve
+                    // Un artefact est plus rare si sa probabilité (chance) est plus faible
+                    // On ne veut pas que les emojis flottants s'affichent pour les CPS
+                    if (event && obtainedArtifact.chance < rarestChance) {
+                        rarestArtifactFound = obtainedArtifact.emoji;
+                        rarestChance = obtainedArtifact.chance;
+                    }
+                }
+            }
+            
+            // Si des artefacts ont été trouvés et que c'est un clic manuel, affiche le plus rare
+            if (event && rarestArtifactFound) {
+                showFloatingEmoji(rarestArtifactFound, event.clientX, event.clientY);
+            }
+
+            // Mise à jour des autres panneaux après les actions
+            updateUpgradesDisplay();      // Mettre à jour les améliorations et la pastille
+            updateGameStatsDisplay();     // Mettre à jour les stats
+            updateAchievementsDisplay();  // Vérifier les succès après chaque clic et la pastille
+            updateSuperShopDisplay();     // Vérifier le super shop si les stats de CPS affectent le déblocage
+        }
+
+
+        // Événement de clic sur la zone de jeu
+        gameArea.addEventListener('click', (event) => {
+            gameStats.totalClicks += gameStats.clickPower;
+            performClickActions(gameStats.clickPower, event); // Passe l'événement de clic
+        });
+
+        // Clics par seconde automatiques
+        setInterval(() => {
+            if (gameStats.clicksPerSecond > 0) {
+                gameStats.totalClicks += gameStats.clicksPerSecond;
+                performClickActions(gameStats.clicksPerSecond); // Pas d'événement de clic pour les CPS
+            }
+        }, 1000); // Toutes les secondes
+
+        // Raccourci Ctrl + Q pour ajouter des clics
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'q') {
+                e.preventDefault(); // Empêche le comportement par défaut du navigateur (ex: quitter)
+                gameStats.totalClicks += 1000;
+                updateArtifactDisplay(); 
+                updateUpgradesDisplay();      // Mettre à jour les améliorations et la pastille
+                updateGameStatsDisplay();
+                updateAchievementsDisplay();  // Vérifier les succès après l'ajout manuel de clics et la pastille
+                updateSuperShopDisplay();     // Vérifier le super shop si les stats de CPS affectent le déblocage
+                console.log("1000 clics ajoutés via Ctrl+Q ! Total : " + gameStats.totalClicks);
+            }
+             // Raccourci Ctrl + G pour ajouter de l'or (pour tests)
+            if (e.ctrlKey && e.key === 'g') {
+                e.preventDefault(); 
+                gameStats.gold += 1000; 
+                updateGameStatsDisplay();
+                updateSuperShopDisplay(); // Vérifier le super shop si l'or débloque un achat
+                console.log("1000 Or ajoutés via Ctrl+G ! Total Or : " + gameStats.gold);
+            }
+        });
+
+        // Logique de bascule des onglets
+        upgradesTabButton.addEventListener('click', () => {
+            upgradesListDiv.classList.add('active');
+            achievementsListDiv.classList.remove('active');
+            superShopListDiv.classList.remove('active'); 
+            settingsListDiv.classList.remove('active'); 
+
+            upgradesTabButton.classList.add('active');
+            achievementsTabButton.classList.remove('active');
+            superShopTabButton.classList.remove('active'); 
+            settingsTabButton.classList.remove('active'); 
+
+            updateUpgradesDisplay(); 
+            updateAchievementsDisplay(); 
+            updateSuperShopDisplay(); 
+        });
+
+        achievementsTabButton.addEventListener('click', () => {
+            achievementsListDiv.classList.add('active');
+            upgradesListDiv.classList.remove('active');
+            superShopListDiv.classList.remove('active'); 
+            settingsListDiv.classList.remove('active'); 
+
+            achievementsTabButton.classList.add('active');
+            upgradesTabButton.classList.remove('active');
+            superShopTabButton.classList.remove('active'); 
+            settingsTabButton.classList.remove('active'); 
+
+            updateAchievementsDisplay(); 
+            updateUpgradesDisplay(); 
+            updateSuperShopDisplay(); 
+        });
+
+        // Événement de clic pour l'onglet Super-Shop
+        superShopTabButton.addEventListener('click', () => {
+            superShopListDiv.classList.add('active');
+            upgradesListDiv.classList.remove('active');
+            achievementsListDiv.classList.remove('active');
+            settingsListDiv.classList.remove('active'); 
+
+            superShopTabButton.classList.add('active');
+            upgradesTabButton.classList.remove('active');
+            achievementsTabButton.classList.remove('active');
+            settingsTabButton.classList.remove('active'); 
+            
+            updateSuperShopDisplay(); 
+            updateUpgradesDisplay(); 
+            updateAchievementsDisplay(); 
+        });
+
+        // Événement de clic pour l'onglet Paramètres
+        settingsTabButton.addEventListener('click', () => {
+            settingsListDiv.classList.add('active');
+            superShopListDiv.classList.remove('active');
+            upgradesListDiv.classList.remove('active');
+            achievementsListDiv.classList.remove('active');
+
+            settingsTabButton.classList.add('active');
+            superShopTabButton.classList.remove('active');
+            upgradesTabButton.classList.remove('active');
+            achievementsTabButton.classList.remove('active');
+        });
+
+
+        // Logique de bascule des panneaux
+        toggleLeftButton.addEventListener('click', () => {
+            leftPanelWrapper.classList.toggle('hidden-left');
+            // Lorsque le panneau est basculé, on doit re-vérifier l'état des pastilles
+            updateUpgradesDisplay(); 
+            updateAchievementsDisplay(); 
+            updateSuperShopDisplay(); 
+        });
+
+        // Logique de bascule du panneau de droite
+        toggleRightButton.addEventListener('click', () => {
+            rightPanelWrapper.classList.toggle('hidden-right');
+        });
+
+        // Fonction pour exporter la progression
+        exportJsonButton.addEventListener('click', () => {
+            const saveData = {
+                gameStats: gameStats,
+                artifactCounts: artifactCounts,
+                upgrades: upgrades,
+                superShopUpgrades: superShopUpgrades,
+                achievements: achievements
+            };
+            const dataStr = JSON.stringify(saveData, null, 2); // Pretty print JSON
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'clicker_artefacts_progression.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('Progression exportée avec succès !');
+        });
+
+        // Fonction pour importer la progression
+        importJsonButton.addEventListener('click', () => {
+            importJsonFile.click(); // Déclenche le clic sur l'input de fichier caché
+        });
+
+        importJsonFile.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const loadedData = JSON.parse(e.target.result);
+                        
+                        // Réinitialiser toutes les stats et les états des améliorations/succès
+                        // pour s'assurer que l'importation est propre et n'accumule pas les effets
+                        gameStats.totalClicks = 0;
+                        gameStats.baseClicksPerSecond = 0;
+                        gameStats.clicksPerSecond = 0;
+                        gameStats.baseClickPower = 1;
+                        gameStats.clickPower = 1;
+                        gameStats.baseLuck = 0;
+                        gameStats.luck = 0;
+                        gameStats.gold = 0;
+                        gameStats.cpsMultiplier = 1;
+                        gameStats.powerMultiplier = 1;
+                        gameStats.luckMultiplier = 1;
+                        gameStats.allStatsMultiplier = 1;
+
+                        // Réinitialiser les comptes d'artefacts
+                        for (const emoji in artifactCounts) {
+                            artifactCounts[emoji] = 0;
+                        }
+
+                        // Réinitialiser les améliorations achetées
+                        upgrades.forEach(upgrade => upgrade.purchased = false);
+                        superShopUpgrades.forEach(upgrade => upgrade.purchased = false);
+
+                        // Réinitialiser les succès validés
+                        achievements.forEach(achievement => {
+                            achievement.currentLevel = 0;
+                            achievement.validatedLevels = 0;
+                        });
+
+
+                        // Restauration de gameStats à partir des données chargées
+                        Object.assign(gameStats, loadedData.gameStats);
+
+                        // Restauration de artifactCounts à partir des données chargées
+                        if (loadedData.artifactCounts) {
+                            for (const emoji in loadedData.artifactCounts) {
+                                // S'assurer que seuls les artefacts définis sont restaurés
+                                if (artifactCounts.hasOwnProperty(emoji)) {
+                                    artifactCounts[emoji] = loadedData.artifactCounts[emoji];
+                                }
+                            }
+                        }
+
+                        // Restauration des upgrades et réapplication des effets
+                        loadedData.upgrades.forEach(loadedUpgrade => {
+                            const existingUpgrade = upgrades.find(u => u.id === loadedUpgrade.id);
+                            if (existingUpgrade) {
+                                existingUpgrade.purchased = loadedUpgrade.purchased; // Juste l'état purchased
+                                if (existingUpgrade.purchased) {
+                                    // Appliquer les effets de l'amélioration de base si elle a été achetée
+                                    if (existingUpgrade.effect.cps) {
+                                        gameStats.baseClicksPerSecond += existingUpgrade.effect.cps;
+                                    }
+                                    if (existingUpgrade.effect.power) {
+                                        gameStats.baseClickPower += existingUpgrade.effect.power;
+                                    }
+                                    if (existingUpgrade.effect.luck) {
+                                        gameStats.baseLuck += existingUpgrade.effect.luck;
+                                    }
+                                }
+                            }
+                        });
+
+                        // Restauration des superShopUpgrades et réapplication des effets
+                        loadedData.superShopUpgrades.forEach(loadedUpgrade => {
+                            const existingUpgrade = superShopUpgrades.find(u => u.id === loadedUpgrade.id);
+                            if (existingUpgrade) {
+                                existingUpgrade.purchased = loadedUpgrade.purchased; // Juste l'état purchased
+                                if (existingUpgrade.purchased) {
+                                    // Appliquer les effets de l'amélioration du Super-Shop si elle a été achetée
+                                    if (existingUpgrade.effect.cps) {
+                                        gameStats.baseClicksPerSecond += existingUpgrade.effect.cps;
+                                    }
+                                    if (existingUpgrade.effect.power) {
+                                        gameStats.baseClickPower += existingUpgrade.effect.power;
+                                    }
+                                    if (existingUpgrade.effect.luckMultiplier) {
+                                        gameStats.luckMultiplier *= existingUpgrade.effect.luckMultiplier;
+                                    }
+                                    if (existingUpgrade.effect.cpsMultiplier) {
+                                        gameStats.cpsMultiplier *= existingUpgrade.effect.cpsMultiplier;
+                                    }
+                                    if (existingUpgrade.effect.powerMultiplier) {
+                                        gameStats.powerMultiplier *= existingUpgrade.effect.powerMultiplier;
+                                    }
+                                    if (existingUpgrade.effect.allStatsMultiplier) {
+                                        gameStats.allStatsMultiplier *= existingUpgrade.effect.allStatsMultiplier;
+                                    }
+                                }
+                            }
+                        });
+
+                        // Recalculer les stats effectives après avoir appliqué tous les effets
+                        recalculateEffectiveStats();
+
+                        // Restauration des achievements
+                        loadedData.achievements.forEach(loadedAchievement => {
+                            const existingAchievement = achievements.find(a => a.id === loadedAchievement.id);
+                            if (existingAchievement) {
+                                // Copier les valeurs validées directement
+                                existingAchievement.validatedLevels = loadedAchievement.validatedLevels;
+                                // currentLevel sera recalculé par updateAchievementsDisplay
+                            }
+                        });
+
+                        // Mise à jour de l'affichage après l'importation
+                        // L'ordre est important ici :
+                        // 1. Stats de jeu (elles dépendent des améliorations appliquées)
+                        // 2. Artefacts (dépendent des artifactCounts)
+                        // 3. Améliorations (dépendent de gameStats.totalClicks et de leur état acheté)
+                        // 4. Super Shop (dépend de gameStats.gold et gameStats.clicksPerSecond)
+                        // 5. Succès (dépendent de gameStats et artifactCounts)
+                        updateGameStatsDisplay();
+                        updateArtifactDisplay();
+                        updateUpgradesDisplay();
+                        updateSuperShopDisplay();
+                        updateAchievementsDisplay();
+
+
+                        alert('Progression importée avec succès !');
+                    } catch (e) {
+                        alert('Erreur lors de l\'importation du fichier JSON. Assurez-vous que le format est correct.');
+                        console.error("Erreur d'importation:", e);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+
+        // Initialisation de l'affichage au chargement de la page
+        updateArtifactDisplay(); 
+        updateUpgradesDisplay();      
+        updateGameStatsDisplay();
+        updateAchievementsDisplay();  
+        updateSuperShopDisplay();     
+    </script>
+</body>
+</html>
