@@ -17,9 +17,16 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #282b30; /* Couleur principale du fond */
-            color: lightgray; /* Couleur du texte par défaut */
+            background: radial-gradient(circle at center, #282b30 0%, #1e2124 100%); /* Dégradé radial pour le fond */
+            background-size: 200% 200%; /* Pour permettre l'animation du fond */
+            animation: subtleBackgroundPulse 20s ease-in-out infinite alternate; /* Animation du fond */
+            color: lightgray;
             text-align: center;
+        }
+
+        @keyframes subtleBackgroundPulse {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
 
         header {
@@ -27,25 +34,27 @@
         }
 
         header img {
-            display: block; /* Permet de centrer l'image avec margin auto */
-            margin: 0 auto 30px auto; /* Centre l'image et ajoute de l'espace en bas */
-            max-width: 600px; /* Taille du logo */
+            display: block;
+            margin: 0 auto 30px auto;
+            max-width: 600px;
             height: auto;
-            border-radius: 10px; /* Bords légèrement arrondis pour le logo */
-            border: none; /* Supprime toute bordure */
-            outline: none; /* Supprime l'outline (contour de focus) */
+            border-radius: 10px;
+            border: none;
+            outline: none;
         }
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Ajusté pour 3 colonnes */
-            gap: 40px; /* Espace entre les éléments */
-            max-width: 1000px; /* Largeur maximale pour la grille */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 30px;
-            background-color: #1e2124; /* Fond de la grille */
+            background-color: #1e2124;
             border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            /* Ajout d'une légère transition pour l'ombre du cadre si jamais activé */
+            transition: box-shadow 0.3s ease-in-out;
         }
 
         .game-item {
@@ -54,25 +63,61 @@
             align-items: center;
             text-decoration: none;
             color: lightgray;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             border-radius: 10px;
             padding: 0;
             background-color: transparent;
             box-shadow: none;
+            border: 2px solid transparent; /* Bordure transparente par défaut */
+
+            /* Transitions pour tous les effets interactifs */
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out,
+                        border-color 0.3s ease-out, filter 0.3s ease-out, opacity 0.5s ease-out;
+
+            opacity: 0; /* Commence caché pour l'animation d'apparition */
+            transform: translateY(20px); /* Commence légèrement en dessous pour l'animation */
+            animation: itemFadeIn 0.6s ease-out forwards; /* Animation d'apparition */
+        }
+
+        /* Délais d'animation pour un effet d'apparition en cascade */
+        .games-grid .game-item:nth-child(1) { animation-delay: 0.1s; }
+        .games-grid .game-item:nth-child(2) { animation-delay: 0.2s; }
+        .games-grid .game-item:nth-child(3) { animation-delay: 0.3s; }
+        .games-grid .game-item:nth-child(4) { animation-delay: 0.4s; }
+        .games-grid .game-item:nth-child(5) { animation-delay: 0.5s; }
+        .games-grid .game-item:nth-child(6) { animation-delay: 0.6s; }
+        .games-grid .game-item:nth-child(7) { animation-delay: 0.7s; }
+        .games-grid .game-item:nth-child(8) { animation-delay: 0.8s; }
+        .games-grid .game-item:nth-child(9) { animation-delay: 0.9s; }
+        .games-grid .game-item:nth-child(10) { animation-delay: 1.0s; }
+        .games-grid .game-item:nth-child(11) { animation-delay: 1.1s; }
+        .games-grid .game-item:nth-child(12) { animation-delay: 1.2s; }
+        .games-grid .game-item:nth-child(13) { animation-delay: 1.3s; }
+        /* Ajoutez d'autres nth-child si vous avez plus de jeux */
+
+
+        @keyframes itemFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .game-item:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            background-color: transparent;
+            transform: translateY(-12px) scale(1.02); /* Soulève et zoome légèrement */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), 0 0 15px #9eff9e; /* Ombre plus forte + lueur verte */
+            border-color: #9eff9e; /* Bordure verte au survol */
+            filter: brightness(1.1); /* Rend l'image légèrement plus lumineuse */
+        }
+
+        .game-item:active {
+            transform: translateY(-4px) scale(0.99); /* S'enfonce légèrement au clic */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Réduit l'ombre au clic */
         }
 
         .game-item img {
-            width: 300px; /* Ajusté pour 3 colonnes */
-            height: 170px; /* Ajusté proportionnellement */
+            width: 300px;
+            height: 170px;
             object-fit: cover;
             border-radius: 8px;
-            border: none; /* Pas de bordure sur les miniatures */
+            border: none;
             outline: none;
             display: block;
         }
@@ -80,17 +125,17 @@
         /* Styles pour les petits écrans (mobiles) */
         @media (max-width: 768px) {
             .games-grid {
-                grid-template-columns: 1fr; /* Une seule colonne sur petits écrans */
+                grid-template-columns: 1fr;
                 gap: 20px;
                 padding: 15px;
             }
             header img {
-                max-width: 250px; /* Logo réduit sur mobile */
+                max-width: 250px;
             }
             .game-item img {
-                width: 100%; /* L'image prend toute la largeur disponible de son conteneur */
+                width: 100%;
                 height: auto;
-                max-height: 200px; /* Garde une hauteur raisonnable sur mobile */
+                max-height: 200px;
             }
         }
     </style>
