@@ -38,9 +38,9 @@
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Adapté pour des miniatures plus grandes */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Ajusté pour 3 colonnes */
             gap: 40px; /* Espace entre les éléments */
-            max-width: 1000px; /* Largeur maximale pour favoriser 2 colonnes avec les nouvelles tailles */
+            max-width: 1000px; /* Largeur maximale pour la grille */
             margin: 0 auto;
             padding: 30px;
             background-color: #1e2124; /* Fond de la grille */
@@ -68,8 +68,8 @@
         }
 
         .game-item img {
-            width: 350px; /* Miniatures plus larges */
-            height: 200px; /* Miniatures plus hautes */
+            width: 300px; /* Ajusté pour 3 colonnes */
+            height: 170px; /* Ajusté proportionnellement */
             object-fit: cover;
             border-radius: 8px;
             border: none; /* Pas de bordure sur les miniatures */
