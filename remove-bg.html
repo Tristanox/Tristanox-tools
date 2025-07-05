@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supprimeur de Fond d'Images 100% En Ligne</title>
+    <title>Supprimeur de Fond d'Images 100% En Ligne (ONNX)</title>
     <style>
         /* --- CSS intégré avec la nouvelle palette --- */
         :root {
@@ -175,9 +175,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden; /* Pour que la barre de remplissage ne dépasse pas les bords arrondis */
+            overflow: hidden;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
-            display: none; /* Caché par défaut */
+            display: none;
         }
 
         .progress-bar {
@@ -186,19 +186,19 @@
             background-color: var(--color-accent-light);
             border-radius: 5px;
             text-align: center;
-            line-height: 25px; /* Centre le texte verticalement */
+            line-height: 25px;
             color: var(--color-darkest);
             font-weight: bold;
             transition: width 0.3s ease-in-out;
-            white-space: nowrap; /* Empêche le texte de se briser */
+            white-space: nowrap;
         }
         .progress-text {
             position: absolute;
             width: 100%;
             text-align: center;
-            color: var(--color-text-light); /* Texte par-dessus la barre */
+            color: var(--color-text-light);
             font-weight: bold;
-            z-index: 1; /* S'assure que le texte est au-dessus de la barre de remplissage */
+            z-index: 1;
         }
 
 
@@ -305,38 +305,73 @@
             </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.2.0/dist/background-removal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/ort.min.js"></script>
 
     <script>
-        /* --- JavaScript intégré --- */
+        /* --- JavaScript intégré pour ONNX Runtime Web --- */
         document.addEventListener('DOMContentLoaded', () => {
             const imageUpload = document.getElementById('imageUpload');
             const fileCount = document.getElementById('fileCount');
             const statusMessage = document.getElementById('statusMessage');
             const loadingSpinner = document.getElementById('loadingSpinner');
-            const inputPreviewContainer = document.getElementById('inputPreviewContainer'); // Nouveau
+            const inputPreviewContainer = document.getElementById('inputPreviewContainer');
             const outputContainer = document.getElementById('outputContainer');
-            const progressBarContainer = document.getElementById('progressBarContainer'); // Nouveau
-            const progressBar = document.getElementById('progressBar'); // Nouveau
-            const progressText = document.getElementById('progressText'); // Nouveau
+            const progressBarContainer = document.getElementById('progressBarContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
 
             let filesToProcess = [];
             let imagesProcessedCount = 0;
+            let onnxSession = null; // Pour stocker la session ONNX
 
-            imageUpload.addEventListener('change', (event) => {
+            const MODEL_PATH = './u2net.onnx'; // Assurez-vous que ce fichier est dans le même dossier que index.html
+            const IMAGE_SIZE = 320; // Taille d'entrée requise par le modèle U2NET
+
+            // Fonction d'initialisation du modèle ONNX
+            async function initializeOnnxModel() {
+                if (onnxSession) return; // Modèle déjà chargé
+
+                statusMessage.className = 'status-message loading';
+                statusMessage.textContent = 'Chargement du modèle d\'IA (U2NET)... Cela peut prendre un instant.';
+                loadingSpinner.style.display = 'block';
+
+                try {
+                    // Crée une nouvelle session ONNX Runtime
+                    onnxSession = await ort.InferenceSession.create(MODEL_PATH);
+                    statusMessage.textContent = 'Modèle d\'IA chargé. Prêt pour le traitement.';
+                    statusMessage.className = 'status-message success'; // Temporaire, sera écrasé
+                } catch (error) {
+                    console.error("Erreur lors du chargement du modèle ONNX:", error);
+                    statusMessage.textContent = `Erreur de chargement du modèle: ${error.message}. Vérifiez le fichier ${MODEL_PATH}.`;
+                    statusMessage.className = 'status-message error';
+                    loadingSpinner.style.display = 'none';
+                    throw error; // Rejeter l'erreur pour arrêter le processus
+                } finally {
+                    // Le spinner reste visible jusqu'à la fin du traitement des images
+                }
+            }
+
+            imageUpload.addEventListener('change', async (event) => {
                 filesToProcess = Array.from(event.target.files);
-                inputPreviewContainer.innerHTML = ''; // Nettoie les anciens aperçus
-                outputContainer.innerHTML = ''; // Nettoie les anciens résultats
-                imagesProcessedCount = 0; // Réinitialise le compteur
-                updateProgressBar(0, filesToProcess.length); // Réinitialise la barre de progression
+                inputPreviewContainer.innerHTML = '';
+                outputContainer.innerHTML = '';
+                imagesProcessedCount = 0;
+                updateProgressBar(0, filesToProcess.length);
 
                 if (filesToProcess.length > 0) {
                     fileCount.textContent = `${filesToProcess.length} fichier(s) sélectionné(s)`;
-                    displayInputPreviews(filesToProcess); // Affiche les aperçus des images importées
-                    processImages(); // Déclenche le traitement
+                    displayInputPreviews(filesToProcess);
+                    // Initialiser le modèle avant de commencer le traitement
+                    try {
+                        await initializeOnnxModel();
+                        processImages();
+                    } catch (error) {
+                        // L'erreur est déjà affichée dans initializeOnnxModel
+                        console.error("Échec de l'initialisation du modèle, traitement annulé.");
+                    }
                 } else {
                     fileCount.textContent = 'Aucun fichier sélectionné';
-                    progressBarContainer.style.display = 'none'; // Cache la barre si pas de fichiers
+                    progressBarContainer.style.display = 'none';
                 }
             });
 
@@ -349,7 +384,7 @@
                         const img = document.createElement('img');
                         img.src = e.target.result;
                         img.alt = file.name;
-                        imgBox.title = file.name; // Info-bulle au survol
+                    // imgBox.title = file.name; // Info-bulle au survol (peut être enlevé si trop de texte)
                         imgBox.appendChild(img);
                         inputPreviewContainer.appendChild(imgBox);
                     };
@@ -362,7 +397,7 @@
                     progressBarContainer.style.display = 'none';
                     return;
                 }
-                progressBarContainer.style.display = 'flex'; // Affiche la barre
+                progressBarContainer.style.display = 'flex';
                 const percentage = Math.round((processed / total) * 100);
                 progressBar.style.width = `${percentage}%`;
                 progressText.textContent = `${percentage}% (${processed}/${total} images)`;
@@ -372,85 +407,158 @@
             }
 
             async function processImages() {
-                statusMessage.style.display = 'block';
-                statusMessage.className = 'status-message loading';
-                statusMessage.textContent = 'Chargement du modèle d\'IA... (cela peut prendre un instant la première fois)';
-                loadingSpinner.style.display = 'block';
-                updateProgressBar(0, filesToProcess.length); // Initialise la barre
+                statusMessage.className = 'status-message processing';
+                statusMessage.textContent = `Démarrage du traitement de ${filesToProcess.length} image(s)...`;
+                loadingSpinner.style.display = 'block'; // Assurez-vous qu'il est visible pendant le traitement
 
-                try {
-                    if (!window.backgroundRemoval) {
-                         throw new Error("La bibliothèque @imgly/background-removal n'a pas été chargée. Veuillez vérifier votre connexion Internet ou la manière dont le fichier est ouvert (doit être via un serveur HTTP).");
+                for (const file of filesToProcess) {
+                    try {
+                        const image = await loadImage(file);
+                        const [inputTensor, originalWidth, originalHeight] = preprocessImage(image);
+
+                        // Exécution de l'inférence du modèle
+                        const feeds = { 'input': inputTensor }; // Le nom 'input' doit correspondre à l'entrée de votre modèle ONNX
+                        const results = await onnxSession.run(feeds);
+                        const outputTensor = results[onnxSession.outputNames[0]]; // Récupère la première sortie
+
+                        const processedCanvas = postprocessImage(image, outputTensor.data, originalWidth, originalHeight);
+                        const processedBlob = await new Promise(resolve => processedCanvas.toBlob(resolve, 'image/png'));
+                        const processedUrl = URL.createObjectURL(processedBlob);
+
+                        // Afficher l'image traitée
+                        const previewDiv = document.createElement('div');
+                        previewDiv.className = 'image-preview';
+
+                        const noBgBox = document.createElement('div');
+                        noBgBox.className = 'no-bg-image-box';
+                        const processedImg = document.createElement('img');
+                        processedImg.src = processedUrl;
+                        processedImg.alt = `Image traitée de ${file.name}`;
+                        noBgBox.appendChild(processedImg);
+
+                        const fileNameParagraph = document.createElement('p');
+                        fileNameParagraph.textContent = `Fichier: ${file.name}`;
+
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = processedUrl;
+                        downloadLink.download = `${file.name.split('.')[0]}_no_bg.png`;
+                        downloadLink.textContent = 'Télécharger';
+                        downloadLink.className = 'download-link';
+
+                        previewDiv.appendChild(noBgBox);
+                        previewDiv.appendChild(fileNameParagraph);
+                        previewDiv.appendChild(downloadLink);
+                        outputContainer.appendChild(previewDiv);
+
+                        imagesProcessedCount++;
+                        updateProgressBar(imagesProcessedCount, filesToProcess.length);
+
+                    } catch (imageError) {
+                        console.error(`Erreur de traitement pour ${file.name}:`, imageError);
+                        statusMessage.textContent = `Erreur lors du traitement de ${file.name}. Certaines images peuvent avoir échoué.`;
+                        statusMessage.className = 'status-message error';
+                        // Ne pas incrémenter imagesProcessedCount pour les échecs si on veut la progression des succès.
+                        // Cependant, pour montrer que le traitement a "tenté" cette image, on pourrait l'incrémenter.
+                        // Pour l'UX de la barre, nous allons l'incrémenter pour que la barre avance même en cas d'erreur.
+                         imagesProcessedCount++; // Avance la barre même en cas d'erreur pour ne pas bloquer
+                         updateProgressBar(imagesProcessedCount, filesToProcess.length);
                     }
-                    await window.backgroundRemoval.ready();
-
-                    statusMessage.className = 'status-message processing';
-                    statusMessage.textContent = `Démarrage du traitement de ${filesToProcess.length} image(s)...`;
-
-                    for (const file of filesToProcess) {
-                        try {
-                            const originalImageBitmap = await createImageBitmap(file);
-                            const processedBlob = await window.backgroundRemoval.removeBackground(originalImageBitmap);
-                            const processedUrl = URL.createObjectURL(processedBlob);
-
-                            // Afficher l'image traitée
-                            const previewDiv = document.createElement('div');
-                            previewDiv.className = 'image-preview';
-
-                            const noBgBox = document.createElement('div');
-                            noBgBox.className = 'no-bg-image-box';
-                            const processedImg = document.createElement('img');
-                            processedImg.src = processedUrl;
-                            processedImg.alt = `Image traitée de ${file.name}`;
-                            noBgBox.appendChild(processedImg);
-
-                            const fileNameParagraph = document.createElement('p');
-                            fileNameParagraph.textContent = `Fichier: ${file.name}`;
-
-                            const downloadLink = document.createElement('a');
-                            downloadLink.href = processedUrl;
-                            downloadLink.download = `${file.name.split('.')[0]}_no_bg.png`;
-                            downloadLink.textContent = 'Télécharger';
-                            downloadLink.className = 'download-link';
-
-                            previewDiv.appendChild(noBgBox);
-                            previewDiv.appendChild(fileNameParagraph);
-                            previewDiv.appendChild(downloadLink);
-                            outputContainer.appendChild(previewDiv);
-
-                            imagesProcessedCount++;
-                            updateProgressBar(imagesProcessedCount, filesToProcess.length);
-
-                        } catch (imageError) {
-                            console.error(`Erreur de traitement pour ${file.name}:`, imageError);
-                            // Ne pas incrémenter imagesProcessedCount pour les erreurs si vous voulez que la barre reflète les succès.
-                            // Si vous voulez qu'elle reflète les tentatives, incrémentez-la ici.
-                            // Pour cette version, nous incrémentons seulement si le traitement réussit.
-                            statusMessage.textContent = `Erreur lors du traitement de ${file.name}. Certaines images peuvent avoir échoué.`;
-                            statusMessage.className = 'status-message error';
-                        }
-                    }
-
-                    if (imagesProcessedCount === filesToProcess.length) {
-                        statusMessage.textContent = 'Toutes les images ont été traitées avec succès !';
-                        statusMessage.className = 'status-message success';
-                    } else if (imagesProcessedCount > 0) {
-                        statusMessage.textContent = `Traitement terminé. ${imagesProcessedCount} sur ${filesToProcess.length} images traitées avec succès.`;
-                        statusMessage.className = 'status-message success';
-                    } else {
-                         statusMessage.textContent = 'Aucune image n\'a pu être traitée. Veuillez vérifier les fichiers.';
-                         statusMessage.className = 'status-message error';
-                    }
-
-
-                } catch (generalError) {
-                    console.error("Erreur générale lors du chargement ou du traitement:", generalError);
-                    statusMessage.textContent = `Une erreur grave s'est produite: ${generalError.message}. Veuillez réessayer.`;
-                    statusMessage.className = 'status-message error';
-                } finally {
-                    loadingSpinner.style.display = 'none';
-                    // La barre de progression reste visible avec le résultat final
                 }
+
+                if (imagesProcessedCount === filesToProcess.length) {
+                    statusMessage.textContent = 'Toutes les images ont été traitées avec succès !';
+                    statusMessage.className = 'status-message success';
+                } else if (imagesProcessedCount > 0) {
+                    statusMessage.textContent = `Traitement terminé. ${imagesProcessedCount} sur ${filesToProcess.length} images traitées avec succès.`;
+                    statusMessage.className = 'status-message success';
+                } else {
+                     statusMessage.textContent = 'Aucune image n\'a pu être traitée. Veuillez vérifier les fichiers.';
+                     statusMessage.className = 'status-message error';
+                }
+                loadingSpinner.style.display = 'none';
+            }
+
+            // --- Fonctions utilitaires pour le traitement ONNX ---
+
+            async function loadImage(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = () => resolve(img);
+                        img.onerror = reject;
+                        img.src = e.target.result;
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function preprocessImage(image) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = IMAGE_SIZE;
+                canvas.height = IMAGE_SIZE;
+
+                // Redimensionner l'image pour qu'elle corresponde à la taille d'entrée du modèle
+                ctx.drawImage(image, 0, 0, IMAGE_SIZE, IMAGE_SIZE);
+                const imageData = ctx.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE).data;
+
+                // Normalisation : U2NET attend des valeurs entre 0 et 1,
+                // puis normalisées par la moyenne et l'écart-type
+                // Pour la plupart des modèles U2NET, la normalisation est (x - mean) / std
+                // Les valeurs typiques de mean et std pour des modèles pré-entraînés sur ImageNet sont :
+                const mean = [0.485, 0.456, 0.406];
+                const std = [0.229, 0.224, 0.225];
+
+                const inputData = new Float32Array(IMAGE_SIZE * IMAGE_SIZE * 3); // RGB
+                for (let i = 0; i < IMAGE_SIZE * IMAGE_SIZE; i++) {
+                    inputData[i * 3 + 0] = (imageData[i * 4 + 0] / 255 - mean[0]) / std[0]; // R
+                    inputData[i * 3 + 1] = (imageData[i * 4 + 1] / 255 - mean[1]) / std[1]; // G
+                    inputData[i * 3 + 2] = (imageData[i * 4 + 2] / 255 - mean[2]) / std[2]; // B
+                }
+
+                // Créer un Tensor ONNX. U2NET attend souvent un format [1, 3, H, W]
+                const inputTensor = new ort.Tensor('float32', inputData, [1, 3, IMAGE_SIZE, IMAGE_SIZE]);
+                return [inputTensor, image.width, image.height];
+            }
+
+            function postprocessImage(originalImage, maskData, originalWidth, originalHeight) {
+                const maskCanvas = document.createElement('canvas');
+                const maskCtx = maskCanvas.getContext('2d');
+                maskCanvas.width = IMAGE_SIZE;
+                maskCanvas.height = IMAGE_SIZE;
+
+                // La sortie du modèle est souvent une heatmap de probabilités.
+                // Nous devons la transformer en un masque binaire (0 ou 255)
+                const maskImageData = maskCtx.createImageData(IMAGE_SIZE, IMAGE_SIZE);
+                for (let i = 0; i < IMAGE_SIZE * IMAGE_SIZE; i++) {
+                    // U2NET produit 1 output (logit). Appliquer sigmoid et seuil
+                    const alpha = maskData[i] > 0.5 ? 255 : 0; // Seuil à 0.5 (arbitraire, peut être ajusté)
+                    maskImageData.data[i * 4 + 0] = 0; // R
+                    maskImageData.data[i * 4 + 1] = 0; // G
+                    maskImageData.data[i * 4 + 2] = 0; // B
+                    maskImageData.data[i * 4 + 3] = alpha; // Alpha (transparence)
+                }
+                maskCtx.putImageData(maskImageData, 0, 0);
+
+                // Créer le canvas final pour l'image avec fond supprimé
+                const finalCanvas = document.createElement('canvas');
+                const finalCtx = finalCanvas.getContext('2d');
+                finalCanvas.width = originalWidth;
+                finalCanvas.height = originalHeight;
+
+                // Dessiner l'image originale
+                finalCtx.drawImage(originalImage, 0, 0, originalWidth, originalHeight);
+
+                // Appliquer le masque. Pour cela, on utilise le masque comme source d'alpha.
+                // On redimensionne le masque à la taille originale de l'image.
+                finalCtx.globalCompositeOperation = 'destination-in';
+                finalCtx.drawImage(maskCanvas, 0, 0, originalWidth, originalHeight);
+                
+                finalCtx.globalCompositeOperation = 'source-over'; // Réinitialiser le mode de composition
+
+                return finalCanvas;
             }
         });
     </script>
