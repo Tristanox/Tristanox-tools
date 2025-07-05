@@ -58,7 +58,8 @@
             grid-template-columns: repeat(3, 1fr); /* Fixé à 3 colonnes de taille égale */
             gap: 40px;
             width: 100%;
-            margin: 0 auto;
+            max-width: 95vw; /* La grille ne dépassera pas 95% de la largeur de la fenêtre */
+            margin: 0 auto; /* Centre la grille et assure des marges égales de chaque côté */
             padding: 30px;
             background-color: #1e2124;
             border-radius: 15px;
@@ -121,9 +122,9 @@
         }
 
         .game-item img {
-            width: 700px; /* Miniatures deux fois plus grandes */
-            height: 400px; /* Hauteur ajustée proportionnellement */
-            object-fit: cover;
+            width: 560px; /* Miniatures redimensionnées à 80% */
+            height: 320px; /* Hauteur ajustée à 80% */
+            object-fit: contain; /* L'image s'affiche en entier, sans être coupée */
             border-radius: 8px;
             border: none;
             outline: none;
