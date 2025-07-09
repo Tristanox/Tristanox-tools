@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clash Royale Stats Complètes</title>
+    <style>
+        /* CSS intégré */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #4CAF50; /* Vert Clash Royale */
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3, h4 {
+            color: #333;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba
+            (0,0,0,0.1);
+        }
+
+        .search-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .search-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        input[type="text"], select {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #FF9800; /* Orange Clash Royale */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e68900;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .results-section h2 {
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .info-block {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .info-block h3, .info-block h4 {
+            margin-top: 0;
+            color: #4CAF50;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-block ul li {
+            background-color: #fff;
+            border: 1px solid #e9e9e9;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-block ul li span {
+            margin-right: 10px;
+        }
+
+        .tag {
+            font-size: 0.8em;
+            color: #666;
+            background-color: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* Details for battle log */
+        details {
+            margin-top: 10px;
+            background-color: #eef;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        details summary {
+            font-weight: bold;
+            cursor: pointer;
+            color: #007bff;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+        }
+
+        /* Basic spinner for loader */
+        #loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #4CAF50; /* Green */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none; /* Hidden by default */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Stats Complètes Clash Royale</h1>
+    </header>
+
+    <main>
+        <section class="search-section">
+            <h2>Rechercher Joueur ou Clan</h2>
+            <div class="search-inputs">
+                <input type="text" id="searchInput" placeholder="Entrez le tag (ex: #PYCRQJJV ou #8J2RPLPP)">
+                <select id="searchType">
+                    <option value="player">Joueur</option>
+                    <option value="clan">Clan</option>
+                </select>
+                <button id="searchButton">Rechercher</button>
+            </div>
+            <div id="loader"></div>
+        </section>
+
+        <section id="playerResults" class="results-section">
+            <h2>Statistiques du Joueur</h2>
+            <div id="playerGeneralInfo" class="info-block"></div>
+            <div id="playerAchievementList" class="info-block"></div>
+            <div id="playerCardCollection" class="info-block"></div>
+            <div id="playerUpcomingChests" class="info-block"></div>
+            <div id="playerBattleLog" class="info-block"></div>
+            <div id="playerRankedLadder" class="info-block"></div>
+        </section>
+
+        <section id="clanResults" class="results-section">
+            <h2>Statistiques du Clan</h2>
+            <div id="clanGeneralInfo" class="info-block"></div>
+            <div id="clanMemberList" class="info-block"></div>
+            <div id="clanWarLog" class="info-block"></div>
+            <div id="clanCurrentWar" class="info-block"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Clash Royale Stats - Fait avec passion et l'API Supercell</p>
+    </footer>
+
+    <script>
+        // JavaScript intégré
+        const API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6Ijk3ZmJmMWNiLWM3YjgtNDZmOC05ZTgzLWYzMGU5MDlhZWU3MSIsImlhdCI6MTc1MjA4MTU5Miwic3ViIjoiZGV2ZWxvcGVyL2EyMzg3MTNiLTVkOWMtYzAwZS1kZTdiLTY2NzU1MTY3ZWU1OCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxODUuMTk5LjEwOC4xNTMiLCIxODUuMTk5LjEwOS4xNTMiLCIxODUuMTk5LjExMC4xNTMiLCIxODUuMTk5LjExMS4xNTMiLCIwLjAuMC4wIl0sInR5cGUiOiJjbGllbnQifV19.eLfXXLtr6hzwjBMKegRhfixYf4gLRHeHhBJY2hQWowiEZJyPACMCgBxfhxWPhrZuvhOLAIHEkaUmSKcIFWSynA';
+        const BASE_URL = 'https://api.clashroyale.com/v1';
+
+        // DOM Elements - Inputs & Buttons
+        const searchInput = document.getElementById('searchInput');
+        const searchTypeSelect = document.getElementById('searchType');
+        const searchButton = document.getElementById('searchButton');
+        const loader = document.getElementById('loader');
+
+        // DOM Elements - Player Results
+        const playerResultsSection = document.getElementById('playerResults');
+        const playerGeneralInfo = document.getElementById('playerGeneralInfo');
+        const playerAchievementList = document.getElementById('playerAchievementList');
+        const playerCardCollection = document.getElementById('playerCardCollection');
+        const playerUpcomingChests = document.getElementById('playerUpcomingChests');
+        const playerBattleLog = document.getElementById('playerBattleLog');
+        const playerRankedLadder = document.getElementById('playerRankedLadder');
+
+        // DOM Elements - Clan Results
+        const clanResultsSection = document.getElementById('clanResults');
+        const clanGeneralInfo = document.getElementById('clanGeneralInfo');
+        const clanMemberList = document.getElementById('clanMemberList');
+        const clanWarLog = document.getElementById('clanWarLog');
+        const clanCurrentWar = document.getElementById('clanCurrentWar');
+
+        // Helper function to show/hide sections
+        function toggleSection(sectionElement, show) {
+            sectionElement.style.display = show ? 'block' : 'none';
+        }
+
+        // Function to handle API errors
+        function handleError(error) {
+            console.error('API Error:', error);
+            alert('Une erreur est survenue : ' + error.message + '. Vérifiez le tag et votre clé API. (Si vous utilisez localhost, assurez-vous que votre clé est configurée pour 0.0.0.0/0 ou votre IP locale).');
+            toggleSection(playerResultsSection, false);
+            toggleSection(clanResultsSection, false);
+            loader.style.display = 'none';
+        }
+
+        // Function to clean and encode tags
+        function cleanAndEncodeTag(tag) {
+            const cleanTag = tag.startsWith('#') ? tag.substring(1) : tag;
+            return encodeURIComponent(cleanTag);
+        }
+
+        // --- Player Functions ---
+
+        async function fetchPlayerStats(playerTag) {
+            loader.style.display = 'block';
+            toggleSection(playerResultsSection, false);
+            toggleSection(clanResultsSection, false);
+
+            const encodedTag = cleanAndEncodeTag(playerTag);
+
+            try {
+                const playerResponse = await fetch(`${BASE_URL}/players/%23${encodedTag}`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!playerResponse.ok) {
+                    if (playerResponse.status === 404) throw new Error('Joueur non trouvé.');
+                    throw new Error(`Erreur HTTP: ${playerResponse.status} ${playerResponse.statusText}`);
+                }
+                const playerData = await playerResponse.json();
+                displayPlayerStats(playerData);
+
+                // Fetch & display upcoming chests (separate API call)
+                const chestsResponse = await fetch(`${BASE_URL}/players/%23${encodedTag}/upcomingchests`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!chestsResponse.ok) {
+                    console.warn('Impossible de récupérer les prochains coffres:', chestsResponse.status, chestsResponse.statusText);
+                    playerUpcomingChests.innerHTML = '<p>Prochains coffres non disponibles.</p>';
+                } else {
+                    const chestsData = await chestsResponse.json();
+                    displayUpcomingChests(chestsData.items);
+                }
+
+                // Fetch & display battle log (separate API call)
+                const battleLogResponse = await fetch(`${BASE_URL}/players/%23${encodedTag}/battles`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!battleLogResponse.ok) {
+                    console.warn('Impossible de récupérer l\'historique des combats:', battleLogResponse.status, battleLogResponse.statusText);
+                    playerBattleLog.innerHTML = '<p>Historique des combats non disponible.</p>';
+                } else {
+                    const battleLogData = await battleLogResponse.json();
+                    displayBattleLog(battleLogData, playerTag); // Pass playerTag to identify player in battles
+                }
+
+                // Display ranked ladder info (Path of Legends)
+                // Note: The API doesn't have a direct endpoint for Path of Legends seasons per player.
+                // This data typically comes with the player profile or global leaderboards.
+                // For simplicity, we'll try to extract what's available from the player data.
+                displayPlayerRankedLadder(playerData);
+
+            } catch (error) {
+                handleError(error);
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayPlayerStats(player) {
+            playerGeneralInfo.innerHTML = `
+                <p><strong>Nom:</strong> ${player.name} <span class="tag">#${player.tag.substring(1)}</span></p>
+                <p><strong>Niveau du Roi:</strong> ${player.expLevel}</p>
+                <p><strong>Trophées Actuels:</strong> ${player.trophies}</p>
+                <p><strong>Record Trophées:</strong> ${player.bestTrophies}</p>
+                <p><strong>Victoires Totales:</strong> ${player.wins}</p>
+                <p><strong>Défaites Totales:</strong> ${player.losses}</p>
+                <p><strong>Matchs Nuls Totaux:</strong> ${player.draws}</p>
+                <p><strong>Ratio Victoires:</strong> ${player.wins + player.losses > 0 ? ((player.wins / (player.wins + player.losses)) * 100).toFixed(2) + '%' : 'N/A'}</p>
+                <p><strong>Victoires à 3 Couronnes:</strong> ${player.threeCrownWins}</p>
+                <p><strong>Dons Totaux:</strong> ${player.donations}</p>
+                <p><strong>Dons Reçus:</strong> ${player.donationsReceived}</p>
+                <p><strong>Points Étoiles:</strong> ${player.starPoints}</p>
+                <p><strong>Rôle Compétitif:</strong> ${player.role}</p>
+                <p><strong>Clan Actuel:</strong> ${player.clan ? `<span>${player.clan.name}</span> <span class="tag">#${player.clan.tag.substring(1)}</span>` : 'Aucun clan'}</p>
+                <p><strong>Record de Victoires en Défi:</strong> ${player.challengeMaxWins}</p>
+                <p><strong>Victoires Défi Classique:</strong> ${player.challengeCardsWon}</p>
+                <p><strong>Victoires Grand Défi:</strong> ${player.grandChallengeCardsWon}</p>
+                <p><strong>Tournois Joués:</strong> ${player.tournamentCardsWon}</p>
+                <p><strong>Victoires Tournoi:</strong> ${player.tournamentBattleCount}</p>
+            `;
+
+            // Achievements
+            playerAchievementList.innerHTML = '<h3>Succès Débloqués</h3>';
+            if (player.achievements && player.achievements.length > 0) {
+                const ul = document.createElement('ul');
+                player.achievements.filter(a => a.value > 0).forEach(achievement => { // Only show achievements with progress
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${achievement.name}</strong>: ${achievement.value} / ${achievement.target} ${achievement.info} (Étoiles: ${achievement.stars})`;
+                    ul.appendChild(li);
+                });
+                playerAchievementList.appendChild(ul);
+            } else {
+                playerAchievementList.innerHTML += '<p>Aucun succès significatif trouvé.</p>';
+            }
+
+            // Card Collection
+            playerCardCollection.innerHTML = '<h3>Collection de Cartes</h3>';
+            if (player.cards && player.cards.length > 0) {
+                const ul = document.createElement('ul');
+                // Sort by level (descending) and then rarity (legendary, epic, rare, common)
+                const rarityOrder = { "legendary": 4, "epic": 3, "rare": 2, "common": 1 };
+                player.cards.sort((a, b) => {
+                    if (b.level !== a.level) return b.level - a.level;
+                    return rarityOrder[b.maxLevel] - rarityOrder[a.maxLevel]; // Use maxLevel to infer rarity
+                }).forEach(card => {
+                    const li = document.createElement('li');
+                    li.textContent = `${card.name} (Lvl ${card.level}/${card.maxLevel})`;
+                    ul.appendChild(li);
+                });
+                playerCardCollection.appendChild(ul);
+            } else {
+                playerCardCollection.innerHTML += '<p>Aucune carte trouvée.</p>';
+            }
+
+            toggleSection(playerResultsSection, true);
+        }
+
+        function displayUpcomingChests(chests) {
+            playerUpcomingChests.innerHTML = '<h3>Prochains Coffres</h3>';
+            if (chests && chests.length > 0) {
+                const ul = document.createElement('ul');
+                chests.slice(0, 10).forEach(chest => { // Show first 10 chests
+                    const li = document.createElement('li');
+                    li.textContent = `${chest.name} (dans ${chest.index} coffres)`;
+                    ul.appendChild(li);
+                });
+                playerUpcomingChests.appendChild(ul);
+            } else {
+                playerUpcomingChests.innerHTML += '<p>Aucun coffre à venir.</p>';
+            }
+        }
+
+        function displayBattleLog(battles, playerTag) {
+            playerBattleLog.innerHTML = '<h3>Historique des Combats Récents</h3>';
+            if (battles && battles.length > 0) {
+                const ul = document.createElement('ul');
+                battles.slice(0, 15).forEach(battle => { // Show last 15 battles
+                    const li = document.createElement('li');
+                    const battleTime = new Date(battle.battleTime).toLocaleString();
+                    let resultText = '';
+
+                    // Determine player's outcome based on their tag in team/opponent
+                    const isPlayerInTeam = battle.team.some(p => p.tag === playerTag);
+                    const playerCrowns = isPlayerInTeam ? battle.team[0]?.crowns : battle.opponent[0]?.crowns;
+                    const opponentCrowns = isPlayerInTeam ? battle.opponent[0]?.crowns : battle.team[0]?.crowns;
+
+                    if (playerCrowns > opponentCrowns) {
+                        resultText = 'Victoire';
+                    } else if (playerCrowns < opponentCrowns) {
+                        resultText = 'Défaite';
+                    } else {
+                        resultText = 'Match Nul';
+                    }
+
+                    // Get player names
+                    const teamNames = battle.team.map(p => p.name).join(' & ');
+                    const opponentNames = battle.opponent.map(p => p.name).join(' & ');
+
+                    li.innerHTML = `
+                        <p><strong>${resultText}</strong> (${playerCrowns}-${opponentCrowns} couronnes) - ${battle.type}</p>
+                        <p>vs ${opponentNames} (${battleTime})</p>
+                        <details>
+                            <summary>Détails du combat</summary>
+                            <p>Durée: ${battle.gameMode.name}</p>
+                            <p>Deck Joueur: ${battle.team[0]?.cards.map(c => c.name).join(', ')}</p>
+                            <p>Deck Adversaire: ${battle.opponent[0]?.cards.map(c => c.name).join(', ')}</p>
+                        </details>
+                    `;
+                    ul.appendChild(li);
+                });
+                playerBattleLog.appendChild(ul);
+            } else {
+                playerBattleLog.innerHTML += '<p>Aucun combat récent trouvé.</p>';
+            }
+        }
+
+        function displayPlayerRankedLadder(player) {
+            playerRankedLadder.innerHTML = '<h3>Classement Compétitif (Chemin des Légendes)</h3>';
+            if (player.leagueStatistics && player.leagueStatistics.currentSeason) {
+                const current = player.leagueStatistics.currentSeason;
+                const previous = player.leagueStatistics.previousSeason;
+                const best = player.leagueStatistics.bestSeason;
+
+                playerRankedLadder.innerHTML += `
+                    <h4>Saison Actuelle</h4>
+                    <p><strong>Trophées:</strong> ${current.trophies}</p>
+                    <p><strong>Meilleure Trophées:</strong> ${current.bestTrophies}</p>
+                    <p><strong>Nom de la Ligue:</strong> ${current.league.name}</p>
+                    <p><strong>Rang:</strong> ${current.rank ? current.rank : 'Non classé'}</p>
+                `;
+
+                if (previous) {
+                    playerRankedLadder.innerHTML += `
+                        <h4>Saison Précédente</h4>
+                        <p><strong>Trophées:</strong> ${previous.trophies}</p>
+                        <p><strong>Meilleure Trophées:</strong> ${previous.bestTrophies}</p>
+                        <p><strong>Nom de la Ligue:</strong> ${previous.league.name}</p>
+                        <p><strong>Rang:</strong> ${previous.rank ? previous.rank : 'Non classé'}</p>
+                    `;
+                }
+                if (best) {
+                    playerRankedLadder.innerHTML += `
+                        <h4>Meilleure Saison Historique</h4>
+                        <p><strong>Trophées:</strong> ${best.trophies}</p>
+                        <p><strong>Meilleure Trophées:</strong> ${best.bestTrophies}</p>
+                        <p><strong>Nom de la Ligue:</strong> ${best.league.name}</p>
+                        <p><strong>Rang:</strong> ${best.rank ? best.rank : 'Non classé'}</p>
+                    `;
+                }
+            } else {
+                playerRankedLadder.innerHTML += '<p>Aucune donnée de classement compétitif disponible.</p>';
+            }
+        }
+
+
+        // --- Clan Functions ---
+
+        async function fetchClanStats(clanTag) {
+            loader.style.display = 'block';
+            toggleSection(playerResultsSection, false);
+            toggleSection(clanResultsSection, false);
+
+            const encodedTag = cleanAndEncodeTag(clanTag);
+
+            try {
+                const clanResponse = await fetch(`${BASE_URL}/clans/%23${encodedTag}`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!clanResponse.ok) {
+                    if (clanResponse.status === 404) throw new Error('Clan non trouvé.');
+                    throw new Error(`Erreur HTTP: ${clanResponse.status} ${clanResponse.statusText}`);
+                }
+                const clanData = await clanResponse.json();
+                displayClanStats(clanData);
+
+                // Fetch & display clan war log (separate API call)
+                const warLogResponse = await fetch(`${BASE_URL}/clans/%23${encodedTag}/warlog`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!warLogResponse.ok) {
+                    console.warn('Impossible de récupérer l\'historique des guerres de clans:', warLogResponse.status, warLogResponse.statusText);
+                    clanWarLog.innerHTML = '<p>Historique des guerres de clans non disponible.</p>';
+                } else {
+                    const warLogData = await warLogResponse.json();
+                    displayClanWarLog(warLogData.items);
+                }
+
+                // Fetch & display current clan war (separate API call)
+                const currentWarResponse = await fetch(`${BASE_URL}/clans/%23${encodedTag}/currentwar`, {
+                    headers: { 'Authorization': API_KEY }
+                });
+                if (!currentWarResponse.ok) {
+                    console.warn('Impossible de récupérer la guerre de clans actuelle:', currentWarResponse.status, currentWarResponse.statusText);
+                    clanCurrentWar.innerHTML = '<p>Aucune guerre de clans actuelle en cours ou données non disponibles.</p>';
+                } else {
+                    const currentWarData = await currentWarResponse.json();
+                    displayCurrentClanWar(currentWarData);
+                }
+
+            } catch (error) {
+                handleError(error);
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function displayClanStats(clan) {
+            clanGeneralInfo.innerHTML = `
+                <p><strong>Nom du Clan:</strong> ${clan.name} <span class="tag">#${clan.tag.substring(1)}</span></p>
+                <p><strong>Description:</strong> ${clan.description}</p>
+                <p><strong>Type:</strong> ${clan.type}</p>
+                <p><strong>Trophées du Clan:</strong> ${clan.clanScore}</p>
+                <p><strong>Trophées Requis:</strong> ${clan.requiredTrophies}</p>
+                <p><strong>Membres:</strong> ${clan.members} / 50</p>
+                <p><strong>Emplacement:</strong> ${clan.location ? clan.location.name : 'Inconnu'}</p>
+                <p><strong>Points de Guerre Totaux:</strong> ${clan.clanWarTrophies}</p>
+                <p><strong>Dons Hebdomadaires:</strong> ${clan.donations}</p>
+            `;
+
+            // Members List
+            clanMemberList.innerHTML = '<h3>Membres du Clan</h3>';
+            if (clan.memberList && clan.memberList.length > 0) {
+                const ul = document.createElement('ul');
+                clan.memberList.sort((a, b) => b.trophies - a.trophies).forEach(member => { // Sort by trophies
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span><strong>${member.name}</strong> <span class="tag">#${member.tag.substring(1)}</span> (Lvl ${member.expLevel})</span>
+                        <span>Trophées: ${member.trophies}</span>
+                        <span>Rôle: ${member.role}</span>
+                        <span>Dons: ${member.donations}</span>
+                    `;
+                    ul.appendChild(li);
+                });
+                clanMemberList.appendChild(ul);
+            } else {
+                clanMemberList.innerHTML += '<p>Aucun membre trouvé.</p>';
+            }
+
+            toggleSection(clanResultsSection, true);
+        }
+
+        function displayClanWarLog(warlog) {
+            clanWarLog.innerHTML = '<h3>Historique des Guerres de Clans</h3>';
+            if (warlog && warlog.length > 0) {
+                const ul = document.createElement('ul');
+                warlog.slice(0, 5).forEach(war => { // Show last 5 wars
+                    const createdDate = new Date(war.createdDate).toLocaleDateString();
+                    const li = document.createElement('li');
+
+                    let standingsHtml = '<h4>Classement final:</h4><ul>';
+                    war.standings.forEach(standing => {
+                        standingsHtml += `<li>${standing.rank}. ${standing.clan.name} (${standing.clan.clanScore} pts) - Trophées gagnés: ${standing.trophyChange}</li>`;
+                    });
+                    standingsHtml += '</ul>';
+
+                    li.innerHTML = `
+                        <p><strong>Date de la guerre:</strong> ${createdDate}</p>
+                        <p><strong>Nombre de participants:</strong> ${war.participants.length}</p>
+                        ${standingsHtml}
+                        <details>
+                            <summary>Détails des participants du clan</summary>
+                            <ul>
+                                ${war.participants.map(p => `<li>${p.name} (Attaques jouées: ${p.battlesPlayed}, Victoires: ${p.wins}, Cartes collectionnées: ${p.cardsEarned})</li>`).join('')}
+                            </ul>
+                        </details>
+                    `;
+                    ul.appendChild(li);
+                });
+                clanWarLog.appendChild(ul);
+            } else {
+                clanWarLog.innerHTML += '<p>Aucun historique de guerre de clans trouvé.</p>';
+            }
+        }
+
+        function displayCurrentClanWar(currentWar) {
+            clanCurrentWar.innerHTML = '<h3>Guerre de Clans Actuelle</h3>';
+            if (currentWar && currentWar.state === 'inWar') {
+                const stateMapping = {
+                    'collectionDay': 'Jour de Collection',
+                    'preparation': 'Préparation',
+                    'warDay': 'Jour de Guerre',
+                    'inWar': 'En Guerre', // For Clan Wars 2
+                    'notInWar': 'Pas en Guerre'
+                };
+
+                let clanInfoHtml = '';
+                if (currentWar.clans && currentWar.clans.length > 0) {
+                    clanInfoHtml = '<h4>Clans participants:</h4><ul>';
+                    currentWar.clans.forEach(clan => {
+                        clanInfoHtml += `<li>${clan.name} (Trophées de guerre: ${clan.clanWarTrophies}, Victoires: ${clan.wins}, Nombre d'attaques: ${clan.totalAttacks}, Nombre de decks détruits: ${clan.boatsDestroyed}, Participants: ${clan.participants.length})</li>`;
+                    });
+                    clanInfoHtml += '</ul>';
+                }
+
+                let playerStatsHtml = '';
+                if (currentWar.participants && currentWar.participants.length > 0) {
+                    playerStatsHtml = '<h4>Statistiques des Membres dans cette Guerre:</h4><ul>';
+                    currentWar.participants.forEach(p => {
+                        playerStatsHtml += `<li>${p.name} (Attaques: ${p.attacks}, Victoires: ${p.wins}, Decks détruits: ${p.decksUsedToday})</li>`;
+                    });
+                    playerStatsHtml += '</ul>';
+                }
+
+                clanCurrentWar.innerHTML += `
+                    <p><strong>État de la guerre:</strong> ${stateMapping[currentWar.state] || currentWar.state}</p>
+                    <p><strong>Jour de la guerre:</strong> ${currentWar.warEndTime ? 'Se termine le ' + new Date(currentWar.warEndTime).toLocaleString() : 'N/A'}</p>
+                    ${clanInfoHtml}
+                    ${playerStatsHtml}
+                `;
+            } else if (currentWar.state === 'notInWar') {
+                clanCurrentWar.innerHTML += '<p>Le clan n\'est pas en guerre de clans actuellement.</p>';
+            } else {
+                clanCurrentWar.innerHTML += '<p>Aucune guerre de clans actuelle ou données non disponibles.</p>';
+            }
+        }
+
+
+        // --- Event Listeners ---
+
+        searchButton.addEventListener('click', () => {
+            const tag = searchInput.value.trim();
+            const type = searchTypeSelect.value;
+
+            if (!tag) {
+                alert('Veuillez entrer un tag de joueur ou de clan.');
+                return;
+            }
+
+            // Add a hash if the user forgot it (most common format)
+            const formattedTag = tag.startsWith('#') ? tag : '#' + tag;
+
+            if (type === 'player') {
+                fetchPlayerStats(formattedTag);
+            } else if (type === 'clan') {
+                fetchClanStats(formattedTag);
+            }
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
+        // Initial state: hide results
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleSection(playerResultsSection, false);
+            toggleSection(clanResultsSection, false);
+            loader.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
