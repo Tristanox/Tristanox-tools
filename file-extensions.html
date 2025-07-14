@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Répertoire des Extensions de Fichiers</title>
+    <style>
+        /* --- Palette de Couleurs ---
+        #424549 - Gris moyen (pour les descriptions)
+        #36393E - Gris foncé (pour les titres et bords)
+        #282B30 - Noir presque (pour les fiches d'extension et le champ de recherche)
+        #1E2124 - Noir très foncé (fond principal)
+        #559fff - Bleu vif (accent)
+        -------------------------- */
+
+        /* --- CSS Global --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #1E2124; /* Noir très foncé */
+            color: #f0f2f5; /* Texte clair pour le contraste général */
+        }
+
+        h1 {
+            color: #559fff; /* Bleu vif */
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 10px rgba(85, 159, 255, 0.4); /* Léger éclat bleu */
+        }
+
+        /* --- Barre de recherche et Bouton Télécharger Tout --- */
+        .top-controls {
+            text-align: center;
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        #searchInput {
+            width: 80%;
+            max-width: 600px;
+            padding: 12px 20px;
+            border: 2px solid #36393E; /* Gris foncé */
+            background-color: #282B30; /* Noir presque */
+            color: #f0f2f5; /* Texte clair */
+            border-radius: 25px;
+            font-size: 1.1em;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #searchInput::placeholder {
+            color: #929292; /* Placeholder plus clair */
+        }
+
+        #searchInput:focus {
+            border-color: #559fff; /* Bleu vif au focus */
+            box-shadow: 0 4px 12px rgba(85, 159, 255, 0.3);
+        }
+
+        .download-all-button {
+            display: inline-block;
+            background-color: #28a745; /* Vert pour le bouton de téléchargement */
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .download-all-button:hover {
+            background-color: #218838; /* Vert plus foncé au survol */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        /* --- Conteneur principal des extensions --- */
+        .extensions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* --- Style d'un élément d'extension --- */
+        .extension-item {
+            background-color: #282B30; /* Noir presque, pour l'intérieur des cases */
+            border: 1px solid #36393E; /* Gris foncé pour le bord */
+            border-radius: 12px; /* Bords arrondis */
+            padding: 0; /* Pas de padding direct sur l'item pour que le ruban aille jusqu'aux bords */
+            display: flex;
+            flex-direction: column; /* Pour empiler le ruban et les détails */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            overflow: hidden; /* Important pour les bords arrondis du ruban */
+            color: #f0f2f5; /* Texte clair pour les détails */
+            cursor: pointer; /* Add pointer cursor to indicate clickability */
+        }
+
+        .extension-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border-color: #424549; /* Gris moyen au survol */
+        }
+
+        /* --- Ruban de couleur aléatoire --- */
+        .extension-ribbon {
+            height: 80px; /* Hauteur du ruban */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em; /* Taille du texte de l'extension */
+            font-weight: bold;
+            color: white; /* Texte blanc sur le ruban - C'EST LE SEUL ÉLÉMENT BLANC */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Ombre pour la lisibilité */
+            padding: 10px 20px;
+            border-top-left-radius: 12px; /* Assure que le ruban a aussi les bords arrondis */
+            border-top-right-radius: 12px;
+            /* La couleur sera définie par JS */
+        }
+
+        /* --- Détails de l'extension (sous le ruban) --- */
+        .extension-details {
+            flex-grow: 1;
+            padding: 25px; /* Padding pour le contenu sous le ruban */
+            color: #f0f2f5; /* Texte clair pour les détails */
+        }
+
+        .extension-details h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #559fff; /* Bleu vif pour le titre */
+            font-size: 1.5em;
+        }
+
+        .extension-details p {
+            font-size: 0.95em;
+            color: #b0b0b0; /* Gris clair pour la description */
+            margin-bottom: 20px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .download-button {
+            display: inline-block;
+            background-color: #559fff; /* Bleu vif */
+            color: #1E2124; /* Texte noir très foncé sur bouton bleu */
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 4px 8px rgba(85, 159, 255, 0.3); /* Ombre pour le bouton */
+        }
+
+        .download-button:hover {
+            background-color: #428dff; /* Bleu légèrement plus foncé au survol */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(85, 159, 255, 0.4);
+        }
+
+        .extensions-grid p.no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            font-size: 1.2em;
+            color: #b0b0b0; /* Gris clair pour le message 'Aucune extension' */
+        }
+    </style>
+    <style>
+        /* Minimal CSS for the software modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease;
+        }
+        .modal-overlay.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: #282B30; /* Same as extension-item background */
+            color: #f0f2f5;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-out;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
+        .modal-content h2 {
+            color: #559fff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        .modal-content li {
+            padding: 8px 0;
+            border-bottom: 1px solid #36393E;
+            font-size: 1.1em;
+            color: #b0b0b0;
+        }
+        .modal-content li:last-child {
+            border-bottom: none;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: #f0f2f5;
+            cursor: pointer;
+            padding: 5px;
+            line-height: 1;
+            transition: color 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: #559fff;
+        }
+
+        /* Minimal CSS for the download warning modal */
+        .warning-modal-content {
+            background-color: #282B30;
+            color: #f0f2f5;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-out;
+        }
+        .warning-modal-overlay.visible .warning-modal-content {
+            transform: translateY(0);
+        }
+        .warning-modal-content h2 {
+            color: #ffc107; /* Jaune pour l'avertissement */
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        .warning-modal-content p {
+            font-size: 1.1em;
+            color: #b0b0b0;
+            margin-bottom: 25px;
+        }
+        .warning-modal-content .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .warning-modal-content .buttons button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease;
+        }
+        .warning-modal-content .buttons .confirm-button {
+            background-color: #28a745; /* Vert */
+            color: #fff;
+        }
+        .warning-modal-content .buttons .confirm-button:hover {
+            background-color: #218838;
+        }
+        .warning-modal-content .buttons .cancel-button {
+            background-color: #dc3545; /* Rouge */
+            color: #fff;
+        }
+        .warning-modal-content .buttons .cancel-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Répertoire des Extensions de Fichiers</h1>
+
+    <div class="top-controls">
+        <input type="text" id="searchInput" placeholder="Rechercher une extension ou une description..." onkeyup="filterExtensions()">
+        <button class="download-all-button" onclick="showDownloadWarning()">Télécharger toutes les informations (JSON)</button>
+    </div>
+
+    <div class="extensions-grid" id="extensionsGrid">
+        </div>
+
+    <div id="softwareModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeSoftwareModal()">&times;</button>
+            <h2 id="softwareModalTitle"></h2>
+            <ul id="softwareList"></ul>
+        </div>
+    </div>
+
+    <div id="downloadWarningModalOverlay" class="modal-overlay warning-modal-overlay">
+        <div class="warning-modal-content">
+            <h2>Avertissement de Téléchargement</h2>
+            <p>Le téléchargement de toutes les informations des extensions va démarrer. Ce fichier contient une grande quantité de données JSON.</p>
+            <div class="buttons">
+                <button class="confirm-button" onclick="confirmDownload()">Confirmer</button>
+                <button class="cancel-button" onclick="closeDownloadWarning()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript pour gérer les données et l'affichage ---
+
+        let allExtensions = []; // Déclare allExtensions globalement pour être accessible après le fetch
+
+        // Fonction pour générer une couleur saturée aléatoire (HSL)
+        function getRandomSaturatedColor() {
+            const hue = Math.floor(Math.random() * 360); // Teinte (0-359)
+            const saturation = 70 + Math.floor(Math.random() * 30); // Saturation (70-100%)
+            const lightness = 40 + Math.floor(Math.random() * 20); // Luminosité (40-60%)
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+
+        // Fonction pour afficher les extensions
+        function displayExtensions(extensions) {
+            const extensionsGrid = document.getElementById('extensionsGrid');
+            extensionsGrid.innerHTML = ''; // Nettoyer la grille existante
+
+            if (extensions.length === 0) {
+                extensionsGrid.innerHTML = '<p class="no-results">Aucune extension trouvée.</p>';
+                return;
+            }
+
+            extensions.forEach(extInfo => {
+                const item = document.createElement('div');
+                item.className = 'extension-item';
+                item.onclick = () => showSoftwareModal(extInfo['nom d\'extension'], extInfo['logiciels communs']); // Modified to use new keys
+
+                const ribbon = document.createElement('div');
+                ribbon.className = 'extension-ribbon';
+                ribbon.style.backgroundColor = getRandomSaturatedColor();
+                ribbon.textContent = extInfo['nom d\'extension']; // Modified to use new key
+
+                const details = document.createElement('div');
+                details.className = 'extension-details';
+                details.innerHTML = `
+                    <h3>${extInfo.title || extInfo['nom d\'extension']}</h3> <p>${extInfo.description}</p>
+                    <a href="#" class="download-button" onclick="event.stopPropagation(); alert('Fonctionnalité de téléchargement pour ${extInfo['nom d\'extension']} à implémenter.');">Plus d'infos</a>
+                `;
+
+                item.appendChild(ribbon);
+                item.appendChild(details);
+                extensionsGrid.appendChild(item);
+            });
+        }
+
+        // Fonction pour filtrer les extensions
+        function filterExtensions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredExtensions = allExtensions.filter(extInfo => {
+                const ext = extInfo['nom d\'extension'].toLowerCase(); // Modified to use new key
+                const description = extInfo.description.toLowerCase();
+                const title = (extInfo.title || '').toLowerCase(); // Added title for search
+                return ext.includes(searchTerm) || description.includes(searchTerm) || title.includes(searchTerm);
+            });
+            displayExtensions(filteredExtensions);
+        }
+
+        // Fonctions pour le modal des logiciels
+        const softwareModalOverlay = document.getElementById('softwareModalOverlay');
+        const softwareModalTitle = document.getElementById('softwareModalTitle');
+        const softwareList = document.getElementById('softwareList');
+
+        function showSoftwareModal(extensionName, softwareArray) {
+            softwareModalTitle.textContent = `Logiciels pour ${extensionName}`;
+            softwareList.innerHTML = '';
+            if (softwareArray && softwareArray.length > 0) {
+                softwareArray.forEach(software => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = software;
+                    softwareList.appendChild(listItem);
+                });
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = "Aucun logiciel commun répertorié pour cette extension.";
+                softwareList.appendChild(listItem);
+            }
+
+            softwareModalOverlay.classList.add('visible');
+        }
+
+        // Fonction pour fermer la modale des logiciels
+        function closeSoftwareModal() {
+            softwareModalOverlay.classList.remove('visible');
+        }
+
+        // Fonctions pour le modal d'avertissement de téléchargement (désactivé pour "Télécharger tout")
+        const downloadWarningModalOverlay = document.getElementById('downloadWarningModalOverlay');
+
+        function showDownloadWarning() {
+            downloadWarningModalOverlay.classList.add('visible');
+        }
+
+        function closeDownloadWarning() {
+            downloadWarningModalOverlay.classList.remove('visible');
+        }
+
+        function confirmDownload() {
+            closeDownloadWarning();
+            // Créer un blob JSON des données et le télécharger
+            const dataStr = JSON.stringify(allExtensions, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'all_file_extensions_info.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+
+        // Afficher toutes les extensions au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('data.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    allExtensions = data.map(item => ({ // Map data to match existing structure or adjust where used
+                        ext: item["nom d'extension"].substring(1).toLowerCase(), // Remove '.' and convert to lowercase for 'ext'
+                        title: item["nom d'extension"], // Use the full name as title for now
+                        description: item.description,
+                        "nom d'extension": item["nom d'extension"], // Keep original for modal
+                        "logiciels communs": item["logiciels communs"]
+                    }));
+                    displayExtensions(allExtensions);
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                    const extensionsGrid = document.getElementById('extensionsGrid');
+                    extensionsGrid.innerHTML = '<p class="no-results" style="color: red;">Erreur lors du chargement des données des extensions. Veuillez vérifier la console pour plus de détails.</p>';
+                });
+        });
+    </script>
+</body>
+</html>
