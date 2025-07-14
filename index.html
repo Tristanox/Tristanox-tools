@@ -158,13 +158,13 @@
         #hits-counter {
             position: fixed;
             top: 10px;
-            right: 10px;
-            z-index: 1000; /* Assure qu'il est au-dessus du reste du contenu */
+            left: 10px; /* Changé de 'right' à 'left' */
+            right: auto; /* S'assure qu'il n'interfère pas avec 'right' */
+            z-index: 1000;
         }
         #hits-counter img {
-            height: auto;
-            width: auto;
-            max-width: 150px; /* Limite la taille de l'image du compteur */
+            width: 600px; /* Rend l'image 4 fois plus grande (150px * 4) */
+            height: auto; /* Maintient le ratio d'aspect */
             border-radius: 5px;
         }
     </style>
