@@ -462,7 +462,7 @@
 
         // Afficher toutes les extensions au chargement de la page
         document.addEventListener('DOMContentLoaded', () => {
-            fetch('data.json')
+            fetch('https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/extension-data.json')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
