@@ -153,9 +153,27 @@
                 max-height: 200px;
             }
         }
+
+        /* Styles pour le compteur de vues */
+        #hits-counter {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000; /* Assure qu'il est au-dessus du reste du contenu */
+        }
+        #hits-counter img {
+            height: auto;
+            width: auto;
+            max-width: 150px; /* Limite la taille de l'image du compteur */
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+
+    <a href="https://hits.sh/tristanox.github.io/Tristanox-tools/" target="_blank" id="hits-counter">
+        <img alt="Hits" src="https://hits.sh/tristanox.github.io/Tristanox-tools.svg?label=views&color=75FF75"/>
+    </a>
 
     <header>
         <img src="https://i.imgur.com/bgXj7TV.png" alt="Tristanox Logo">
