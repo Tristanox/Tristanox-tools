@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Recettes Improbables</title>
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-icons/refs/heads/main/marmiton.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif; /* Police de base */
+            background-color: #1E2124; /* FOND DU SITE : Le plus foncé */
+            color: #FFFFFF; /* Couleur du texte par défaut : BLANC pour la lisibilité */
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Nouveau style pour le sélecteur de langue */
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1000; /* Assure que le sélecteur est au-dessus des autres éléments */
+        }
+
+        .language-selector img {
+            width: 40px; /* Taille du drapeau */
+            height: auto;
+            border: 2px solid #FE6F5F; /* Bordure autour du drapeau */
+            border-radius: 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .language-selector img:hover {
+            transform: scale(1.1);
+        }
+
+        .container {
+            background-color: #282B30; /* FOND DU CONTENEUR PRINCIPAL : Un peu plus clair que le body */
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée pour fonds sombres */
+            padding: 30px;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid #FE6F5F; /* Bordure amusante : rouge orangé */
+        }
+
+        h1 {
+            color: #FE6F5F; /* Couleur du titre principal : rouge orangé pour l'accent */
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px rgba(0, 0, 0, 0.2); /* Ombre douce */
+        }
+
+        p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #FFFFFF; /* Texte des paragraphes : BLANC */
+        }
+
+        button {
+            background-color: #FE6F5F; /* Couleur du bouton : rouge orangé */
+            color: white; /* Texte du bouton : BLANC */
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #FF877F; /* Une nuance légèrement plus claire pour le survol */
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        /* Animation de secousse */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake-animation {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        #recipeOutput {
+            background-color: #36393E; /* FOND DE LA ZONE DE RECETTE : Légèrement plus clair que le container */
+            border: 2px solid #FE6F5F; /* Bordure de la zone de recette : rouge orangé */
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 25px;
+            text-align: left;
+            white-space: pre-wrap; /* Préserve les retours à la ligne */
+            font-family: Arial, sans-serif; /* Police de base comme le reste */
+            font-size: 1.1em;
+            line-height: 1.5;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+            color: #FFFFFF; /* Texte de la zone de recette : BLANC */
+        }
+
+        #recipeOutput h2 {
+            color: #FE6F5F; /* Couleur du titre de recette : rouge orangé */
+            font-size: 1.3em;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Styles pour les titres de catégorie (H3) */
+        #recipeOutput h3 {
+            color: #FE6F5F; /* Rouge orangé */
+            font-size: 1.5em; /* Plus gros */
+            margin-top: 20px; /* Plus d'espace au-dessus */
+            margin-bottom: 10px; /* Plus d'espace en dessous */
+            padding-bottom: 3px;
+            text-align: center; /* Centrer les titres de catégorie */
+        }
+
+        #recipeOutput ul {
+            list-style: none; /* Supprime les puces */
+            padding-left: 0;
+        }
+
+        #recipeOutput li {
+            margin-bottom: 5px;
+        }
+
+        /* Styles pour la barre de survie */
+        .survival-section {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-top: 1px dashed #424549; /* Bordure : gris intermédiaire */
+            border-bottom: 1px dashed #424549; /* Bordure : gris intermédiaire */
+            padding-top: 20px;
+            padding-bottom: 20px;
+            text-align: center;
+        }
+
+        .survival-bar-container {
+            width: 80%;
+            max-width: 400px;
+            background-color: #1E2124; /* FOND DE LA BARRE : Le plus foncé */
+            border: 1px solid #424549; /* OUTLINE DE LA BARRE : gris intermédiaire */
+            border-radius: 10px;
+            overflow: hidden;
+            height: 25px; /* Hauteur fixe pour la barre */
+            margin: 10px auto 0 auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+        }
+
+        .survival-bar-fill {
+            height: 100%;
+            width: 0%; /* Initial width */
+            transition: width 1s ease-in-out, background-color 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white; /* Texte blanc sur la barre (pour le pourcentage) */
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .survival-text {
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #FFFFFF; /* Texte de description survie : BLANC (sauf pour la couleur générée par JS) */
+        }
+
+        /* Nouveau style pour la section difficulté */
+        .difficulty-section {
+            margin-top: 15px;
+            margin-bottom: 15px;
+            border-top: 1px dashed #424549; /* Bordure similaire à la survie */
+            padding-top: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #424549; /* Couleur du footer : gris intermédiaire pour la subtilité */
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector" onclick="toggleLanguage()">
+        <img id="languageFlag" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png" alt="English">
+    </div>
+
+    <div class="container">
+        <h1 id="mainTitle">✨ Générateur de Recettes douteuses✨</h1>
+        <p id="mainDescription">Cliquez sur le bouton pour générer une recette improbable et potentiellement dangereuse !</p>
+
+        <button id="generateButton" onclick="generateRecipe()">générer</button>
+
+        <div id="recipeOutput">
+            </div>
+    </div>
+
+    <footer>
+        <p id="footerText">Créé avec ❤️ pour l'art culinaire non conventionnel.</p>
+    </footer>
+
+    <script>
+        // --- TEXTES POUR LA TRADUCTION ---
+        const translations = {
+            fr: {
+                mainTitle: "✨ Générateur de Recettes douteuses✨",
+                mainDescription: "Cliquez sur le bouton pour générer une recette improbable et potentiellement dangereuse !",
+                generateButton: "Générer",
+                recipeTitlePrefix: "Recette :",
+                ingredientsTitle: "Ingrédients Improbables",
+                survivalTitle: "Chances de survie :",
+                survivalDescription: {
+                    "Mortel": "Mortel",
+                    "Dangereux": "Dangereux",
+                    "Mauvais": "Mauvais",
+                    "Bon": "Bon",
+                    "Excellent": "Excellent",
+                    "Délicieux !": "Délicieux !"
+                },
+                difficultyTitle: "Difficulté :",
+                difficultyText: {
+                    "Débutant": "Débutant",
+                    "Simple": "Simple",
+                    "Moyenne": "Moyenne",
+                    "Difficile": "Difficile",
+                    "Extrême": "Extrême",
+                    "Impossible": "Impossible"
+                },
+                instructionsTitle: "Instructions Démentes",
+                conditionsTitle: "Conditions de service (au choix)",
+                disclaimer: "Savourez à vos risques et périls ! (Nous déclinons toute responsabilité en cas de problèmes de santé)",
+                footerText: "Créé avec ❤️ pour l'art culinaire non conventionnel."
+            },
+            en: {
+                mainTitle: "✨ Doubtful Recipe Generator✨",
+                mainDescription: "Click the button to generate an improbable and potentially dangerous recipe!",
+                generateButton: "Generate",
+                recipeTitlePrefix: "Recipe :",
+                ingredientsTitle: "Improbable Ingredients",
+                survivalTitle: "Survival Chances :",
+                survivalDescription: {
+                    "Mortel": "Deadly",
+                    "Dangereux": "Dangerous",
+                    "Mauvais": "Bad",
+                    "Bon": "Good",
+                    "Excellent": "Excellent",
+                    "Délicieux !": "Delicious!"
+                },
+                difficultyTitle: "Difficulty :",
+                difficultyText: {
+                    "Débutant": "Beginner",
+                    "Simple": "Simple",
+                    "Moyenne": "Medium",
+                    "Difficile": "Difficult",
+                    "Extrême": "Extreme",
+                    "Impossible": "Impossible"
+                },
+                instructionsTitle: "Insane Instructions",
+                conditionsTitle: "Serving Conditions (optional)",
+                disclaimer: "Savor at your own risk! (We disclaim all responsibility for health problems)",
+                footerText: "Created with ❤️ for unconventional culinary art."
+            }
+        };
+
+        let currentLanguage = 'fr'; // Langue par défaut
+
+        // Fonction pour changer la langue
+        function setLanguage(lang) {
+            currentLanguage = lang;
+
+            // Met à jour le texte statique
+            document.getElementById('mainTitle').textContent = translations[lang].mainTitle;
+            document.getElementById('mainDescription').textContent = translations[lang].mainDescription;
+            document.getElementById('generateButton').textContent = translations[lang].generateButton;
+            document.getElementById('footerText').textContent = translations[lang].footerText;
+
+            // Met à jour le drapeau
+            const languageFlag = document.getElementById('languageFlag');
+            if (lang === 'fr') {
+                languageFlag.src = "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png";
+                languageFlag.alt = "English";
+            } else {
+                languageFlag.src = "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France.png";
+                languageFlag.alt = "Français";
+            }
+
+            // Régénère la recette pour mettre à jour les textes dynamiques
+            generateRecipe();
+        }
+
+        // Fonction pour basculer entre les langues
+        function toggleLanguage() {
+            if (currentLanguage === 'fr') {
+                setLanguage('en');
+            } else {
+                setLanguage('fr');
+            }
+        }
+
+        // --- VOS INGRÉDIENTS PERSONNALISÉS SONT ICI ! ---
+        // Les "danger_score" ne sont plus utilisés pour le calcul des chances de survie aléatoires.
+        // Ils sont maintenus ici au cas où vous souhaiteriez revenir à une logique basée sur les ingrédients.
+        const fixedIngredientsData = [
+            { name: "Cornichons", type: "N", danger_score: 1, name_en: "Pickles" },
+            { name: "œufs durs", type: "N", danger_score: 1, name_en: "Hard-boiled eggs" },
+            { name: "Eau de pluie", type: "L", danger_score: 2, name_en: "Rainwater" },
+            { name: "Sirop de menthe", type: "L", danger_score: 1, name_en: "Mint syrup" },
+            { name: "Sirop de grenadine", type: "L", danger_score: 1, name_en: "Grenadine syrup" },
+            { name: "Jus de citron", type: "L", danger_score: 1, name_en: "Lemon juice" },
+            { name: "Jus de citron vert", type: "L", danger_score: 1, name_en: "Lime juice" },
+            { name: "Zeste de citron", type: "G", danger_score: 1, name_en: "Lemon zest" },
+            { name: "Parmesan", type: "G", danger_score: 1, name_en: "Parmesan" },
+            { name: "Camenbert", type: "G", danger_score: 1, name_en: "Camembert" },
+            { name: "Rosé", type: "L", danger_score: 2, name_en: "Rosé wine" },
+            { name: "Vodka", type: "L", danger_score: 4, name_en: "Vodka" },
+            { name: "vin rouge", type: "L", danger_score: 2, name_en: "Red wine" },
+            { name: "vin blanc", type: "L", danger_score: 2, name_en: "White wine" },
+            { name: "whisky", type: "L", danger_score: 4, name_en: "Whisky" },
+            { name: "coca-cola", type: "L", danger_score: 2, name_en: "Coca-Cola" },
+            { name: "pâte à cookies", type: "G", danger_score: 1, name_en: "Cookie dough" },
+            { name: "Miel", type: "L", danger_score: 1, name_en: "Honey" },
+            { name: "Vinaigre ménager", type: "L", danger_score: 7, name_en: "Household vinegar" },
+            { name: "olives", type: "N", danger_score: 1, name_en: "Olives" },
+            { name: "Huile d'olive", type: "L", danger_score: 1, name_en: "Olive oil" },
+            { name: "Huile de cuisson", type: "L", danger_score: 1, name_en: "Cooking oil" },
+            { name: "Nutella", type: "G", danger_score: 1, name_en: "Nutella" },
+            { name: "Kinder bueno", type: "N", danger_score: 1, name_en: "Kinder Bueno" },
+            { name: "Eau de mer", type: "L", danger_score: 6, name_en: "Seawater" },
+            { name: "Sel", type: "G", danger_score: 1, name_en: "Salt" },
+            { name: "Poivre", type: "G", danger_score: 1, name_en: "Pepper" },
+            { name: "Lait fermenté", type: "L", danger_score: 1, name_en: "Fermented milk" },
+            { name: "Bière", type: "L", danger_score: 2, name_en: "Beer" },
+            { name: "Lait d’amande", type: "L", danger_score: 1, name_en: "Almond milk" },
+            { name: "Chocolat", type: "G", danger_score: 1, name_en: "Chocolate" },
+            { name: "Sauce algérienne", type: "L", danger_score: 1, name_en: "Algerian sauce" },
+            { name: "Ketchup", type: "L", danger_score: 1, name_en: "Ketchup" },
+            { name: "Sirop d’érable", type: "L", danger_score: 1, name_en: "Maple syrup" },
+            { name: "Mayonnaise", type: "L", danger_score: 1, name_en: "Mayonnaise" },
+            { name: "Vinaigre balsamique", type: "L", danger_score: 1, name_en: "Balsamic vinegar" },
+            { name: "Red Bull", type: "L", danger_score: 3, name_en: "Red Bull" },
+            { name: "Eau de cuisson", type: "L", danger_score: 1, name_en: "Cooking water" },
+            { name: "Roquefort", type: "G", danger_score: 1, name_en: "Roquefort cheese" },
+            { name: "Yaourt à la grecque", type: "N", danger_score: 1, name_en: "Greek yogurt" },
+            { name: "Glace à la vanille", type: "G", danger_score: 1, name_en: "Vanilla ice cream" },
+            { name: "Fromage frais aux herbes", type: "G", danger_score: 1, name_en: "Herbed cream cheese" },
+            { name: "Crème fraiche", type: "L", danger_score: 1, name_en: "Crème fraîche" },
+            { name: "Piment d’Espelette", type: "G", danger_score: 2, name_en: "Espelette pepper" },
+            { name: "piment fort", type: "N", danger_score: 3, name_en: "Hot pepper" },
+            { name: "Cannelle", type: "G", danger_score: 1, name_en: "Cinnamon" },
+            { name: "Moutarde", type: "L", danger_score: 1, name_en: "Mustard" },
+            { name: "Fleur d’oranger", type: "G", danger_score: 1, name_en: "Orange blossom water" },
+            { name: "Curry", type: "G", danger_score: 1, name_en: "Curry" },
+            { name: "Wasabi", type: "G", danger_score: 2, name_en: "Wasabi" },
+            { name: "Sauce soja sucrée", type: "L", danger_score: 1, name_en: "Sweet soy sauce" },
+            { name: "Haricots verts", type: "G", danger_score: 1, name_en: "Green beans" },
+            { name: "Anchois", type: "G", danger_score: 1, name_en: "Anchovies" },
+            { name: "Marshmallows", type: "G", danger_score: 1, name_en: "Marshmallows" },
+            { name: "Bonbons Crocodiles", type: "N", danger_score: 1, name_en: "Crocodile candies" },
+            { name: "Caramel liquide", type: "G", danger_score: 1, name_en: "Liquid caramel" },
+            { name: "Réglisse", type: "G", danger_score: 1, name_en: "Licorice" },
+            { name: "Sucre", type: "G", danger_score: 1, name_en: "Sugar" },
+            { name: "Pâtes de fruit", type: "N", danger_score: 1, name_en: "Fruit jellies" },
+            { name: "Nitrogène liquide", type: "L", danger_score: 10, name_en: "Liquid Nitrogen" },
+            { name: "Avocat", type: "G", danger_score: 1, name_en: "Avocado" },
+            { name: "Betterave", type: "G", danger_score: 1, name_en: "Beetroot" },
+            { name: "Courgette", type: "G", danger_score: 1, name_en: "Zucchini" },
+            { name: "Banane", type: "G", danger_score: 1, name_en: "Banana" },
+            { name: "Patate douce", type: "G", danger_score: 1, name_en: "Sweet potato" },
+            { name: "Aubergine", type: "G", danger_score: 1, name_en: "Eggplant" },
+            { name: "Monster Energy", type: "L", danger_score: 3, name_en: "Monster Energy" },
+            { name: "fenouil", type: "G", danger_score: 1, name_en: "Fennel" },
+            { name: "Carotte", type: "G", danger_score: 1, name_en: "Carrot" },
+            { name: "Poivron", type: "G", danger_score: 1, name_en: "Bell pepper" },
+            { name: "Concombre", type: "G", danger_score: 1, name_en: "Cucumber" },
+            { name: "Oignon", type: "N", danger_score: 1, name_en: "Onion" },
+            { name: "Ail", type: "G", danger_score: 1, name_en: "Garlic" },
+            { name: "Salade", type: "G", danger_score: 1, name_en: "Lettuce" },
+            { name: "Épinards", type: "G", danger_score: 1, name_en: "Spinach" },
+            { name: "Pomme", type: "G", danger_score: 1, name_en: "Apple" },
+            { name: "Orange", type: "G", danger_score: 1, name_en: "Orange" },
+            { name: "Poire", type: "G", danger_score: 1, name_en: "Pear" },
+            { name: "Fraise", type: "G", danger_score: 1, name_en: "Strawberry" },
+            { name: "Raisin", type: "G", danger_score: 1, name_en: "Grape" },
+            { name: "Pêche", type: "G", danger_score: 1, name_en: "Peach" },
+            { name: "Abricot", type: "G", danger_score: 1, name_en: "Apricot" },
+            { name: "Kiwi", type: "G", danger_score: 1, name_en: "Kiwi" },
+            { name: "Poulet", type: "N", danger_score: 1, name_en: "Chicken" },
+            { name: "Bœuf", type: "N", danger_score: 1, name_en: "Beef" },
+            { name: "Porc", type: "G", danger_score: 1, name_en: "Pork" },
+            { name: "Agneau", type: "G", danger_score: 1, name_en: "Lamb" },
+            { name: "Dinde", type: "G", danger_score: 1, name_en: "Turkey" },
+            { name: "Veau", type: "G", danger_score: 1, name_en: "Veal" },
+            { name: "Canard", type: "N", danger_score: 1, name_en: "Duck" },
+            { name: "Lapin", type: "N", danger_score: 1, name_en: "Rabbit" },
+            { name: "Saucisse", type: "N", danger_score: 1, name_en: "Sausage" },
+            { name: "Jambon", type: "G", danger_score: 1, name_en: "Ham" }
+        ];
+
+        const recipeNameAdjectives = [
+            { fr: "Inattendu", en: "Unexpected" }, { fr: "Surréaliste", en: "Surreal" }, { fr: "Cosmique", en: "Cosmic" }, { fr: "Délirant", en: "Delirious" }, { fr: "Mystérieux", en: "Mysterious" },
+            { fr: "Fantastique", en: "Fantastic" }, { fr: "Étrange", en: "Strange" }, { fr: "Absurde", en: "Absurd" }, { fr: "Intergalactique", en: "Intergalactic" }, { fr: "Farfelu", en: "Whacky" },
+            { fr: "Fou", en: "Crazy" }, { fr: "Extravagant", en: "Extravagant" }, { fr: "Paradoxal", en: "Paradoxical" }, { fr: "Chimérique", en: "Chimerical" }, { fr: "Insensé", en: "Senseless" },
+            { fr: "Surnaturel", en: "Supernatural" }, { fr: "Oublié", en: "Forgotten" }, { fr: "Transcendant", en: "Transcendent" }, { fr: "Céleste", en: "Celestial" }, { fr: "Cauchemardesque", en: "Nightmarish" },
+            { fr: "Malfaisant", en: "Evil" }, { fr: "Bizarre", en: "Bizarre" }, { fr: "Pérenne", en: "Perennial" }, { fr: "Éthéré", en: "Ethereal" }, { fr: "Spectrale", en: "Spectral" }
+        ];
+        const recipeNameNouns = [
+            // Anciens noms (maintenus pour la génération combinée)
+            { fr: "Concoction", en: "Concoction" }, { fr: "Plat", en: "Dish" }, { fr: "Brebis", en: "Ewe" }, { fr: "Potion", en: "Potion" }, { fr: "Mélange", en: "Mixture" }, { fr: "Chef-d'œuvre", en: "Masterpiece" },
+            { fr: "Abomination", en: "Abomination" }, { fr: "Délice", en: "Delight" }, { fr: "Catastrophe", en: "Catastrophe" }, { fr: "Soufflé", en: "Soufflé" },
+            { fr: "Gâteau", en: "Cake" }, { fr: "Breuvage", en: "Beverage" }, { fr: "Pâté", en: "Pâté" }, { fr: "Elixir", en: "Elixir" }, { fr: "Ragout", en: "Stew" },
+            { fr: "Assiette", en: "Plate" }, { fr: "Infusion", en: "Infusion" }, { fr: "Gargouillis", en: "Gurgle" }, { fr: "Ragoût", en: "Stew" }, { fr: "Ambroisie", en: "Ambrosia" },
+            { fr: "Mixture", en: "Mixture" }, { fr: "Magma", en: "Magma" }, { fr: "Salade", en: "Salad" }, { fr: "Dessert", en: "Dessert" }, { fr: "Vapeur", en: "Steam" },
+            // Nouveaux noms ajoutés (commencent à l'index 25)
+            { fr: "Bouillon fermenté libanais", en: "Lebanese Fermented Broth" },
+            { fr: "Crumble inversé des steppes", en: "Steppe Inverted Crumble" },
+            { fr: "Ragoût cosmique du vendredi soir", en: "Cosmic Friday Night Stew" },
+            { fr: "Velouté de minuit sans retour", en: "Midnight Velouté of No Return" },
+            { fr: "Omelette du triangle des Bermudes", en: "Bermuda Triangle Omelet" },
+            { fr: "Gratin de l’oubli joyeux", en: "Gratin of Joyful Oblivion" },
+            { fr: "Fondue du mont qui pique", en: "Spicy Mountain Fondue" },
+            { fr: "Tarte flottante à la verticale", en: "Vertically Floating Tart" },
+            { fr: "Mousse des abysses végétales", en: "Vegetal Abyss Mousse" },
+            { fr: "Riz soufflé des anciens oracles", en: "Puffed Rice of Ancient Oracles" },
+            { fr: "Mille-feuille de la troisième dimension", en: "Third Dimension Mille-feuille" },
+            { fr: "Pizza roulée du grand nord", en: "Rolled Pizza of the Great North" },
+            { fr: "Vapeur des cavernes tranquilles", en: "Steam of Quiet Caves" },
+            { fr: "Cassoulet à l’envers des Carpates", en: "Carpathian Upside-Down Cassoulet" },
+            { fr: "Terrine suspendue de l’arrière-monde", en: "Suspended Terrine of the Underworld" },
+            { fr: "Clafoutis du futur incertain", en: "Clafoutis of the Uncertain Future" },
+            { fr: "Pain perdu retrouvé au sommet", en: "French Toast Found at the Summit" },
+            { fr: "Flan qui doute mais fond", en: "Flan That Doubts But Melts" },
+            { fr: "Brochette diplomatique du désert", en: "Desert Diplomatic Skewer" },
+            { fr: "Cocotte des vents lunaires", en: "Casserole of Lunar Winds" },
+            { fr: "Parmentier de la dernière averse", en: "Shepherd's Pie of the Last Shower" },
+            { fr: "Curry invisible de l’est profond", en: "Invisible Curry of the Deep East" },
+            { fr: "Lasagnes de l’oubli savoureux", en: "Lasagna of Savory Oblivion" },
+            { fr: "Tartine plate du haut plateau", en: "Flat Tartine of the High Plateau" },
+            { fr: "Sorbet du volcan silencieux", en: "Sorbet of the Silent Volcano" },
+            { fr: "Crêpe ambiguë des soirs d’orage", en: "Ambiguous Crepe of Stormy Evenings" },
+            { fr: "Boulette post-moderne d’altitude", en: "Post-Modern Altitude Meatball" },
+            { fr: "Gaufre désorientée du petit matin", en: "Disoriented Waffle of Early Morning" },
+            { fr: "Tourte à la gravité variable", en: "Variable Gravity Pie" },
+            { fr: "Roulé du murmure ancien", en: "Roll of Ancient Whisper" },
+            { fr: "Beignet métaphysique des plaines", en: "Metaphysical Donut of the Plains" },
+            { fr: "Soufflé qui savait voler", en: "Soufflé That Knew How to Fly" },
+            { fr: "Couscous du néant parfumé", en: "Couscous of Scented Nothingness" },
+            { fr: "Salade plate mais émotive", en: "Flat But Emotional Salad" },
+            { fr: "Pancake quantique du mardi", en: "Quantum Tuesday Pancake" },
+            { fr: "Râpé mystique à trois étages", en: "Three-Story Mystical Gratin" },
+            { fr: "Fricassée du silence intérieur", en: "Fricassee of Inner Silence" },
+            { fr: "Macaron des contrées floues", en: "Macaron of Blurry Lands" },
+            { fr: "Fajita céleste du crépuscule", en: "Celestial Twilight Fajita" },
+            { fr: "Boule croustillante de la 7e maison", en: "Crispy Ball of the 7th House" },
+            { fr: "Quiche incertaine de l’aube", en: "Uncertain Dawn Quiche" },
+            { fr: "Potage existentiel de l’instant", en: "Existential Soup of the Moment" },
+            { fr: "Tournedos du milieu flottant", en: "Tournedos of the Floating Middle" },
+            { fr: "Crème brûlée du doute festif", en: "Crème brûlée of Festive Doubt" },
+            { fr: "Charlotte suspendue au plafond", en: "Charlotte Suspended from the Ceiling" },
+            { fr: "Ramen du dernier samouraï las", en: "Ramen of the Last Weary Samurai" },
+            { fr: "Tatin déconstruite du vieux moulin", en: "Deconstructed Tatin of the Old Mill" },
+            { fr: "Galette qui fait semblant", en: "Galette That Pretends" },
+            { fr: "Blanquette qui rêvait d’ailleurs", en: "Blanquette That Dreamed of Elsewhere" },
+            { fr: "Tarte feuilletée aux regrets doux", en: "Puff Pastry Tart with Sweet Regrets" },
+            { fr: "Omelette de la fin heureuse", en: "Omelet of the Happy Ending" },
+            { fr: "Gratin bipolaire du dimanche", en: "Bipolar Sunday Gratin" },
+            { fr: "Moelleux indécis de la plaine", en: "Indecisive Soft Cake of the Plain" },
+            { fr: "Flan mystère en trois mouvements", en: "Mystery Flan in Three Movements" },
+            { fr: "Mijoté des jours pairs seulement", en: "Stew of Even Days Only" },
+            { fr: "Crêpe de la vieille chanson", en: "Crepe of the Old Song" },
+            { fr: "Panure philosophique à l’horizon", en: "Philosophical Breadcrumb on the Horizon" },
+            { fr: "Bavarois qui rit tout seul", en: "Bavarian Cream That Laughs Alone" },
+            { fr: "Nems de la diplomatie obscure", en: "Spring Rolls of Obscure Diplomacy" },
+            { fr: "Cannelloni de l’autre rive", en: "Cannelloni from the Other Shore" },
+            { fr: "Brioche du grand bouleversement", en: "Brioche of the Great Upheaval" },
+            { fr: "Soupe qui voit double", en: "Soup That Sees Double" },
+            { fr: "Chausson oublié sur le rebord", en: "Slipper Forgotten on the Ledge" },
+            { fr: "Burger du plan B revisité", en: "Revisited Plan B Burger" },
+            { fr: "Casserole suspendue dans le vide", en: "Casserole Suspended in the Void" },
+            { fr: "Blinis de la courbe intérieure", en: "Blinis of the Inner Curve" },
+            { fr: "Paella de la dernière pluie", en: "Paella of the Last Rain" },
+            { fr: "Quenelle intrépide à la dérive", en: "Intrepid Drifting Quenelle" },
+            { fr: "Pizza des trois lunes", en: "Pizza of the Three Moons" },
+            { fr: "Bouchée du vertige apaisé", en: "Bite of Soothed Vertigo" },
+            { fr: "Tartare de l’incompréhensible", en: "Tartare of the Incomprehensible" },
+            { fr: "Tourte molle de la mer fixe", en: "Soft Pie of the Fixed Sea" },
+            { fr: "Crème qui ne voulait pas cuire", en: "Cream That Didn't Want to Cook" },
+            { fr: "Pudding de la réconciliation fragile", en: "Pudding of Fragile Reconciliation" },
+            { fr: "Boulette contemplative de fin d’été", en: "Contemplative Late Summer Meatball" },
+            { fr: "Maki de la voie détournée", en: "Maki of the Detoured Path" },
+            { fr: "Soufflé dramatique du matin calme", en: "Dramatic Soufflé of the Calm Morning" },
+            { fr: "Pot-au-feu des retours manqués", en: "Pot-au-feu of Missed Returns" },
+            { fr: "Toasts synchronisés du solstice", en: "Synchronized Solstice Toasts" },
+            { fr: "Croustillant des hauteurs basses", en: "Crispy Low Heights" },
+            { fr: "Crumble de la tempête intérieure", en: "Crumble of the Inner Storm" },
+            { fr: "Flan de la pleine confusion", en: "Flan of Full Confusion" },
+            { fr: "Gâteau qui parle aux oiseaux", en: "Cake That Talks to Birds" },
+            { fr: "Salade du grand silence bleu", en: "Salad of the Great Blue Silence" },
+            { fr: "Wok du chemin qui hésite", en: "Wok of the Hesitant Path" },
+            { fr: "Tarte qui change d’avis", en: "Pie That Changes Its Mind" },
+            { fr: "Ravioli de l’oubli heureux", en: "Ravioli of Happy Oblivion" },
+            { fr: "Bouillon du cercle imparfait", en: "Broth of the Imperfect Circle" },
+            { fr: "Croquette du soir tombant", en: "Falling Evening Croquette" },
+            { fr: "Quiche des paradoxes doux", en: "Quiche of Sweet Paradoxes" },
+            { fr: "Blanquette de l’espace personnel", en: "Blanquette of Personal Space" },
+            { fr: "Charlotte du tiroir secret", en: "Charlotte of the Secret Drawer" },
+            { fr: "Pâtes à la mémoire floue", en: "Pasta with Blurry Memory" },
+            { fr: "Burger de l’ennui délicieux", en: "Burger of Delicious Boredom" },
+            { fr: "Éclair de la pensée lente", en: "Eclair of Slow Thought" },
+            { fr: "Biscuit du murmure global", en: "Biscuit of Global Whisper" },
+            { fr: "Tartelette de la contradiction dorée", en: "Tartlet of Golden Contradiction" },
+            { fr: "Soupe aux regrets fondants", en: "Soup with Melting Regrets" },
+            { fr: "Flan suspendu du non-choix", en: "Suspended Flan of Non-Choice" },
+            { fr: "Glace de la brume tiède", en: "Ice Cream of Warm Mist" }
+        ];
+
+        const recipeNameThemes = [
+            { fr: "de l'Apocalypse", en: "of the Apocalypse" }, { fr: "des Terres Oubliées", en: "of the Forgotten Lands" }, { fr: "du Dragon Endormi", en: "of the Sleeping Dragon" },
+            { fr: "des Profondeurs Sous-Marines", en: "of the Underwater Depths" }, { fr: "Galactique", en: "Galactic" }, { fr: "à la Mode de Grand-Mère (sur Mars)", en: "Grandma's Style (on Mars)" },
+            { fr: "du Lundi Matin", en: "of Monday Morning" }, { fr: "du Chaos Organisé", en: "of Organized Chaos" }, { fr: "qui Murmure", en: "That Whispers" }, { fr: "des Rêves Brisés", en: "of Broken Dreams" },
+            { fr: "des Anciens", en: "of the Ancients" }, { fr: "de la Quatrième Dimension", en: "of the Fourth Dimension" }, { fr: "du Désert Glacial", en: "of the Glacial Desert" }, { fr: "de l'Imagination Pure", en: "of Pure Imagination" },
+            { fr: "des Âges Oubliés", en: "of Forgotten Ages" }, { fr: "des Échos Lointains", en: "of Distant Echoes" }, { fr: "du Sombre Passé", en: "of the Dark Past" }, { fr: "de la Lumière Éteinte", en: "of the Extinguished Light" }, { fr: "du Vent Silencieux", en: "of the Silent Wind" },
+            { fr: "des Mondes Perdues", en: "of Lost Worlds" }, { fr: "des Âmes Égarées", en: "of Lost Souls" }, { fr: "du Festin Interdit", en: "of the Forbidden Feast" }, { fr: "de la Prophétie Absurde", en: "of the Absurd Prophecy" }, { fr: "de la Danse des Éléments", en: "of the Dance of Elements" }
+        ];
+
+        const preparationSteps = [
+            { fr: "Dans un chaudron rouillé, mélangez tous les ingrédients en chantant une vieille ballade de marins.", en: "In a rusty cauldron, mix all ingredients while singing an old sailor's ballad." },
+            { fr: "Ajoutez l'ingrédient principal en invoquant l'esprit d'un chef étoilé des années 80.", en: "Add the main ingredient by invoking the spirit of an 80s Michelin-starred chef." },
+            { fr: "Laissez reposer le tout sous un rayon de lune, ou à défaut, sous un abat-jour douteux.", en: "Let it rest under a moonbeam, or failing that, under a dubious lampshade." },
+            { fr: "Mélangez vigoureusement avec une cuillère en bois ayant appartenu à un sorcier fou.", en: "Mix vigorously with a wooden spoon that belonged to a mad wizard." },
+            { fr: "Faites chauffer à feu doux jusqu'à ce que la mixture prenne une couleur inattendue, puis retirez immédiatement avant qu'elle ne prenne vie.", en: "Heat over low heat until the mixture takes on an unexpected color, then remove immediately before it comes to life." },
+            { fr: "Servez dans une botte de sept lieues ou, si non disponible, dans une vieille chaussette propre.", en: "Serve in a seven-league boot or, if unavailable, in a clean old sock." },
+            { fr: "Garnissez de pensées positives et d'une pincée de poussière d'étoiles (optionnel, mais recommandé).", en: "Garnish with positive thoughts and a pinch of stardust (optional, but recommended)." },
+            { fr: "Laissez macérer pendant une éternité ou jusqu'à ce que votre voisin se plaigne de l'odeur.", en: "Let it macerate for an eternity or until your neighbor complains about the smell." },
+            { fr: "Goûtez prudemment. Si vous voyez des elfes, c'est réussi. Sinon, recommencez depuis l'étape 1.", en: "Taste carefully. If you see elves, it's successful. Otherwise, start over from step 1." },
+            { fr: "Laissez bouillir jusqu'à ce que cela ressemble à un rêve fiévreux d'un chef malade.", en: "Let it boil until it resembles a feverish dream of a sick chef." },
+            { fr: "Triez les composants par ordre alphabétique, puis mélangez les paires impairs avec les paires pairs.", en: "Sort the components alphabetically, then mix odd pairs with even pairs." },
+            { fr: "Incorporez l'air ambiant en agitant frénétiquement le bol au-dessus de votre tête.", en: "Incorporate ambient air by frantically shaking the bowl above your head." },
+            { fr: "Faites un vœu secret avant d'ajouter le dernier ingrédient ; c'est crucial pour la saveur.", en: "Make a secret wish before adding the last ingredient; it's crucial for the flavor." },
+            { fr: "Disposez les éléments restants en forme de constellation du Dragon avant de cuire.", en: "Arrange the remaining elements in the shape of the Dragon constellation before cooking." },
+            { fr: "Cuisinez à la lumière d'une luciole mourante pour un arôme optimal.", en: "Cook in the light of a dying firefly for optimal aroma." },
+            { fr: "Remuez le mélange avec un bâton de réglisse en invoquant les esprits des légumes perdus.", en: "Stir the mixture with a licorice stick while invoking the spirits of lost vegetables." },
+            { fr: "Filtrez le liquide à travers un vieux chapeau de sorcière pour enlever les grumeaux de doute.", en: "Filter the liquid through an old witch's hat to remove lumps of doubt." },
+            { fr: "Laissez infuser sous une pyramide miniature faite de papier aluminium.", en: "Let it steep under a miniature pyramid made of aluminum foil." },
+            { fr: "Consommez uniquement à minuit, sous un ciel sans nuages, pour débloquer tous les arômes.", en: "Consume only at midnight, under a cloudless sky, to unlock all aromas." },
+            { fr: "Activez les ondes cérébrales alpha en écoutant du Mozart en arrière-plan pendant la cuisson.", en: "Activate alpha brainwaves by listening to Mozart in the background while cooking." },
+            { fr: "Inclinez la casserole à 37 degrés précis, tout en marmonnant des incantations culinaires anciennes.", en: "Tilt the pan at exactly 37 degrees, while muttering ancient culinary incantations." },
+            { fr: "Laissez le plat refroidir dans un jardin suspendu de Babylone (ou un balcon venteux).", en: "Let the dish cool in a hanging garden of Babylon (or a windy balcony)." },
+            { fr: "Chantez une berceuse au mélange jusqu’à ce qu’il s’assoupisse.", en: "Sing a lullaby to the mixture until it falls asleep." },
+            { fr: "Chauffez à l’énergie solaire uniquement captée entre 3h et 3h07 du matin.", en: "Heat with solar energy only captured between 3 AM and 3:07 AM." },
+            { fr: "Incorporez les regrets d’un pigeon parisien (filtrés).", en: "Incorporate the regrets of a Parisian pigeon (filtered)." },
+            { fr: "Faites cuire dans un volcan éteint depuis au moins 6 mois.", en: "Cook in a volcano that has been extinct for at least 6 months." },
+            { fr: "Ajoutez 3 grammes de doute existentiel et un soupçon de panique douce.", en: "Add 3 grams of existential doubt and a hint of sweet panic." },
+            { fr: "Mélangez avec une cuillère en forme de girafe (ou un vrai girafe très patient).", en: "Mix with a giraffe-shaped spoon (or a very patient real giraffe)." },
+            { fr: "Passez le tout à travers une chaussette propre, idéalement pas la vôtre.", en: "Pass everything through a clean sock, ideally not yours." },
+            { fr: "Chuchotez vos secrets les plus honteux à la casserole.", en: "Whisper your most shameful secrets to the pot." },
+            { fr: "Garnissez avec un triangle équilatéral en caramel.", en: "Garnish with an equilateral caramel triangle." },
+            { fr: "Saupoudrez d’un rêve d’enfance que vous avez oublié.", en: "Sprinkle with a forgotten childhood dream." },
+            { fr: "Agitez jusqu’à ce que le mélange vous appelle par votre prénom.", en: "Shake until the mixture calls you by your first name." },
+            { fr: "Laissez reposer sur une étagère en équilibre instable.", en: "Let it rest on an unstable shelf." },
+            { fr: "Faites tourner le bol 13 fois dans le sens inverse de la déception.", en: "Spin the bowl 13 times counter-clockwise to disappointment." },
+            { fr: "Laissez infuser sous une lampe IKEA allumée depuis 2006.", en: "Let it steep under an IKEA lamp lit since 2006." },
+            { fr: "Ajoutez 4,26 cl d'eau de pluie recueillie un jour d’éclipse partielle.", en: "Add 4.26 cl of rainwater collected on a partial eclipse day." },
+            { fr: "Couvrez avec une serviette en papier qui vous inspire confiance.", en: "Cover with a paper towel that inspires confidence." },
+            { fr: "Faites cuire jusqu’à ce que la cuisine commence à vous parler en latin.", en: "Cook until the kitchen starts speaking to you in Latin." },
+            { fr: "Versez en criant “POUR LA SCIENCE !” très fort.", en: "Pour while shouting “FOR SCIENCE!” very loudly." },
+            { fr: "Ajoutez une larme de dragon (ou de piment très très fort).", en: "Add a dragon's tear (or very, very hot pepper)." },
+            { fr: "Cuisez dans une théière volée à un chapelier fou.", en: "Cook in a teapot stolen from a mad hatter." },
+            { fr: "Laissez tremper dans une fontaine à souhaits (désinfectée).", en: "Let it soak in a wishing well (disinfected)." },
+            { fr: "Filtrez à travers un rêve de chat.", en: "Filter through a cat's dream." },
+            { fr: "Disposez les ingrédients selon les principes du feng-shui inversé.", en: "Arrange ingredients according to inverted feng shui principles." },
+            { fr: "Ajoutez un soupçon d’absurde avec la main gauche.", en: "Add a hint of absurdity with your left hand." },
+            { fr: "Mélangez jusqu’à obtenir une texture de pluie de printemps.", en: "Mix until it has the texture of spring rain." },
+            { fr: "Posez le plat au centre d’un cercle de bougies parfumées au mystère.", en: "Place the dish in the center of a circle of mystery-scented candles." },
+            { fr: "Laissez reposer jusqu’à ce que Mercure ne soit plus rétrograde.", en: "Let it rest until Mercury is no longer in retrograde." },
+            { fr: "Ajoutez les cris d’un lama en rut (en option, mais ça relève le goût).", en: "Add the cries of a rutting llama (optional, but enhances the flavor)." },
+            { fr: "Faites bouillir sur une émotion pure.", en: "Boil over a pure emotion." },
+            { fr: "Incorporez un poème écrit à l’envers.", en: "Incorporate a poem written backwards." },
+            { fr: "Laissez reposer sur un coussin d'air en suspension.", en: "Let it rest on a suspended air cushion." },
+            { fr: "Ajoutez un cube de sucre déçu.", en: "Add a disappointed sugar cube." },
+            { fr: "Faites tourner dans un manège pendant 2 minutes.", en: "Spin in a carousel for 2 minutes." },
+            { fr: "Glissez une citation de Kant dans le mélange.", en: "Slip a Kant quote into the mixture." },
+            { fr: "Utilisez une cuillère qui a connu la guerre.", en: "Use a spoon that has known war." },
+            { fr: "Couvrez avec du papier bulle et éclatez chaque bulle en attendant.", en: "Cover with bubble wrap and pop each bubble while waiting." },
+            { fr: "Faites cuire jusqu’à ce que le mélange vous juge en silence.", en: "Cook until the mixture judges you in silence." },
+            { fr: "Ajoutez la sagesse d’un vieux hibou.", en: "Add the wisdom of an old owl." },
+            { fr: "Mettez le tout dans un Tupperware oublié au fond du frigo (vide).", en: "Put everything in a Tupperware forgotten at the back of the fridge (empty)." },
+            { fr: "Saupoudrez de nostalgie lycéenne.", en: "Sprinkle with high school nostalgia." },
+            { fr: "Laissez reposer dans une grotte fréquentée par des trolls.", en: "Let it rest in a cave frequented by trolls." },
+            { fr: "Mélangez avec une baguette magique (ou un bâton très convaincant).", en: "Mix with a magic wand (or a very convincing stick)." },
+            { fr: "Incantez une recette en langue oubliée tout en dansant sur un pied.", en: "Chant a recipe in a forgotten language while dancing on one foot." },
+            { fr: "Faites chauffer au soleil couchant, mais seulement si vous avez pleuré aujourd’hui.", en: "Heat under the setting sun, but only if you've cried today." },
+            { fr: "Ajoutez une carte de tarot tirée au hasard (évitez “La Mort”).", en: "Add a randomly drawn tarot card (avoid “Death”)." },
+            { fr: "Faites cuire dans une marmite ayant appartenu à une sorcière bienveillante.", en: "Cook in a cauldron that belonged to a benevolent witch." },
+            { fr: "Incorporez un cri de mouette enregistré sur vinyle.", en: "Incorporate a seagull's cry recorded on vinyl." },
+            { fr: "Dressez le plat en suivant les conseils d’un perroquet très critique.", en: "Plate the dish following the advice of a very critical parrot." },
+            { fr: "Laissez infuser sous l’influence d’un bon film des années 90.", en: "Let it steep under the influence of a good 90s movie." },
+            { fr: "Ajoutez deux pincées de suspense.", en: "Add two pinches of suspense." },
+            { fr: "Mettez au four avec une lettre d’amour jamais envoyée.", en: "Bake with a never-sent love letter." },
+            { fr: "Couvrez avec une couverture tricotée par votre grand-mère imaginaire.", en: "Cover with a blanket knitted by your imaginary grandmother." },
+            { fr: "Laissez mijoter au rythme d’une playlist de jazz expérimental.", en: "Simmer to the rhythm of an experimental jazz playlist." },
+            { fr: "Mélangez en dansant une polka dans votre cuisine.", en: "Mix while dancing a polka in your kitchen." },
+            { fr: "Ajoutez une goutte de pluie tombée sur la joue d’un poète.", en: "Add a raindrop that fell on a poet's cheek." },
+            { fr: "Versez dans un récipient triangulaire (rectangle interdit).", en: "Pour into a triangular container (rectangle forbidden)." },
+            { fr: "Faites cuire jusqu’à ce que l’odeur évoque un souvenir que vous n’avez jamais vécu.", en: "Cook until the smell evokes a memory you've never lived." },
+            { fr: "Ajoutez une note de musique jouée par le vent.", en: "Add a musical note played by the wind." },
+            { fr: "Dites « merci » à chaque tour de cuillère.", en: "Say 'thank you' with each stir of the spoon." },
+            { fr: "Entourez le plat de cristaux (les bonbons sont acceptés).", en: "Surround the dish with crystals (candies are accepted)." },
+            { fr: "Mélangez avec un pinceau trempé dans du jus de carotte lunaire.", en: "Mix with a brush dipped in lunar carrot juice." },
+            { fr: "Couvrez avec une page d’un vieux dictionnaire (définition au hasard).", en: "Cover with a page from an old dictionary (random definition)." },
+            { fr: "Laissez mijoter à la chaleur de votre enthousiasme.", en: "Simmer with the warmth of your enthusiasm." },
+            { fr: "Faites cuire dans une baignoire vide, sous la pleine lune.", en: "Cook in an empty bathtub, under the full moon." },
+            { fr: "Chantez l’hymne national d’un pays imaginaire au moment de servir.", en: "Sing the national anthem of an imaginary country when serving." },
+            { fr: "Incorporez un soupçon de chaos organisé.", en: "Incorporate a hint of organized chaos." },
+            { fr: "Agitez jusqu’à entendre une note harmonieuse.", en: "Shake until you hear a harmonious note." },
+            { fr: "Placez le plat entre deux miroirs pour une cuisson multidimensionnelle.", en: "Place the dish between two mirrors for multidimensional cooking." },
+            { fr: "Ajoutez une cuillère de temps suspendu.", en: "Add a spoonful of suspended time." },
+            { fr: "Faites infuser dans une boîte à musique.", en: "Steep in a music box." },
+            { fr: "Ajoutez l’arôme d’un souvenir d’été.", en: "Add the aroma of a summer memory." },
+            { fr: "Couvrez de silence et laissez cuire dans l’inattendu.", en: "Cover with silence and let it cook in the unexpected." },
+            { fr: "Saupoudrez de poudre de “pourquoi pas ?”.", en: "Sprinkle with 'why not?' powder." },
+            { fr: "Faites mariner dans une conversation absurde.", en: "Marinate in an absurd conversation." },
+            { fr: "Ajoutez une touche de vent du nord.", en: "Add a touch of northern wind." },
+            { fr: "Mélangez en écoutant le chant des casseroles.", en: "Mix while listening to the song of pots." },
+            { fr: "Cuisez avec un tablier de sorcier certifié.", en: "Cook with a certified wizard's apron." },
+            { fr: "Ajoutez un sourire sincère de grand-oncle lointain.", en: "Add a sincere smile from a distant great-uncle." },
+            { fr: "Faites chauffer jusqu’à entendre un petit \"ding\" intérieur.", en: "Heat until you hear a little inner 'ding'." },
+            { fr: "Entourez le plat d’objets bleus pour renforcer l’arôme.", en: "Surround the dish with blue objects to enhance the aroma." },
+            { fr: "Versez en pensant à quelqu’un que vous n’avez jamais rencontré.", en: "Pour while thinking of someone you've never met." },
+            { fr: "Faites cuire dans une boîte à chapeaux en carton recyclé.", en: "Cook in a recycled cardboard hat box." },
+            { fr: "Ajoutez 4 gouttes d’encre invisible.", en: "Add 4 drops of invisible ink." },
+            { fr: "Chantez “Bohemian Rhapsody” à mi-voix pendant que ça mijote.", en: "Sing 'Bohemian Rhapsody' softly while it simmers." },
+            { fr: "Ajoutez une cuillère d’étrangeté pure.", en: "Add a spoonful of pure strangeness." },
+            { fr: "Faites infuser dans un casque de cosmonaute.", en: "Steep in a cosmonaut's helmet." },
+            { fr: "Mélangez en regardant un point fixe pendant 47 secondes.", en: "Mix while staring at a fixed point for 47 seconds." },
+            { fr: "Couvrez d’une écharpe tricotée par un robot.", en: "Cover with a scarf knitted by a robot." },
+            { fr: "Ajoutez une miette de gâteau tombée un mardi.", en: "Add a cake crumb that fell on a Tuesday." },
+            { fr: "Laissez reposer sur un oreiller qui a bien dormi.", en: "Let it rest on a pillow that slept well." },
+            { fr: "Passez le mélange au tamis de vos espérances.", en: "Sift the mixture through the sieve of your hopes." },
+            { fr: "Soufflez dessus en pensant très fort à une énigme non résolue.", en: "Blow on it while thinking very hard about an unsolved riddle." },
+            { fr: "Ajoutez une pincée d’irrationnel mathématique.", en: "Add a pinch of mathematical irrationality." },
+            { fr: "Faites mijoter dans une ampoule tiède.", en: "Simmer in a lukewarm light bulb." },
+            { fr: "Réchauffez le tout au contact d’un câlin sincère.", en: "Reheat everything with the touch of a sincere hug." },
+            { fr: "Mélangez avec une plume volée à un rêve.", en: "Mix with a feather stolen from a dream." }
+        ];
+
+        // Conditions de service
+        const servingConditions = [
+            { fr: "À déguster sous un ciel étoilé, en silence.", en: "To be enjoyed under a starry sky, in silence." },
+            { fr: "Servir chaud, de préférence à l'envers, un mardi soir.", en: "Serve hot, preferably upside down, on a Tuesday evening." },
+            { fr: "Consommer avant que la lune ne soit pleine, ou après une sieste de 3 heures 17 minutes.", en: "Consume before the moon is full, or after a 3-hour 17-minute nap." },
+            { fr: "Accompagner d'un air de flûte de pan jouée par un chat.", en: "Accompany with a pan flute tune played by a cat." },
+            { fr: "Ne pas regarder dans les yeux pendant la dégustation.", en: "Do not make eye contact during tasting." },
+            { fr: "Manger avec des gants en caoutchouc.", en: "Eat with rubber gloves." },
+            { fr: "Servir sur une assiette flottante.", en: "Serve on a floating plate." },
+            { fr: "Idéalement consommé en apesanteur.", en: "Ideally consumed in zero gravity." },
+            { fr: "À partager avec une entité non-humaine.", en: "To be shared with a non-human entity." },
+            { fr: "Déguster uniquement après avoir résolu une énigme complexe.", en: "Taste only after solving a complex riddle." },
+            { fr: "Servir dans un récipient qui n'existe pas encore.", en: "Serve in a container that does not yet exist." },
+            { fr: "Consommer en écoutant le silence de l'univers.", en: "Consume while listening to the silence of the universe." },
+            { fr: "Ne pas respirer pendant la dégustation.", en: "Do not breathe during tasting." },
+            { fr: "Manger avec les yeux fermés pour une expérience optimale.", en: "Eat with eyes closed for an optimal experience." },
+            { fr: "Servir à l'aube, face à l'est.", en: "Serve at dawn, facing east." },
+            { fr: "À consommer avant que le doute ne s'installe.", en: "To be consumed before doubt sets in." }
+        ];
+
+        function generateRecipe() {
+            const generateButton = document.getElementById('generateButton');
+            // Ajoute la classe d'animation
+            generateButton.classList.add('shake-animation');
+            // Retire la classe après l'animation pour pouvoir la rejouer
+            setTimeout(() => {
+                generateButton.classList.remove('shake-animation');
+            }, 300); // La durée de l'animation est de 0.3s
+
+            const ingredientsData = fixedIngredientsData;
+
+            if (ingredientsData.length === 0) {
+                document.getElementById('recipeOutput').innerHTML = `<p style='color: red;'>${currentLanguage === 'fr' ? "La liste d'ingrédients est vide. Veuillez l'ajouter dans le code JavaScript." : "The ingredient list is empty. Please add it in the JavaScript code."}</p>`;
+                return;
+            }
+
+            // Pour s'assurer que le nom de la recette est un nom complet de la nouvelle liste
+            let recipeTitle;
+            const thresholdForNewNames = 25;
+            const useFullRecipeName = Math.random() < 0.7 && recipeNameNouns.length > thresholdForNewNames;
+
+            if (useFullRecipeName) {
+                const newRecipeNames = recipeNameNouns.slice(thresholdForNewNames);
+                recipeTitle = randomChoice(newRecipeNames)[currentLanguage];
+            } else {
+                recipeTitle = `${randomChoice(recipeNameAdjectives)[currentLanguage]} ` +
+                              `${randomChoice(recipeNameNouns.slice(0, thresholdForNewNames))[currentLanguage]} ` +
+                              `${randomChoice(recipeNameThemes)[currentLanguage]}`;
+            }
+
+            let ingredientsListHtml = "";
+            const generatedQuantities = {};
+
+            const numIngredientsToUse = Math.min(Math.max(5, Math.floor(ingredientsData.length / 2)), 10);
+            const ingredientsToUse = getRandomElements(ingredientsData, numIngredientsToUse);
+
+            ingredientsToUse.forEach(item => {
+                let quantity = 0;
+                let unitStr = "";
+                let prefix = "de ";
+                let ingredientName = item[currentLanguage === 'fr' ? 'name' : 'name_en'];
+
+                if (item.type === "L") {
+                    quantity = parseFloat((Math.random() * (6.0 - 0.1) + 0.1).toFixed(2)); // L: 0.1-6
+                    if (quantity < 0.5 && quantity > 0) {
+                        quantity = Math.floor(quantity * 1000);
+                        unitStr = currentLanguage === 'fr' ? "mL" : "ml";
+                    } else {
+                        unitStr = currentLanguage === 'fr' ? "litres" : "liters";
+                    }
+                } else if (item.type === "G") {
+                    quantity = Math.floor(Math.random() * (6000 - 50) + 50); // G: 50-6000
+                    if (quantity > 1000) {
+                        quantity = parseFloat((quantity / 1000).toFixed(2));
+                        unitStr = currentLanguage === 'fr' ? "kg" : "kg";
+                    } else {
+                        unitStr = currentLanguage === 'fr' ? "grammes" : "grams";
+                    }
+                } else if (item.type === "N") {
+                    quantity = Math.floor(Math.random() * (60 - 1) + 1); // N: 1-60
+                    unitStr = "";
+                    prefix = "";
+                }
+
+                ingredientsListHtml += `<li>${quantity} ${unitStr} ${prefix}${ingredientName}</li>`;
+                generatedQuantities[ingredientName] = { qty: quantity, unit: unitStr, prefix: prefix };
+            });
+
+            let instructionsHtml = "";
+            const numStepsToUse = Math.min(preparationSteps.length, 5);
+            const selectedSteps = getRandomElements(preparationSteps, numStepsToUse);
+
+            selectedSteps.forEach((step, index) => {
+                let modifiedStep = step[currentLanguage];
+                const ingredientsNames = Object.keys(generatedQuantities);
+                if (ingredientsNames.length > 0 && Math.random() < 0.35) {
+                    const randomIngredientName = randomChoice(ingredientsNames);
+                    const { qty, unit, prefix } = generatedQuantities[randomIngredientName];
+                    const placeholder = `(${qty} ${unit} ${prefix}${randomIngredientName})`;
+
+                    if (modifiedStep.toLowerCase().includes(currentLanguage === 'fr' ? "ingrédient principal" : "main ingredient")) {
+                        modifiedStep = modifiedStep.replace(currentLanguage === 'fr' ? "l'ingrédient principal" : "the main ingredient", placeholder);
+                    } else if (modifiedStep.toLowerCase().includes(currentLanguage === 'fr' ? "mélangez" : "mix") && Math.random() < 0.5) {
+                        modifiedStep = modifiedStep.replace(currentLanguage === 'fr' ? "mélangez" : "mix", `${currentLanguage === 'fr' ? "mélangez" : "mix"} ${placeholder} avec`);
+                    } else {
+                        const lastPeriodIndex = modifiedStep.lastIndexOf('.');
+                        if (lastPeriodIndex !== -1 && lastPeriodIndex === modifiedStep.length - 1) {
+                            modifiedStep = modifiedStep.slice(0, lastPeriodIndex) + ` ${placeholder}.`;
+                        } else {
+                            modifiedStep += ` ${placeholder}.`;
+                        }
+                    }
+                }
+                instructionsHtml += `<p><strong>${index + 1}.</strong> ${modifiedStep}\n</p>`;
+            });
+
+            // --- Conditions de service aléatoires ---
+            let conditionsHtml = "";
+            if (Math.random() < 0.5) {
+                const numConditions = Math.floor(Math.random() * 2) + 1;
+                const selectedConditions = getRandomElements(servingConditions, numConditions);
+                conditionsHtml += `<h3>${translations[currentLanguage].conditionsTitle}</h3><ul>`;
+                selectedConditions.forEach(condition => {
+                    conditionsHtml += `<li>${condition[currentLanguage]}</li>`;
+                });
+                conditionsHtml += `</ul>`;
+            }
+
+            // --- Calculate Survival Chance RANDOMLY ---
+            let survivalChance = Math.floor(Math.random() * 101);
+
+            let survivalEmoji = "";
+            let survivalDescriptionKey = ""; // Key for translation
+            let barColor = "";
+
+            if (survivalChance < 10) {
+                survivalDescriptionKey = "Mortel";
+                survivalEmoji = "💀";
+            } else if (survivalChance >= 10 && survivalChance < 25) {
+                survivalDescriptionKey = "Dangereux";
+                survivalEmoji = "☣️";
+            } else if (survivalChance >= 25 && survivalChance < 50) {
+                survivalDescriptionKey = "Mauvais";
+                survivalEmoji = "🤮";
+            } else if (survivalChance >= 50 && survivalChance < 75) {
+                survivalDescriptionKey = "Bon";
+                survivalEmoji = "😊";
+            } else if (survivalChance >= 75 && survivalChance < 90) {
+                survivalDescriptionKey = "Excellent";
+                survivalEmoji = "😁";
+            } else {
+                survivalDescriptionKey = "Délicieux !";
+                survivalEmoji = "🤩";
+            }
+            const survivalDescription = translations[currentLanguage].survivalDescription[survivalDescriptionKey];
+
+            if (survivalChance >= 50) {
+                barColor = "#00FF00";
+            } else {
+                barColor = "#FF0000";
+            }
+
+            // --- Nouveau : Compteur de difficulté ---
+            let difficultyScore = Math.floor(Math.random() * 21);
+            let difficultyTextKey = "";
+            let difficultyEmoji = "";
+
+            if (difficultyScore === 0) {
+                difficultyTextKey = "Débutant";
+                difficultyEmoji = "🐣";
+            } else if (difficultyScore >= 1 && difficultyScore <= 6) {
+                difficultyTextKey = "Simple";
+                difficultyEmoji = "✨";
+            } else if (difficultyScore >= 7 && difficultyScore <= 12) {
+                difficultyTextKey = "Moyenne";
+                difficultyEmoji = "🤖";
+            } else if (difficultyScore >= 13 && difficultyScore <= 16) {
+                difficultyTextKey = "Difficile";
+                difficultyEmoji = "😡";
+            } else if (difficultyScore >= 17 && difficultyScore <= 19) {
+                difficultyTextKey = "Extrême";
+                difficultyEmoji = "💀";
+            } else if (difficultyScore === 20) {
+                difficultyTextKey = "Impossible";
+                difficultyEmoji = "👿";
+            }
+            const difficultyText = translations[currentLanguage].difficultyText[difficultyTextKey];
+
+            const outputDiv = document.getElementById('recipeOutput');
+            outputDiv.innerHTML = `
+                <h2>${translations[currentLanguage].recipeTitlePrefix} ${recipeTitle.toUpperCase()}</h2>
+                <h3>${translations[currentLanguage].ingredientsTitle}</h3>
+                <ul>${ingredientsListHtml}</ul>
+                <div class="survival-section">
+                    <h3>${translations[currentLanguage].survivalTitle} ${survivalEmoji} <span class="survival-text" style="color: ${barColor};">${survivalDescription}</span> (${survivalChance}%)</h3>
+                    <div class="survival-bar-container">
+                        <div class="survival-bar-fill" style="width: ${survivalChance}%; background-color: ${barColor};">${survivalChance}%</div>
+                    </div>
+                </div>
+                <div class="difficulty-section">
+                    <h3>${translations[currentLanguage].difficultyTitle} ${difficultyEmoji} ${difficultyText} (${difficultyScore}/20)</h3>
+                </div>
+                <h3>${translations[currentLanguage].instructionsTitle}</h3>
+                ${instructionsHtml}
+                ${conditionsHtml}
+                <p><em>${translations[currentLanguage].disclaimer}</em></p>
+            `;
+        }
+
+        // Helper function to get a random element from an array
+        function randomChoice(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Helper function to get random elements without repetition from an array
+        function getRandomElements(arr, num) {
+            const shuffled = [...arr].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, num);
+        }
+
+        // Génère une recette et définit la langue initiale au chargement de la page
+        window.onload = function() {
+            setLanguage('fr'); // Définit la langue par défaut sur le français au chargement
+        };
+    </script>
+</body>
+</html>
