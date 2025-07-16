@@ -105,6 +105,7 @@
         .games-grid .game-item:nth-child(13) { animation-delay: 1.3s; }
         .games-grid .game-item:nth-child(14) { animation-delay: 1.4s; }
         .games-grid .game-item:nth-child(15) { animation-delay: 1.5s; }
+        .games-grid .game-item:nth-child(16) { animation-delay: 1.6s; } /* Nouveau délai pour le 16ème élément */
 
 
         @keyframes itemFadeIn {
@@ -158,13 +159,13 @@
         #hits-counter {
             position: fixed;
             top: 10px;
-            left: 10px; /* Changé de 'right' à 'left' */
-            right: auto; /* S'assure qu'il n'interfère pas avec 'right' */
+            left: 10px;
+            right: auto;
             z-index: 1000;
         }
         #hits-counter img {
-            width: 160px; /* Rend l'image 4 fois plus grande (150px * 4) */
-            height: auto; /* Maintient le ratio d'aspect */
+            width: 600px;
+            height: auto;
             border-radius: 5px;
         }
     </style>
@@ -238,6 +239,10 @@
 
         <a href="https://tristanox.github.io/Tristanox-tools/youtube-player.html" target="_blank" class="game-item">
             <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/thumb%20videoplayer.png" alt="Miniature Youtube Player">
+        </a>
+
+        <a href="https://tristanox.github.io/Tristanox-tools/FUT-Swipe.html" target="_blank" class="game-item">
+            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/thumb%20futswipe.png" alt="Miniature FUT Swipe">
         </a>
 
     </div>
