@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grille de Pixels Aléatoires</title>
+    <style>
+        /* General Body and Layout */
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll */
+            display: flex;
+            background-color: #282c34; /* Dark background */
+            color: white; /* Default text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Sidebar Menu */
+        .sidebar {
+            width: 250px; /* Fixed width for the sidebar */
+            background-color: #21252b; /* Slightly lighter dark gray for sidebar */
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto; /* Enable scrolling for the content below fixed header */
+            position: relative; /* Needed for sticky header */
+            height: 100vh; /* Full height */
+        }
+
+        /* Sticky Header for essential buttons */
+        .sidebar-header {
+            background-color: #1a1e23; /* Even darker for the sticky header */
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #3a3f47;
+            position: sticky;
+            top: 0;
+            z-index: 100; /* Ensure it stays on top */
+        }
+
+        /* Scrollbar Styling (Beautiful Slider Bar) */
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .sidebar::-webkit-scrollbar-track {
+            background: #33373e; /* Darker track */
+            border-radius: 10px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #6272a4; /* A nice bluish-gray color for the thumb */
+            border-radius: 10px;
+            border: 2px solid #282c34; /* Border to make it look embedded */
+        }
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: #7b8bc1; /* Lighter on hover */
+        }
+
+        /* Button Styling (Dark Gray, Clean) */
+        .sidebar button, .sidebar input[type="color"] {
+            width: calc(100% - 20px); /* Adjust width for padding */
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background-color: #3a3f47; /* Dark gray */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-align: left; /* Align text to left for clean look */
+            transition: background-color 0.2s ease, transform 0.1s ease; /* Smooth hover and click animations */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+            display: flex; /* Use flex to align icon/text if needed */
+            align-items: center;
+            justify-content: center; /* Center button text */
+        }
+
+        .sidebar button:hover {
+            background-color: #4a5059; /* Lighter dark gray on hover */
+            transform: translateY(-2px); /* Slight lift animation */
+        }
+
+        .sidebar button:active {
+            transform: translateY(0); /* Press down effect */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Color Picker Specific Styling */
+        .sidebar input[type="color"] {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            border: 1px solid #555; /* Add a subtle border */
+            padding: 0;
+            height: 38px; /* Match button height */
+            cursor: pointer;
+            overflow: hidden; /* Hide default color picker border */
+        }
+        .sidebar input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .sidebar input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px; /* Match button border-radius */
+        }
+        .sidebar input[type="color"]::-moz-color-swatch-wrapper {
+            padding: 0;
+        }
+        .sidebar input[type="color"]::-moz-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        /* Active Button States */
+        .sidebar button.active {
+            background-color: #6272a4; /* Highlight for active modes */
+            color: white;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5); /* Inset shadow for active state */
+        }
+        .sidebar button.active:hover {
+            background-color: #7b8bc1;
+        }
+
+        /* Main Content (Canvas) */
+        .content-area {
+            flex-grow: 1; /* Take remaining space */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative; /* For help text positioning */
+            overflow: hidden; /* Hide canvas overflow */
+        }
+
+        canvas {
+            display: block; /* Remove extra space below canvas */
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Fullscreen Mode Adjustments */
+        body.fullscreen .sidebar {
+            display: none; /* Hide sidebar in fullscreen */
+        }
+        body.fullscreen .content-area {
+            width: 100vw;
+            height: 100vh;
+        }
+        body.fullscreen .help-text {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        body.fullscreen:hover .help-text {
+            opacity: 1;
+        }
+
+        /* Help Text */
+        .help-text {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10; /* Above canvas, below buttons */
+            transition: opacity 0.3s ease;
+        }
+
+        /* Hide buttons when 'Q' is pressed (for consistency, applies to help text too) */
+        .sidebar.hidden {
+            opacity: 0;
+            pointer-events: none; /* Disable clicks */
+        }
+        .sidebar.hidden + .content-area .help-text { /* Select sibling help-text */
+            opacity: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebarMenu">
+        <div class="sidebar-header">
+            <button id="autoRefreshButton">Auto-actualisation</button>
+            <button id="exportButton">Exporter en PNG</button>
+            <button id="refreshButton">Actualiser</button>
+        </div>
+
+        <button id="starryNightButton">Ciel Étoilé</button>
+        <button id="fallingPixelsButton">Pluie Numérique</button>
+        <button id="resetColorsButton">Couleurs de base</button>
+        <button id="blackAndWhiteButton">Noir & Blanc</button>
+        <button id="randomColorsButton">Couleurs Aléatoires</button>
+        <button id="analogousPaletteButton">Palette Analogique</button>
+        <button id="sortPixelsButton">Trier les pixels</button>
+        <button id="sortSpiralButton">Tri Serpentin</button>
+        <button id="groupPixelsButton">Regrouper pixels</button>
+        <input type="color" id="gradientColorPicker" value="#007bff">
+        <button id="generateLuminosityGradientButton">Dégradé Luminosité</button>
+        <button id="invertColorsButton">Négatif</button>
+        <button id="hueShiftButton">Décaler Teinte</button>
+        <button id="crossfadeButton">Fondu Enchaîné</button>
+        <button id="edgeDetectionButton">Détection Bordures</button>
+        <button id="generateGeometricPatternButton">Patterns Géométriques</button>
+        <button id="generateMapButton">Créateur de Cartes</button>
+        <button id="doublePixelsButton">x2 Pixels</button>
+        <button id="fullscreenButton">Plein Écran</button>
+        <button id="waveEffectButton">Effet Vague</button>
+        <button id="halvePixelsButton">/2 Pixels</button>
+        <button id="mazeGeneratorButton">Générateur de Labyrinthe</button>
+        <button id="gameOfLifeButton">Jeu de la Vie</button>
+        <button id="retroScreensaverButton">Écran de Veille Rétro</button>
+    </div>
+
+    <div class="content-area">
+        <canvas id="pixelGrid"></canvas>
+        <div class="help-text">Appuyez sur **Q** pour cacher/montrer le menu.</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('pixelGrid');
+        const ctx = canvas.getContext('2d');
+        const sidebarMenu = document.getElementById('sidebarMenu'); // Renamed from buttonContainer
+
+        const baseColors = ['#d9d9d9', '#a3a3a3', '#7a7a7a', '#636363', '#000000'];
+        const blackAndWhiteColors = ['#000000', '#FFFFFF'];
+
+        // Couleurs spécifiques pour la carte
+        const mapColors = {
+            land: '#2feb38', // Vert clair
+            landOutline: '#17821d', // Vert foncé pour les contours
+            ocean: '#4d98e8', // Bleu clair pour l'océan
+            deepOcean: '#336191' // Bleu foncé pour l'océan profond
+        };
+
+        let currentColors = [...baseColors]; // La palette de couleurs actuellement utilisée
+        // Modes : 'random', 'sorted', 'grouped', 'inverted', 'spiralSorted', 'starryNight', 'fallingPixels', 'crossfade', 'edgeDetection', 'hueShift', 'geometricPattern', 'mapCreator', 'waveEffect', 'mazeGenerator', 'gameOfLife', 'retroScreensaver'
+        let currentDrawMode = 'random';
+        let pixelSize = 20;
+        let autoRefreshInterval = null;
+        let autoRefreshTimeout = null;
+        let pixelData = []; // Stockera les couleurs des pixels pour le tri ou le regroupement
+        let isFullscreen = false;
+
+        // Flags pour les modes dynamiques
+        let isStarryNightActive = false;
+        let isFallingPixelsActive = false;
+        let isCrossfadeActive = false;
+        let isHueShiftActive = false;
+        let isWaveEffectActive = false;
+        let isGameOfLifeActive = false; // New flag for Game of Life
+        let isRetroScreensaverActive = false; // New flag for Retro Screensaver
+
+        let nextPixelData = []; // Pour le mode fondu enchaîné
+        let crossfadeProgress = 0; // Pour le fondu enchaîné
+        const crossfadeDuration = 50; // Duration of crossfade in frames
+
+        let frameCount = 0; // For animations that need a frame counter
+
+        let retroShapes = []; // For retro screensaver shapes
+
+
+        // --- Fonctions utilitaires de couleur ---
+
+        // Convertit une couleur hexadécimale en objet {r, g, b}
+        function hexToRgb(hex) {
+            const cleanHex = hex.startsWith('#') ? hex.substring(1) : hex;
+            if (cleanHex.length !== 6) {
+                // console.warn(`Code hexadécimal invalide: ${hex}`); // Commented for less console spam
+                return { r: 0, g: 0, b: 0 }; // Retourne noir par défaut
+            }
+            const r = parseInt(cleanHex.substring(0, 2), 16);
+            const g = parseInt(cleanHex.substring(2, 4), 16);
+            const b = parseInt(cleanHex.substring(4, 6), 16);
+            return { r, g, b };
+        }
+
+        // Convertit un objet {r, g, b} en chaîne hexadécimale (non utilisé directement pour le style, mais utile)
+        function rgbToHex(r, g, b) {
+            return '#' + ((1 << 24) + (Math.round(r) << 16) + (Math.round(g) << 8) + Math.round(b)).toString(16).slice(1).padStart(6, '0');
+        }
+
+        // Convertit une couleur RGB (0-255) en HSL (H: 0-360, S: 0-100, L: 0-100)
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0; // achromatique
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+
+        // Convertit une couleur HSL (H: 0-360, S: 0-100, L: 0-100) en chaîne "rgb(r, g, b)"
+        function hslToRgb(h, s, l) {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l; // achromatique
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                };
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
+        }
+
+        // Obtient la luminance d'une couleur (qu'elle soit hex ou rgb())
+        function getLuminance(colorString) {
+            let r, g, b;
+            if (colorString.startsWith('#')) {
+                const rgb = hexToRgb(colorString);
+                r = rgb.r; g = rgb.g; b = rgb.b;
+            } else if (colorString.startsWith('rgb')) {
+                const parts = colorString.match(/\d+/g).map(Number); // Extrait les nombres
+                r = parts[0]; g = parts[1]; b = parts[2];
+            } else {
+                return 0; // Cas inconnu ou invalide
+            }
+            // Formule de luminance (ITU-R BT.709)
+            return (0.2126 * r + 0.7152 * g + 0.0722 * b);
+        }
+
+        // Génère une couleur hexadécimale aléatoire
+        function getRandomHexColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+        }
+
+        // Mélange deux couleurs sur une proportion donnée (0 = couleur1, 1 = couleur2)
+        function mixColors(color1, color2, proportion) {
+            let rgb1_r, rgb1_g, rgb1_b;
+            if (color1.startsWith('#')) {
+                const rgb = hexToRgb(color1);
+                rgb1_r = rgb.r; rgb1_g = rgb.g; rgb1_b = rgb.b;
+            } else if (color1.startsWith('rgb')) {
+                const parts = color1.match(/\d+/g).map(Number);
+                rgb1_r = parts[0]; rgb1_g = parts[1]; rgb1_b = parts[2];
+            } else {
+                rgb1_r = 0; rgb1_g = 0; rgb1_b = 0;
+            }
+
+            let rgb2_r, rgb2_g, rgb2_b;
+            if (color2.startsWith('#')) {
+                const rgb = hexToRgb(color2);
+                rgb2_r = rgb.r; rgb2_g = rgb.g; rgb2_b = rgb.b;
+            } else if (color2.startsWith('rgb')) {
+                const parts = color2.match(/\d+/g).map(Number);
+                rgb2_r = parts[0]; rgb2_g = parts[1]; rgb2_b = parts[2];
+            } else {
+                rgb2_r = 0; rgb2_g = 0; rgb2_b = 0;
+            }
+
+            const r = rgb1_r + (rgb2_r - rgb1_r) * proportion;
+            const g = rgb1_g + (rgb2_g - rgb1_g) * proportion;
+            const b = rgb1_b + (rgb2_b - rgb1_b) * proportion;
+
+            return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+        }
+
+
+        // --- Fonctions de dessin et de manipulation ---
+
+        // La fonction principale de dessin, elle se base sur `currentDrawMode`
+        function drawGrid() {
+            const contentArea = document.querySelector('.content-area');
+            canvas.width = contentArea.offsetWidth;
+            canvas.height = contentArea.offsetHeight;
+
+            if (isFullscreen) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            const numPixelsX = Math.ceil(canvas.width / pixelSize);
+            const numPixelsY = Math.ceil(canvas.height / pixelSize);
+            const totalPixels = numPixelsX * numPixelsY;
+
+            frameCount++; // Increment frame count for animations
+
+            // Logique de régénération de pixelData pour les modes non-dynamiques
+            // Ne génère une nouvelle `pixelData` de base que si aucun mode dynamique n'est actif
+            // ET le mode actuel nécessite une nouvelle génération (ou pixelData est vide).
+            if (!isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                // Only generate if pixelData is empty OR if the mode specifically changes the base grid content
+                if (pixelData.length === 0 || ['random', 'grouped', 'geometricPattern', 'mapCreator', 'mazeGenerator'].includes(currentDrawMode)) {
+                    pixelData = []; // Clear previous data
+                    if (currentDrawMode === 'grouped') {
+                        const tempColors = [...currentColors];
+                        if (tempColors.length === 0) {
+                            ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, canvas.width, canvas.height); return;
+                        }
+                        const backgroundColorIndex = Math.floor(Math.random() * tempColors.length);
+                        const backgroundColor = tempColors[backgroundColorIndex];
+                        tempColors.splice(backgroundColorIndex, 1);
+
+                        let currentGroupColor = null;
+                        const groupSizeMin = 5;
+                        const groupSizeMax = 6;
+                        let pixelsInCurrentGroup = 0;
+
+                        for (let i = 0; i < totalPixels; i++) {
+                            if (pixelsInCurrentGroup === 0) {
+                                if (Math.random() < 0.7 && tempColors.length > 0) {
+                                    currentGroupColor = tempColors[Math.floor(Math.random() * tempColors.length)];
+                                    pixelsInCurrentGroup = Math.floor(Math.random() * (groupSizeMax - groupSizeMin + 1)) + groupSizeMin;
+                                } else {
+                                    currentGroupColor = backgroundColor;
+                                    pixelsInCurrentGroup = 1;
+                                }
+                            }
+                            pixelData.push(currentGroupColor);
+                            pixelsInCurrentGroup--;
+                        }
+                    } else if (currentDrawMode === 'geometricPattern') {
+                        pixelData = new Array(totalPixels).fill(0);
+
+                        const patternType = Math.floor(Math.random() * 3); // 0: rayures, 1: cercles, 2: triangles
+                        const color1 = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        let color2 = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        while(color2 === color1 && currentColors.length > 1) {
+                            color2 = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        }
+
+                        const center_x = numPixelsX / 2;
+                        const center_y = numPixelsY / 2;
+
+                        for (let y = 0; y < numPixelsY; y++) {
+                            for (let x = 0; x < numPixelsX; x++) {
+                                const index = y * numPixelsX + x;
+                                let colorToUse = color1;
+
+                                if (patternType === 0) {
+                                    const stripeDir = Math.floor(Math.random() * 2);
+                                    const stripeWidth = Math.floor(Math.random() * 3) + 1;
+                                    if (stripeDir === 0) {
+                                        if (Math.floor(y / stripeWidth) % 2 === 0) {
+                                            colorToUse = color2;
+                                        }
+                                    } else {
+                                        if (Math.floor(x / stripeWidth) % 2 === 0) {
+                                            colorToUse = color2;
+                                        }
+                                    }
+                                } else if (patternType === 1) {
+                                    const dist = Math.sqrt(Math.pow(x - center_x, 2) + Math.pow(y - center_y, 2));
+                                    const circleSize = Math.floor(Math.random() * 10) + 5;
+                                    if (Math.floor(dist / circleSize) % 2 === 0) {
+                                        colorToUse = color2;
+                                    }
+                                } else if (patternType === 2) {
+                                     const angle = Math.random() * Math.PI;
+                                     const val = Math.sin(x * Math.cos(angle) + y * Math.sin(angle));
+                                     if (val > 0) {
+                                         colorToUse = color2;
+                                     }
+                                }
+                                pixelData[index] = colorToUse;
+                            }
+                        }
+                    } else if (currentDrawMode === 'mapCreator') {
+                        const mapGrid = Array(numPixelsY).fill(0).map(() => Array(numPixelsX).fill(0)); // 0: water, 1: land
+
+                        // 1. Initialiser avec des points de terre aléatoires (seeds)
+                        const numLandSeeds = Math.floor(Math.random() * 15) + 20; // 20-34 seeds
+                        for (let i = 0; i < numLandSeeds; i++) {
+                            const seedX = Math.floor(Math.random() * numPixelsX);
+                            const seedY = Math.floor(Math.random() * numPixelsY);
+                            mapGrid[seedY][seedX] = 1;
+                        }
+
+                        // 2. Faire "grandir" la terre via quelques itérations de cellular automata
+                        const iterations = 15;
+                        for (let iter = 0; iter < iterations; iter++) {
+                            const newMapGrid = Array(numPixelsY).fill(0).map(() => Array(numPixelsX).fill(0));
+                            for (let y = 0; y < numPixelsY; y++) {
+                                for (let x = 0; x < numPixelsX; x++) {
+                                    let landNeighbors = 0;
+                                    // Count land neighbors (including diagonals for more organic growth)
+                                    for (let dy = -1; dy <= 1; dy++) {
+                                        for (let dx = -1; dx <= 1; dx++) {
+                                            if (dx === 0 && dy === 0) continue;
+                                            const nx = x + dx;
+                                            const ny = y + dy;
+                                            if (nx >= 0 && nx < numPixelsX && ny >= 0 && ny < numPixelsY) {
+                                                if (mapGrid[ny][nx] === 1) {
+                                                    landNeighbors++;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Rules for evolution
+                                    if (mapGrid[y][x] === 1) { // If it's land
+                                        // Land remains land if it has enough land neighbors or a good chance to persist
+                                        newMapGrid[y][x] = (landNeighbors >= 2 || Math.random() < 0.5) ? 1 : 0; // Adjusted from 0.6 to 0.5
+                                    } else { // If it's water
+                                        // Water becomes land if it has many land neighbors or a decent chance to start new land
+                                        newMapGrid[y][x] = (landNeighbors >= 3 || (landNeighbors >= 1 && Math.random() < 0.15)) ? 1 : 0; // Adjusted from 0.25 to 0.15
+                                    }
+                                }
+                            }
+                            Object.assign(mapGrid, newMapGrid); // Copy results for next iteration
+                        }
+
+                        // Convert mapGrid to pixelData with colors and outlines
+                        pixelData = new Array(totalPixels).fill(0);
+                        for (let y = 0; y < numPixelsY; y++) {
+                            for (let x = 0; x < numPixelsX; x++) {
+                                const index = y * numPixelsX + x;
+                                const isLand = mapGrid[y][x] === 1;
+                                let isOutline = false;
+                                let isDeepOcean = false;
+
+                                if (isLand) {
+                                    // Check neighbors for water to determine outline
+                                    const neighbors = [
+                                        {dx: 0, dy: -1}, {dx: 0, dy: 1}, // Top, Bottom
+                                        {dx: -1, dy: 0}, {dx: 1, dy: 0}  // Left, Right
+                                    ];
+                                    for(const n of neighbors) {
+                                        const nx = x + n.dx;
+                                        const ny = y + n.dy;
+                                        if (nx >= 0 && nx < numPixelsX && ny >= 0 && ny < numPixelsY) {
+                                            if (mapGrid[ny][nx] === 0) { // If any neighbor is water
+                                                isOutline = true;
+                                                break;
+                                            }
+                                        } else { // If it's a map border, consider it water
+                                            isOutline = true;
+                                            break;
+                                        }
+                                    }
+                                    pixelData[index] = isOutline ? mapColors.landOutline : mapColors.land;
+                                } else { // It's water
+                                    // Calculate distance to nearest land pixel for deep ocean
+                                    let minDistToLand = Infinity;
+                                    // Optimize: only search within a reasonable radius
+                                    const searchRadius = Math.min(numPixelsX, numPixelsY) / 6; // Adjusted radius
+
+                                    for (let ly = Math.max(0, y - Math.ceil(searchRadius)); ly < Math.min(numPixelsY, y + Math.ceil(searchRadius)); ly++) {
+                                        for (let lx = Math.max(0, x - Math.ceil(searchRadius)); lx < Math.min(numPixelsX, x + Math.ceil(searchRadius)); lx++) {
+                                            if (mapGrid[ly] && mapGrid[ly][lx] === 1) {
+                                                const dist = Math.sqrt(Math.pow(x - lx, 2) + Math.pow(y - ly, 2));
+                                                if (dist < minDistToLand) {
+                                                    minDistToLand = dist;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    const deepOceanThreshold = Math.min(numPixelsX, numPixelsY) / 10; // Threshold for deepness
+                                    if (minDistToLand > deepOceanThreshold) {
+                                        isDeepOcean = true;
+                                    }
+                                    pixelData[index] = isDeepOcean ? mapColors.deepOcean : mapColors.ocean;
+                                }
+                            }
+                        }
+                    } else if (currentDrawMode === 'mazeGenerator') {
+                        // Initialize grid with all walls
+                        const mazeGrid = Array(numPixelsY).fill(0).map(() => Array(numPixelsX).fill(1)); // 1 for wall, 0 for path
+
+                        // Simple recursive backtracking for maze generation
+                        function carvePath(cx, cy) {
+                            const directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // Right, Down, Left, Up
+                            // Shuffle directions
+                            for (let i = directions.length - 1; i > 0; i--) {
+                                const j = Math.floor(Math.random() * (i + 1));
+                                [directions[i], directions[j]] = [directions[j], directions[i]];
+                            }
+
+                            for (const [dx, dy] of directions) {
+                                const nx = cx + dx * 2;
+                                const ny = cy + dy * 2;
+
+                                if (nx >= 0 && nx < numPixelsX && ny >= 0 && ny < numPixelsY && mazeGrid[ny][nx] === 1) {
+                                    mazeGrid[cy + dy][cx + dx] = 0; // Carve path (remove wall)
+                                    mazeGrid[ny][nx] = 0; // Carve cell
+                                    carvePath(nx, ny);
+                                }
+                            }
+                        }
+
+                        // Start carving from a random point
+                        const startX = Math.floor(Math.random() * (numPixelsX / 2)) * 2;
+                        const startY = Math.floor(Math.random() * (numPixelsY / 2)) * 2;
+                        mazeGrid[startY][startX] = 0; // Set starting cell as path
+                        carvePath(startX, startY);
+
+                        // Convert mazeGrid to pixelData
+                        pixelData = new Array(totalPixels).fill(0);
+                        for (let y = 0; y < numPixelsY; y++) {
+                            for (let x = 0; x < numPixelsX; x++) {
+                                const index = y * numPixelsX + x;
+                                pixelData[index] = mazeGrid[y][x] === 1 ? currentColors[0] : currentColors[currentColors.length - 1]; // Wall or Path
+                            }
+                        }
+
+                    }
+                    else { // 'random', 'sorted', 'spiralSorted' generation (non-dynamic modes)
+                        if (currentColors.length === 0) {
+                            console.warn("Palette de couleurs vide. Utilisation d'une couleur par défaut.");
+                            currentColors = ['#808080'];
+                        }
+                        for (let i = 0; i < totalPixels; i++) {
+                            const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+                            pixelData.push(randomColor);
+                        }
+                    }
+                }
+            }
+
+
+            // --- Apply dynamic effects / processing ---
+            // Create a copy to modify for dynamic effects, so the base pixelData remains consistent
+            let displayPixelData = [...pixelData];
+
+            if (isStarryNightActive) { // Use the flag instead of currentDrawMode
+                const sparkleChance = 0.05;
+                // Ensure pixelData is initialized before adding sparkles
+                if (currentDrawMode !== 'starryNight') { // If just activated, or re-entering
+                    displayPixelData = new Array(totalPixels).fill('#000000'); // Start with black background
+                }
+                for (let i = 0; i < displayPixelData.length; i++) {
+                    if (Math.random() < sparkleChance) {
+                        displayPixelData[i] = getRandomHexColor();
+                    } else if (displayPixelData[i] !== '#000000') {
+                        // Slowly fade existing stars to black if not new sparkle
+                        let rgb = hexToRgb(displayPixelData[i]);
+                        rgb.r = Math.max(0, rgb.r - 5);
+                        rgb.g = Math.max(0, rgb.g - 5);
+                        rgb.b = Math.max(0, rgb.b - 5);
+                        displayPixelData[i] = rgbToHex(rgb.r, rgb.g, rgb.b);
+                    }
+                }
+                pixelData = displayPixelData; // Update base pixelData with animated result
+            } else if (isFallingPixelsActive) { // Use the flag
+                const pixelsPerRow = numPixelsX;
+                // Initialize pixelData to black if entering this mode or not already initialized
+                if (currentDrawMode !== 'fallingPixels') {
+                    displayPixelData = new Array(totalPixels).fill('#000000');
+                }
+
+                const previousFramePixelData = [...displayPixelData]; // Copy current state for next frame calculation
+                
+                for (let i = 0; i < totalPixels; i++) {
+                    const row = Math.floor(i / pixelsPerRow);
+                    //const col = i % pixelsPerRow; // Not used
+
+                    if (row === 0) { // Top row: generate new falling pixels or black
+                        if (Math.random() < 0.03) { // Chance to start a new "drop"
+                            displayPixelData[i] = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        } else {
+                            displayPixelData[i] = '#000000'; // Default black
+                        }
+                    } else { // Other rows: take color from the pixel above it in the previous frame
+                        displayPixelData[i] = previousFramePixelData[i - pixelsPerRow];
+                    }
+                }
+                pixelData = displayPixelData; // Update base pixelData
+            } else if (isCrossfadeActive) { // Use the flag
+                // Ensure pixelData is initialized if the mode is activated directly
+                if (pixelData.length === 0 || nextPixelData.length === 0 || currentDrawMode !== 'crossfade') {
+                    pixelData = [];
+                    for (let i = 0; i < totalPixels; i++) {
+                        pixelData.push(currentColors[Math.floor(Math.random() * currentColors.length)]);
+                    }
+                    // Immediately generate the first nextPixelData for the first fade
+                    nextPixelData = [];
+                    for (let i = 0; i < totalPixels; i++) {
+                        nextPixelData.push(currentColors[Math.floor(Math.random() * currentColors.length)]);
+                    }
+                    crossfadeProgress = 0;
+                }
+                
+                const progress = crossfadeProgress / crossfadeDuration;
+                for (let i = 0; i < pixelData.length; i++) {
+                    displayPixelData[i] = mixColors(pixelData[i], nextPixelData[i], progress);
+                }
+
+                crossfadeProgress++;
+                if (crossfadeProgress > crossfadeDuration) {
+                    crossfadeProgress = 0; // Reset for the next cycle
+                    pixelData = nextPixelData; // The 'next' grid becomes the 'current' grid for the upcoming fade
+                    // A new 'nextPixelData' will be generated at the beginning of the *next* drawGrid call because crossfadeProgress will be 0 again.
+                    nextPixelData = []; // Clear to force regeneration
+                }
+            } else if (isHueShiftActive) { // Use the flag
+                // Ensure pixelData is initialized if entering this mode for the first time
+                if (currentDrawMode !== 'hueShift') {
+                    displayPixelData = [];
+                    for (let i = 0; i < totalPixels; i++) {
+                        displayPixelData.push(currentColors[Math.floor(Math.random() * currentColors.length)]);
+                    }
+                }
+                
+                displayPixelData = displayPixelData.map(colorString => {
+                    let r_val, g_val, b_val;
+                    if (colorString.startsWith('#')) {
+                        const rgb = hexToRgb(colorString);
+                        r_val = rgb.r; g_val = rgb.g; b_val = rgb.b;
+                    } else if (colorString.startsWith('rgb')) {
+                        // Extract numbers from "rgb(r, g, b)" string
+                        const parts = colorString.match(/\d+/g).map(Number);
+                        r_val = parts[0]; g_val = parts[1]; b_val = parts[2];
+                    } else {
+                        return '#000000'; // Fallback for invalid color strings
+                    }
+                    let hsl = rgbToHsl(r_val, g_val, b_val);
+                    hsl.h = (hsl.h + 5) % 360; // Shift hue by 5 degrees
+                    return hslToRgb(hsl.h, hsl.s, hsl.l);
+                });
+                pixelData = displayPixelData; // Update base pixelData
+            } else if (isWaveEffectActive) { // New: Wave Effect
+                // pixelData should be initialized by toggleWaveEffect() now
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = canvas.width;
+                tempCanvas.height = canvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // Draw current pixels onto temp canvas
+                let pixelIndex = 0;
+                for (let y = 0; y < canvas.height; y += pixelSize) {
+                    for (let x = 0; x < canvas.width; x += pixelSize) {
+                        if (pixelIndex < pixelData.length) { // Use pixelData, which is the base
+                            tempCtx.fillStyle = pixelData[pixelIndex];
+                            tempCtx.fillRect(x, y, pixelSize, pixelSize);
+                            pixelIndex++;
+                        }
+                    }
+                }
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear main canvas
+
+                // Draw from temp canvas to main canvas with wave distortion
+                const waveStrength = 10; // Max pixel displacement
+                const waveSpeed = 0.05; // Speed of the wave
+                for (let y = 0; y < numPixelsY; y++) {
+                    for (let x = 0; x < numPixelsX; x++) {
+                        const originalX = x * pixelSize;
+                        const originalY = y * pixelSize;
+
+                        const offsetX = Math.sin((x + frameCount * waveSpeed) * 0.5) * waveStrength;
+                        const offsetY = Math.cos((y + frameCount * waveSpeed) * 0.5) * waveStrength;
+
+                        const sourceX = Math.max(0, Math.min(tempCanvas.width - pixelSize, originalX - offsetX));
+                        const sourceY = Math.max(0, Math.min(tempCanvas.height - pixelSize, originalY - offsetY));
+
+                        ctx.drawImage(tempCanvas, sourceX, sourceY, pixelSize, pixelSize, originalX, originalY, pixelSize, pixelSize);
+                    }
+                }
+                return; // Skip normal pixel rendering as we drew with image
+            } else if (isGameOfLifeActive) { // New: Conway's Game of Life
+                const numPixelsX = Math.ceil(canvas.width / pixelSize);
+                const numPixelsY = Math.ceil(canvas.height / pixelSize);
+                const nextGeneration = [];
+
+                for (let y = 0; y < numPixelsY; y++) {
+                    for (let x = 0; x < numPixelsX; x++) {
+                        const currentIndex = y * numPixelsX + x;
+                        const isLive = pixelData[currentIndex] === 1;
+                        let liveNeighbors = 0;
+
+                        // Check 8 neighbors
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                if (dx === 0 && dy === 0) continue; // Skip self
+
+                                const neighborX = x + dx;
+                                const neighborY = y + dy;
+
+                                if (neighborX >= 0 && neighborX < numPixelsX && neighborY >= 0 && neighborY < numPixelsY) {
+                                    const neighborIndex = neighborY * numPixelsX + neighborX;
+                                    if (pixelData[neighborIndex] === 1) { // Check if neighbor is live
+                                        liveNeighbors++;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Apply Conway's rules
+                        if (isLive) {
+                            if (liveNeighbors < 2 || liveNeighbors > 3) {
+                                nextGeneration.push(0); // Dies (underpopulation or overpopulation)
+                            } else {
+                                nextGeneration.push(1); // Lives (2 or 3 live neighbors)
+                            }
+                        } else {
+                            if (liveNeighbors === 3) {
+                                nextGeneration.push(1); // Becomes live (reproduction)
+                            } else {
+                                nextGeneration.push(0); // Remains dead
+                            }
+                        }
+                    }
+                }
+                pixelData = nextGeneration; // Update pixelData for the next frame
+                // Map 0/1 to actual colors for drawing
+                displayPixelData = pixelData.map(cell => cell === 1 ? currentColors[0] : '#000000'); // Use first current color for live cells, black for dead
+            } else if (isRetroScreensaverActive) { // New: Retro Screensaver
+                // Clear canvas with a slightly transparent black to create a trail effect
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'; // Adjust alpha for desired trail length
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < retroShapes.length; i++) {
+                    let shape = retroShapes[i];
+
+                    // Update position
+                    shape.x += shape.dx;
+                    shape.y += shape.dy;
+
+                    // Bounce off walls
+                    if (shape.x + shape.size > canvas.width || shape.x < 0) {
+                        shape.dx *= -1;
+                        // Adjust position to prevent getting stuck if it overshoots
+                        shape.x = Math.max(0, Math.min(canvas.width - shape.size, shape.x));
+                    }
+                    if (shape.y + shape.size > canvas.height || shape.y < 0) {
+                        shape.dy *= -1;
+                        // Adjust position to prevent getting stuck if it overshoots
+                        shape.y = Math.max(0, Math.min(canvas.height - shape.size, shape.y));
+                    }
+
+                    ctx.fillStyle = shape.color;
+                    if (shape.type === 'square') {
+                        ctx.fillRect(shape.x, shape.y, shape.size, shape.size);
+                    } else if (shape.type === 'line') {
+                        // Draw a line segment. Randomly choose horizontal or vertical for variety
+                        const isHorizontal = Math.random() > 0.5; // This could be pre-defined per shape
+                        const lineWidth = pixelSize / 2; // Thin line
+                        if (isHorizontal) {
+                            ctx.fillRect(shape.x, shape.y, shape.size, lineWidth);
+                        } else {
+                            ctx.fillRect(shape.x, shape.y, lineWidth, shape.size);
+                        }
+                    }
+                }
+                return; // Retro Screensaver draws directly, so skip the general pixel rendering loop
+            }
+            else if (currentDrawMode === 'sorted' || currentDrawMode === 'spiralSorted') {
+                // Ensure pixelData is initialized for sorting if it's empty
+                if (pixelData.length === 0) {
+                    for (let i = 0; i < totalPixels; i++) {
+                        const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        pixelData.push(randomColor);
+                    }
+                }
+                displayPixelData.sort((a, b) => getLuminance(a) - getLuminance(b));
+            } else if (currentDrawMode === 'inverted') {
+                // Invert needs a base pixelData to work on, ensure it exists
+                if (pixelData.length === 0) {
+                     for (let i = 0; i < totalPixels; i++) {
+                        const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        pixelData.push(randomColor);
+                    }
+                }
+                
+                displayPixelData = displayPixelData.map(colorString => {
+                    let r, g, b;
+                    if (colorString.startsWith('#')) {
+                        const rgb = hexToRgb(colorString);
+                        r = rgb.r; g = rgb.g; b = rgb.b;
+                    } else if (colorString.startsWith('rgb')) {
+                        const parts = colorString.match(/\d+/g).map(Number);
+                        r = parts[0]; g = b = parts[2];
+                    } else {
+                        return '#000000'; // Fallback
+                    }
+                    return `rgb(${255 - r}, ${255 - g}, ${255 - b})`;
+                });
+            } else if (currentDrawMode === 'edgeDetection') {
+                // Ensure pixelData is initialized if the mode is activated directly
+                if (pixelData.length === 0) {
+                     for (let i = 0; i < totalPixels; i++) {
+                        const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        pixelData.push(randomColor);
+                    }
+                }
+                const originalPixelData = [...pixelData]; // Work on a copy
+                const edgePixels = [];
+                const threshold = 30;
+
+                for (let y = 0; y < numPixelsY; y++) {
+                    for (let x = 0; x < numPixelsX; x++) {
+                        const currentIndex = y * numPixelsX + x;
+                        
+                        const currentLuminance = getLuminance(originalPixelData[currentIndex]);
+                        let isEdge = false;
+
+                        const neighbors = [
+                            {dx: 0, dy: -1}, {dx: 0, dy: 1},
+                            {dx: -1, dy: 0}, {dx: 1, dy: 0}
+                        ];
+
+                        for (const neighbor of neighbors) {
+                            const nx = x + neighbor.dx;
+                            const ny = y + neighbor.dy;
+                            if (nx >= 0 && nx < numPixelsX && ny >= 0 && ny < numPixelsY) {
+                                const neighborIndex = ny * numPixelsX + nx;
+                                if (Math.abs(currentLuminance - getLuminance(originalPixelData[neighborIndex])) > threshold) {
+                                    isEdge = true;
+                                    break;
+                                }
+                            }
+                        }
+                        edgePixels.push(isEdge ? '#000000' : '#FFFFFF');
+                    }
+                }
+                displayPixelData = edgePixels;
+            }
+
+
+            // Drawing pixels
+            let pixelIndex = 0;
+            if (currentDrawMode === 'spiralSorted') {
+                const tempPixelData = [...displayPixelData]; // Work on a copy for sorting
+                let x = 0, y = 0;
+                let dx = 1, dy = 0;
+                let xMin = 0, yMin = 0;
+                let xMax = numPixelsX - 1;
+                let yMax = numPixelsY - 1;
+
+                for (let i = 0; i < totalPixels; i++) {
+                    if (pixelIndex >= tempPixelData.length) break;
+
+                    ctx.fillStyle = tempPixelData[pixelIndex];
+                    ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                    pixelIndex++;
+
+                    let nextX = x + dx;
+                    let nextY = y + dy;
+
+                    if (dx === 1 && nextX > xMax) { dx = 0; dy = 1; yMin++; }
+                    else if (dy === 1 && nextY > yMax) { dx = -1; dy = 0; xMax--; }
+                    else if (dx === -1 && nextX < xMin) { dx = 0; dy = -1; yMax--; }
+                    else if (dy === -1 && nextY < yMin) { dx = 1; dy = 0; xMin++; }
+
+                    x += dx;
+                    y += dy;
+                }
+
+            } else {
+                for (let y = 0; y < canvas.height; y += pixelSize) {
+                    for (let x = 0; x < canvas.width; x += pixelSize) {
+                        if (pixelIndex < displayPixelData.length) {
+                            ctx.fillStyle = displayPixelData[pixelIndex];
+                            ctx.fillRect(x, y, pixelSize, pixelSize);
+                            pixelIndex++;
+                        }
+                    }
+                }
+            }
+        }
+
+        function exportCanvasAsPNG() {
+            sidebarMenu.classList.add('hidden'); // Hide sidebar temporarily
+            document.querySelector('.help-text').style.opacity = 0; // Hide help text too
+            const dataURL = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = 'grille_pixels.png';
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // Show sidebar again after export
+            sidebarMenu.classList.remove('hidden');
+            document.querySelector('.help-text').style.opacity = 1;
+        }
+
+        // Helper to deactivate all dynamic mode flags and button classes
+        function deactivateAllDynamicModes() {
+            isStarryNightActive = false;
+            document.getElementById('starryNightButton').classList.remove('active');
+            isFallingPixelsActive = false;
+            document.getElementById('fallingPixelsButton').classList.remove('active');
+            isCrossfadeActive = false;
+            document.getElementById('crossfadeButton').classList.remove('active');
+            isHueShiftActive = false;
+            document.getElementById('hueShiftButton').classList.remove('active');
+            isWaveEffectActive = false;
+            document.getElementById('waveEffectButton').classList.remove('active');
+            isGameOfLifeActive = false; // New
+            document.getElementById('gameOfLifeButton').classList.remove('active'); // New
+            isRetroScreensaverActive = false; // New
+            document.getElementById('retroScreensaverButton').classList.remove('active'); // New
+
+            crossfadeProgress = 0;
+            nextPixelData = [];
+            retroShapes = []; // Clear shapes for retro screensaver
+            
+            // Revert pixelData to a clean state after dynamic mode deactivation
+            // This ensures subsequent non-dynamic draws start fresh or from currentColors
+            const totalPixels = Math.ceil(canvas.width / pixelSize) * Math.ceil(canvas.height / pixelSize);
+            pixelData = []; // Clear current pixelData
+            for (let i = 0; i < totalPixels; i++) {
+                pixelData.push(currentColors[Math.floor(Math.random() * currentColors.length)]);
+            }
+        }
+
+        function toggleAutoRefresh() {
+            const autoRefreshButton = document.getElementById('autoRefreshButton');
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                if (autoRefreshTimeout) clearTimeout(autoRefreshTimeout); // Clear timeout if it exists
+                autoRefreshInterval = null;
+                autoRefreshTimeout = null;
+                autoRefreshButton.classList.remove('active');
+                autoRefreshButton.textContent = 'Auto-actualisation';
+
+                // If auto-refresh is turned OFF, and no dynamic mode is active, revert to 'random'
+                if (!isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid(); // Redraw one last time after deactivation
+            } else {
+                autoRefreshButton.classList.add('active');
+                autoRefreshButton.textContent = 'Auto-actualisation (Active)';
+                drawGrid(); // Start the first draw
+                autoRefreshInterval = setInterval(drawGrid, 100); // Repeat drawing every 0.1s
+
+                // Set timeout only if NO dynamic mode (including Game of Life and Retro Screensaver) is active
+                if (!isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    autoRefreshTimeout = setTimeout(() => {
+                        // This timeout will only run if auto-refresh hasn't been manually toggled off.
+                        clearInterval(autoRefreshInterval);
+                        autoRefreshInterval = null;
+                        autoRefreshTimeout = null;
+                        autoRefreshButton.classList.remove('active');
+                        autoRefreshButton.textContent = 'Auto-actualisation';
+                        
+                        // If auto-refresh naturally times out, and no dynamic mode is active, revert to 'random'
+                        currentDrawMode = 'random';
+                        drawGrid();
+                    }, 5000); // Stop after 5 seconds
+                }
+            }
+        }
+
+        // --- Functions for mode and color buttons ---
+
+        function setBaseColors() {
+            currentColors = [...baseColors];
+            deactivateAllDynamicModes(); // Deactivate dynamic modes when changing base color
+            currentDrawMode = 'random';
+            drawGrid();
+        }
+
+        function setBlackAndWhite() {
+            currentColors = [...blackAndWhiteColors];
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random';
+            drawGrid();
+        }
+
+        function setRandomColors() {
+            currentColors = Array.from({length: 5}, getRandomHexColor);
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random';
+            drawGrid();
+        }
+
+        function sortPixels() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'sorted';
+            drawGrid();
+        }
+
+        function groupPixels() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'grouped';
+            drawGrid();
+        }
+
+        function generateLuminosityGradientPalette() {
+            const baseHex = document.getElementById('gradientColorPicker').value;
+            const rgb = hexToRgb(baseHex);
+            let hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            hsl.s = 100;
+            const luminosities = [90, 70, 50, 30, 10];
+            currentColors = luminosities.map(l => hslToRgb(hsl.h, hsl.s, l));
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random';
+            drawGrid();
+        }
+
+        function invertColors() {
+            // Ensure pixelData is initialized before inverting
+            if (pixelData.length === 0) {
+                currentDrawMode = 'random'; // Temporarily set to random to generate initial pixelData
+                drawGrid(); // Populate pixelData
+            }
+            deactivateAllDynamicModes();
+            currentDrawMode = 'inverted';
+            
+            // Only invert if not already in inverted mode (to prevent double inversion on multiple clicks)
+            // Or just apply the inversion logic directly, as the mode will force a redraw anyway.
+            pixelData = pixelData.map(colorString => {
+                let r, g, b;
+                if (colorString.startsWith('#')) {
+                    const rgb = hexToRgb(colorString);
+                    r = rgb.r; g = rgb.g; b = rgb.b;
+                } else if (colorString.startsWith('rgb')) {
+                    const parts = colorString.match(/\d+/g).map(Number);
+                    r = parts[0]; g = b = parts[2];
+                } else {
+                    return '#000000'; // Fallback
+                }
+                return `rgb(${255 - r}, ${255 - g}, ${255 - b})`;
+            });
+            drawGrid();
+        }
+
+        function doublePixels() {
+            pixelSize = Math.max(1, Math.floor(pixelSize / 2));
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random'; // Revert to random mode for new pixel size to apply
+            drawGrid();
+        }
+
+        // --- Functions for new buttons ---
+
+        function toggleStarryNight() {
+            const starryNightButton = document.getElementById('starryNightButton');
+            if (!isStarryNightActive) {
+                deactivateAllDynamicModes(); // Deactivate other dynamic modes first
+                isStarryNightActive = true;
+                starryNightButton.classList.add('active');
+                currentDrawMode = 'starryNight'; // Set currentDrawMode to reflect active dynamic mode
+                if (!autoRefreshInterval) toggleAutoRefresh(); // Ensure auto-refresh is on
+                else drawGrid();
+            } else {
+                isStarryNightActive = false;
+                starryNightButton.classList.remove('active');
+                if (!autoRefreshInterval && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                     currentDrawMode = 'random'; // Only revert if no other dynamic mode or auto-refresh is active
+                }
+                drawGrid();
+            }
+        }
+
+        function sortSpiral() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'spiralSorted';
+            drawGrid();
+        }
+
+        function generateAnalogousPalette() {
+            const baseHue = Math.floor(Math.random() * 360);
+            const analogousRange = 30;
+            const numColors = 5;
+
+            currentColors = [];
+            for (let i = 0; i < numColors; i++) {
+                let hue = (baseHue + (Math.random() * analogousRange * 2) - analogousRange + 360) % 360;
+                let saturation = Math.floor(Math.random() * (90 - 40 + 1)) + 40;
+                let luminosity = Math.floor(Math.random() * (80 - 30 + 1)) + 30;
+                currentColors.push(hslToRgb(hue, saturation, luminosity));
+            }
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random';
+            drawGrid();
+        }
+
+        function toggleFallingPixels() {
+            const fallingPixelsButton = document.getElementById('fallingPixelsButton');
+            if (!isFallingPixelsActive) {
+                deactivateAllDynamicModes(); // Deactivate other dynamic modes first
+                isFallingPixelsActive = true;
+                fallingPixelsButton.classList.add('active');
+                currentDrawMode = 'fallingPixels'; // Set currentDrawMode
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isFallingPixelsActive = false;
+                fallingPixelsButton.classList.remove('active');
+                if (!autoRefreshInterval && !isStarryNightActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        function toggleHueShift() {
+            const hueShiftButton = document.getElementById('hueShiftButton');
+            if (!isHueShiftActive) {
+                deactivateAllDynamicModes(); // Deactivate other dynamic modes first
+                isHueShiftActive = true;
+                hueShiftButton.classList.add('active');
+                currentDrawMode = 'hueShift'; // Set currentDrawMode
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isHueShiftActive = false;
+                hueShiftButton.classList.remove('active');
+                 if (!autoRefreshInterval && !isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        function toggleCrossfade() {
+            const crossfadeButton = document.getElementById('crossfadeButton');
+            if (!isCrossfadeActive) {
+                deactivateAllDynamicModes(); // Deactivate other dynamic modes first
+                isCrossfadeActive = true;
+                crossfadeButton.classList.add('active');
+                currentDrawMode = 'crossfade'; // Set currentDrawMode
+                crossfadeProgress = 0; // Reset progress for a new fade start
+                nextPixelData = []; // Clear nextPixelData to force regeneration on next draw
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isCrossfadeActive = false;
+                crossfadeButton.classList.remove('active');
+                crossfadeProgress = 0; // Reset for next time
+                nextPixelData = []; // Clear nextPixelData
+                if (!autoRefreshInterval && !isStarryNightActive && !isFallingPixelsActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        function toggleEdgeDetection() {
+            deactivateAllDynamicModes();
+            if (currentDrawMode !== 'edgeDetection') {
+                currentDrawMode = 'edgeDetection';
+                // Ensure pixelData is initialized if the mode is activated directly
+                if (pixelData.length === 0) {
+                     const totalPixels = Math.ceil(canvas.width / pixelSize) * Math.ceil(canvas.height / pixelSize);
+                     for (let i = 0; i < totalPixels; i++) {
+                        const randomColor = currentColors[Math.floor(Math.random() * currentColors.length)];
+                        pixelData.push(randomColor);
+                    }
+                }
+            } else {
+                currentDrawMode = 'random'; // Toggle off
+            }
+            drawGrid();
+        }
+
+        function generateGeometricPattern() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'geometricPattern';
+            drawGrid();
+        }
+
+        function generateMap() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'mapCreator';
+            drawGrid();
+        }
+
+        function toggleFullscreen() {
+            const body = document.body;
+            if (!isFullscreen) {
+                body.classList.add('fullscreen');
+                isFullscreen = true;
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+            } else {
+                body.classList.remove('fullscreen');
+                isFullscreen = false;
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.documentElement.webkitExitFullscreen) {
+                    document.documentElement.webkitExitFullscreen();
+                } else if (document.documentElement.msExitFullscreen) {
+                    document.documentElement.msExitFullscreen();
+                }
+            }
+            drawGrid(); // Redraw to adapt to new size
+        }
+
+        // New button functions
+        function toggleWaveEffect() {
+            const waveEffectButton = document.getElementById('waveEffectButton');
+            if (!isWaveEffectActive) {
+                deactivateAllDynamicModes();
+                isWaveEffectActive = true;
+                waveEffectButton.classList.add('active');
+                currentDrawMode = 'waveEffect';
+
+                // Initialize pixelData for wave effect if it's empty or needs resetting
+                if (pixelData.length === 0 || !['random', 'grouped', 'geometricPattern', 'mapCreator', 'mazeGenerator'].includes(currentDrawMode)) {
+                    const numPixelsX = Math.ceil(canvas.width / pixelSize);
+                    const numPixelsY = Math.ceil(canvas.height / pixelSize);
+                    const totalPixels = numPixelsX * numPixelsY;
+                    pixelData = []; // Ensure fresh start
+                    for (let i = 0; i < totalPixels; i++) {
+                        pixelData.push(currentColors[Math.floor(Math.random() * currentColors.length)]);
+                    }
+                }
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isWaveEffectActive = false;
+                waveEffectButton.classList.remove('active');
+                if (!autoRefreshInterval && !isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isGameOfLifeActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        function halvePixels() {
+            pixelSize = pixelSize * 2; // Increase pixel size (decrease resolution)
+            deactivateAllDynamicModes();
+            currentDrawMode = 'random'; // Revert to random mode for new pixel size to apply
+            drawGrid();
+        }
+
+        function generateMaze() {
+            deactivateAllDynamicModes();
+            currentDrawMode = 'mazeGenerator';
+            drawGrid(); // This will trigger the maze generation within drawGrid
+        }
+
+        // New modes functions (Game of Life and Retro Screensaver)
+        function toggleGameOfLife() {
+            const gameOfLifeButton = document.getElementById('gameOfLifeButton');
+            if (!isGameOfLifeActive) {
+                deactivateAllDynamicModes();
+                isGameOfLifeActive = true;
+                gameOfLifeButton.classList.add('active');
+                currentDrawMode = 'gameOfLife'; // Set currentDrawMode
+
+                // Initialize pixelData for Game of Life (random live/dead cells)
+                const numPixelsX = Math.ceil(canvas.width / pixelSize);
+                const numPixelsY = Math.ceil(canvas.height / pixelSize);
+                const totalPixels = numPixelsX * numPixelsY;
+                pixelData = []; // Use pixelData to store 0 (dead) or 1 (live)
+                for (let i = 0; i < totalPixels; i++) {
+                    pixelData.push(Math.random() > 0.7 ? 1 : 0); // ~30% live cells
+                }
+
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isGameOfLifeActive = false;
+                gameOfLifeButton.classList.remove('active');
+                // Revert to random if no other dynamic mode is active
+                if (!autoRefreshInterval && !isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isRetroScreensaverActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        function toggleRetroScreensaver() {
+            const retroScreensaverButton = document.getElementById('retroScreensaverButton');
+            if (!isRetroScreensaverActive) {
+                deactivateAllDynamicModes();
+                isRetroScreensaverActive = true;
+                retroScreensaverButton.classList.add('active');
+                currentDrawMode = 'retroScreensaver'; // Set currentDrawMode
+
+                // Initialize retroShapes
+                retroShapes = [];
+                const numShapes = 3; // Number of shapes
+                for (let i = 0; i < numShapes; i++) {
+                    const type = Math.random() > 0.5 ? 'square' : 'line';
+                    const size = Math.floor(Math.random() * 3) * pixelSize + pixelSize * 2; // e.g., 2, 3, 4 pixelSize blocks
+                    const x = Math.floor(Math.random() * (canvas.width - size));
+                    const y = Math.floor(Math.random() * (canvas.height - size));
+                    const speed = (2 + Math.random() * 3) * 2.5; // Random speed, multiplied by 2.5
+                    const dx = (Math.random() > 0.5 ? 1 : -1) * speed;
+                    const dy = (Math.random() > 0.5 ? 1 : -1) * speed;
+                    const color = currentColors[Math.floor(Math.random() * currentColors.length)];
+                    retroShapes.push({ x, y, dx, dy, color, type, size });
+                }
+
+                if (!autoRefreshInterval) toggleAutoRefresh();
+                else drawGrid();
+            } else {
+                isRetroScreensaverActive = false;
+                retroScreensaverButton.classList.remove('active');
+                retroShapes = []; // Clear shapes
+                if (!autoRefreshInterval && !isStarryNightActive && !isFallingPixelsActive && !isCrossfadeActive && !isHueShiftActive && !isWaveEffectActive && !isGameOfLifeActive) {
+                    currentDrawMode = 'random';
+                }
+                drawGrid();
+            }
+        }
+
+        // Handle exiting fullscreen with Esc key
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+                if (isFullscreen) {
+                    document.body.classList.remove('fullscreen');
+                    isFullscreen = false;
+                    drawGrid(); // Redraw to adapt to normal size
+                }
+            }
+        });
+
+        // Toggle visibility of button container with 'Q' key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'q' || event.key === 'Q') {
+                sidebarMenu.classList.toggle('hidden');
+                // The help text visibility is now controlled by CSS selector based on sidebar's hidden class
+            }
+        });
+
+
+        // Initialization
+        window.addEventListener('load', drawGrid); // Draw initial grid
+        window.addEventListener('resize', drawGrid); // Redraw grid on resize
+
+        // Event Listeners for buttons
+        document.getElementById('refreshButton').addEventListener('click', drawGrid);
+        document.getElementById('autoRefreshButton').addEventListener('click', toggleAutoRefresh);
+        document.getElementById('starryNightButton').addEventListener('click', toggleStarryNight);
+        document.getElementById('fallingPixelsButton').addEventListener('click', toggleFallingPixels);
+        document.getElementById('resetColorsButton').addEventListener('click', setBaseColors);
+        document.getElementById('blackAndWhiteButton').addEventListener('click', setBlackAndWhite);
+        document.getElementById('randomColorsButton').addEventListener('click', setRandomColors);
+        document.getElementById('analogousPaletteButton').addEventListener('click', generateAnalogousPalette);
+        document.getElementById('sortPixelsButton').addEventListener('click', sortPixels);
+        document.getElementById('sortSpiralButton').addEventListener('click', sortSpiral);
+        document.getElementById('groupPixelsButton').addEventListener('click', groupPixels);
+        document.getElementById('generateLuminosityGradientButton').addEventListener('click', generateLuminosityGradientPalette);
+        document.getElementById('invertColorsButton').addEventListener('click', invertColors);
+        document.getElementById('hueShiftButton').addEventListener('click', toggleHueShift);
+        document.getElementById('crossfadeButton').addEventListener('click', toggleCrossfade);
+        document.getElementById('edgeDetectionButton').addEventListener('click', toggleEdgeDetection);
+        document.getElementById('generateGeometricPatternButton').addEventListener('click', generateGeometricPattern);
+        document.getElementById('generateMapButton').addEventListener('click', generateMap);
+        document.getElementById('doublePixelsButton').addEventListener('click', doublePixels);
+        document.getElementById('fullscreenButton').addEventListener('click', toggleFullscreen);
+        document.getElementById('exportButton').addEventListener('click', exportCanvasAsPNG);
+        document.getElementById('waveEffectButton').addEventListener('click', toggleWaveEffect);
+        document.getElementById('halvePixelsButton').addEventListener('click', halvePixels);
+        document.getElementById('mazeGeneratorButton').addEventListener('click', generateMaze);
+        document.getElementById('gameOfLifeButton').addEventListener('click', toggleGameOfLife); // New
+        document.getElementById('retroScreensaverButton').addEventListener('click', toggleRetroScreensaver); // New
+    </script>
+</body>
+</html>
