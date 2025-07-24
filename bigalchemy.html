@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Little Alchemy Clone - Fusion Aléatoire</title>
+  <style>
+    :root {
+      /* Couleurs pour le mode clair (contraste augmenté) */
+      --bg-color-light: #e6e6e6;
+      --sidebar-bg-light: #f5f5f5;
+      --workspace-bg-light: #d0d0d0;
+      --element-bg-light: #6A9BFF;
+      --floating-bg-light: #ffe0a0;
+
+      /* Couleurs pour le mode sombre (adaptées avec le nouveau bleu foncé) */
+      --bg-color-dark: #121212;
+      --sidebar-bg-dark: #1e1e1e;
+      --workspace-bg-dark: #2c2c2c;
+      --element-bg-dark: #4C75BF;
+      --floating-bg-dark: #4C75BF;
+
+      --glow-color: #3fe03f;
+      --transition-speed: 0.3s;
+    }
+
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      background: var(--bg-color-light);
+      color: #111;
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+    body.dark {
+      background: var(--bg-color-dark);
+      color: #eee;
+    }
+
+    #fixed-controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    #themeToggle, #cleanWorkspaceBtn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2em;
+      background-color: white;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+    }
+    #themeToggle:hover, #cleanWorkspaceBtn:hover {
+      transform: scale(1.1);
+    }
+    #themeToggle:active, #cleanWorkspaceBtn:active, #sort-buttons button:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+
+    body.dark #themeToggle,
+    body.dark #cleanWorkspaceBtn {
+      background-color: #333;
+      color: white;
+    }
+
+    #sidebar {
+      width: 250px;
+      background: var(--sidebar-bg-light);
+      padding: 10px;
+      overflow-y: hidden; /* Changé pour cacher le débordement vertical */
+      border-right: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+    body.dark #sidebar {
+      background: var(--sidebar-bg-dark);
+      border-color: #444;
+      color: #ccc;
+    }
+
+    #tab-container {
+      display: flex;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 10px;
+      flex-shrink: 0; /* Empêche les onglets de rétrécir */
+    }
+    body.dark #tab-container {
+      border-color: #444;
+    }
+    .tab-button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 1em;
+      color: #666;
+      transition: color 0.3s, border-bottom 0.3s;
+      border-bottom: 3px solid transparent;
+    }
+    body.dark .tab-button {
+      color: #888;
+    }
+    .tab-button.active {
+      color: #111;
+      font-weight: bold;
+      border-bottom: 3px solid var(--element-bg-light);
+    }
+    body.dark .tab-button.active {
+      color: #eee;
+      border-bottom-color: var(--element-bg-dark);
+    }
+
+    #search {
+      margin-top: 10px; /* Ajusté pour être après les listes */
+      padding: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      transition: background var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed), box-shadow 0.2s ease;
+      background: #fff;
+      color: #000;
+      flex-shrink: 0;
+    }
+    #search:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+      border-color: #666;
+    }
+    body.dark #search {
+      background: #222;
+      color: #ddd;
+      border-color: #555;
+    }
+    body.dark #search:hover {
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+      border-color: #888;
+    }
+
+    #sort-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+    #sort-buttons button {
+      flex: 1;
+      min-width: 80px;
+      padding: 5px 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.85em;
+      background: #4A6B7F;
+      color: white;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    #sort-buttons button:hover {
+      background: #3B5B6F;
+      transform: translateY(-1px);
+    }
+    body.dark #sort-buttons button {
+      background: #3A3A3A;
+    }
+    body.dark #sort-buttons button:hover {
+      background: #4A4A4A;
+    }
+    #sort-buttons button.active {
+      background: #3fe03f;
+      font-weight: bold;
+      color: #222;
+    }
+    body.dark #sort-buttons button.active {
+      background: #3fe03f;
+      color: #222;
+    }
+    
+    .list-container {
+        flex: 1; /* Permet au conteneur de prendre l'espace restant */
+        overflow-y: auto; /* Ajoute une barre de défilement si nécessaire */
+        min-height: 0; /* Essentiel pour que flexbox fonctionne correctement */
+    }
+
+    #elements-list, #undiscovered-list {
+      user-select:none;
+    }
+    #undiscovered-list {
+        display: none;
+    }
+
+    .undiscovered-element {
+        filter: grayscale(1);
+        opacity: 0.6;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    #workspace {
+      flex: 1;
+      position: relative;
+      background: var(--workspace-bg-light);
+      transition: background var(--transition-speed);
+      overflow: hidden;
+    }
+    body.dark #workspace {
+      background: var(--workspace-bg-dark);
+    }
+
+    canvas#backgroundCanvas, canvas#constellationCanvas {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .element {
+      display: inline-block;
+      padding: 5px 10px;
+      margin: 5px;
+      background: var(--element-bg-light);
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: background var(--transition-speed), color var(--transition-speed), box-shadow 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+      color: #000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+    }
+    .element:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    body.dark .element {
+      background: var(--element-bg-dark);
+      color: #eee;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    }
+    body.dark .element:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.9);
+    }
+    .element:active {
+      cursor: grabbing;
+    }
+    
+    .floating-element {
+      position: absolute;
+      padding: 5px 10px;
+      background: var(--floating-bg-light);
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      cursor: move;
+      user-select: none;
+      white-space: nowrap;
+      transition:
+        transform var(--transition-speed) ease,
+        opacity var(--transition-speed) ease,
+        box-shadow 0.2s ease,
+        background var(--transition-speed),
+        border-color var(--transition-speed),
+        color var(--transition-speed),
+        text-shadow 0.2s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+      color: #000;
+      z-index: 1;
+    }
+    .floating-element:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    }
+    body.dark .floating-element {
+      background: var(--floating-bg-dark);
+      border-color: var(--floating-bg-dark);
+      color: #e0eaff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.15);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    body.dark .floating-element:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.95);
+    }
+
+    .combine-animation { animation: pop 0.4s ease forwards; }
+    .glow { box-shadow: 0 0 12px 4px var(--glow-color); border-color: var(--glow-color); transition: box-shadow 0.2s ease, border-color 0.2s ease; }
+    .can-combine-glow { box-shadow: 0 0 15px 5px var(--glow-color); border-color: var(--glow-color); transition: box-shadow 0.15s ease, border-color 0.15s ease; }
+    @keyframes pop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
+    @keyframes fadeOutAndShrink { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.5); } }
+    .disappear-animation { animation: fadeOutAndShrink 0.3s ease-out forwards; pointer-events: none; }
+    @keyframes newElementHighlight { 0% { transform: scale(1); box-shadow: 0 0 0 0 transparent; background-color: inherit; } 25% { transform: scale(1.15); box-shadow: 0 0 25px 8px var(--glow-color); background-color: var(--glow-color); color: #222; } 75% { transform: scale(1.05); box-shadow: 0 0 10px 4px var(--glow-color); } 100% { transform: scale(1); box-shadow: initial; background-color: inherit; color: inherit; } }
+    .new-element-animation { animation: newElementHighlight 1s ease-out; }
+    @keyframes fadeInScale { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
+    .element.animate-in { animation: fadeInScale 0.3s ease-out forwards; }
+  </style>
+</head>
+<body class="dark">
+  <div id="fixed-controls">
+    <button id="cleanWorkspaceBtn">🧹</button>
+    <button id="themeToggle"></button>
+  </div>
+
+  <div id="sidebar">
+    <div id="tab-container">
+        <button id="tab-discovered" class="tab-button active">Découverts</button>
+        <button id="tab-undiscovered" class="tab-button">À découvrir</button>
+    </div>
+
+    <div class="list-container">
+        <div id="elements-list"></div>
+        <div id="undiscovered-list"></div>
+    </div>
+    
+    <div id="sort-buttons">
+        <button id="sortByAge" class="active">Par Âge</button>
+        <button id="sortByName">Par Nom</button>
+        <button id="sortByEmoji">Par Emoji</button>
+        <button id="sortByRandom">Aléatoire</button>
+    </div>
+    <input id="search" type="text" placeholder="🔍 Rechercher..." autocomplete="off" />
+  </div>
+
+  <div id="workspace">
+    <canvas id="backgroundCanvas"></canvas>
+    <canvas id="constellationCanvas"></canvas>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      
+      const recipes = {};
+      const emojis = {};
+      let allElementNames = [];
+
+      // --- CORRECTION : Voici la liste COMPLÈTE de vos éléments ---
+      const elementsJsonContent = [
+        "🧬ADN","🧲aimant","✈️avion","💡ampoule","🧡ambre","💜améthyste","🐜fourmi","🧭boussole","🏹chasse","🏛️temple","⛺camping","🚗conduite","⚙️engrenage","🪓hache","🐴crin","🐃corne","🐘ivoire","🐢écaille","💀os","🩸sang","🥛lait","🧈graisse","🥩viande","🐟poisson","🧹poussière","⚪chaux","🌳mousse","🍄lichen","🌿algue","🔬plancton","🍽️nutriment","🍬sucre","🧂sel","🌶️épice","🍶huile","🧪vinaigre","🍷alcool","🍞levure","🦠bactérie","🦠virus","🧬gène","🔬protéine","🧪acide","🧪base","🧪solution","⚗️mélange","💨gaz","💧liquide","🧱solide","✨plasma","🌌vide","⏳temps","🌐espace","✊force","🎯pression","🌡️température","🔊son","🌟lumière","🌑ombre","🎨couleur","👃odeur","👅goût","✋toucher","👀vision","👂ouïe","👃odorat","🤸équilibre","🤕douleur","😊plaisir","🤔conscience","🧠pensée","💡mémoire","😴rêve","👻esprit","🙏âme","🚶corps","💖vie","💀mort","👶naissance","🌱croissance","📈évolution","🔄changement","🏃mouvement","🧘repos","💼travail","⚡énergie","🚀vitesse","📏distance","⚖️masse","🏺volume","⚖️densité","⚖️poids","♨️chaleur","🥶froid","〰️onde","⚛️particule","⚛️atome","⚛️molécule","🔬cellule","🩸tissu","🧡organe","⚙️système","🌿organisme","🐾espèce","👥population","🌲écosystème","🌍biosphère","🪐planète","💫cosmos","🌌univers","🪨ardoise","💎opale","🔶topaze","💙saphir","💚émeraude","🔴rubis","🟡citrine","⚪zircon","🖤onyx","⚪nacre","🦷défense","🦴phalange","🦴vertèbre","🦴crâne","🦴mâchoire","🦴clavicule","🦴côte","🦴tibia","🦴fémur","🧬cartilage","💅kératine","🦷émail","🦷dentine","🦷pulpe","🪵écorce","🌳rameau","🌲tronc","🌳racine","🪵souche","🪵planche","🪵poutre","🪵copeau","🪵sciure","🪵bûche","🪵sarment","🪚liège","🧺osier","🎋roseau","🌾paille","🌾foin","🌾son","🌾farine","🍞levain","🍞mie","🍞croûte","🍚amidon","🍚grain","🍬sirop","🍮mélasse","🍯nectar","🍯pollen","🐝ruche","🪱ver","🐛chenille","🦋chrysalide","🦋papillon","🦗criquet","🐞coccinelle","🕷️araignée","🦂scorpion","🦟moustique","🪰mouche","🪲scarabée","🦗cigale","🦗grillon","🐌escargot","🦪moule","🦪huître","🦞crabe","🦐crevette","🦑calamar","🐙pieuvre","🐠nageoire","🐠écaille","🦈aileron","🐡poisson","🐬dauphin","🐳baleine","🐊reptile","🐍serpent","🦎lézard","🐢tortue","🐸grenouille","🐥oisillon","🐣poussin","🥚coque","🥚blanc","🥚jaune","🦢duvet","🐓crête","🐓barbillon","🐓plume","🐈poil","🐕mue","🐑toison","🐐corne","🐴sabot","🐄pis","🐖lard","🥩filet","🥩côte","🥩gigot","🥩jarret","🍗cuisse","🍗poitrine","🥓bacon","🌭saucisse","🍕jambon","🧂saumure","🍶laiton","🔩boulon","🧲aimant","💡bobine","🔌fil","⚡circuit","🔌diode","💻puce","📡antenne","📡onde","📻radio","📺écran","🔦lampe","💡ampoule","🔌câble","⛓️chaîne","🔗maillon","🪢nœud","🎗️ruban","🧣écharpe","🧤gant","🧦chaussette","👚manche","👖jambe","👗jupe","🧥col","👕bouton","👕fermeture","🎒bretelle","👛fermoir","🔑serrure","🚪charnière","🪟vitre","🧱brique","🪨moellon","🪨granulat","🪨pavé","🪨dallage","🪨tuile","🪨bardeaux","🪚planche","🪚poutre","🪚chevrons","🔩vis","🔨clou","🔩écrou","🔨rondelle","🔨rivet","🔨goujon","🔨goupille","🪛tournevis","🔧clé","🪚scie","🪓hache","⛏️pelle","⛏️pioche","⛏️marteau","🪚rabot","🪛burin","🪛ciseau","🪛lime","🪛râpe","🪛étau","🪛perceuse","🪛foret","⚙️moteur","⚙️roue","⚙️essieu","⚙️piston","⚙️cylindre","⚙️arbre","⚙️palier","⚙️ressort","⚙️frein","⚙️embrayage","⚙️radiateur","⚙️carburateur","⚙️injecteur","⚙️pompe","⚙️valve","⚙️joint","⚙️turbine","⚙️hélice","⚙️réacteur","⚙️propulseur","⚙️fusée","🚀satelite","🛰️sonde","🔭télescope","🔬microscope","⚖️balance","📏mètre","📐règle","📐compas","📐équerre","🧮calculatrice","🧮ordinateur","🖥️clavier","🖱️souris","🖨️imprimante","⚙️processeur","💾mémoire","💿disque","📡routeur","🌐internet","☁️cloud","💾fichier","📄document","🖼️image","🎶son","🎬vidéo","📧email","💬message","📞appel","🗣️voix","🗣️parole","👂écoute","👁️regard","👃respiration","👅gustation","🖐️sensation","🧠intuition","🧠raison","🧠logique","🧠créativité","🧠imagination","🧠mémoire","🧠apprentissage","🧠sagesse","🧠connaissance","🧠compréhension","🧠intelligence","🧠réflexion","🧠conscience","🧠subconscient","🧠inconscient","💭rêve","🌙sommeil","☀️éveil","🚶marche","🏃course","🤸saut","🏊nage","🚴vélo","🚗conduite","✈️vol","🚀propulsion","⚓ancre","🗺️carte","📍point","📏ligne","📐angle","📐courbe","📐cercle","📐spirale","📐triangle","📐carré","📐rectangle","📐polygone","📐sphère","📐cube","📐cône","📐cylindre","📐pyramide","📐prisme","📐tore","⚛️quantum","⚛️photon","⚛️électron","⚛️proton","⚛️neutron","⚛️noyau","⚛️quarks","⚛️leptons","⚛️bosons","⚛️fermions","⚛️graviton","⚛️gluon","⚛️onde","⚛️champ","⚛️force","⚛️gravité","⚛️électromagnétisme","⚛️nucléaire","⚛️faible","⚛️fort","⚛️température","⚛️pression","⚛️densité","⚛️viscosité","⚛️conductivité","⚛️résistivité","⚛️réfraction","⚛️réflexion","⚛️absorption","⚛️émission","⚛️diffusion","⚛️dispersion","⚛️interférence","⚛️diffraction","⚛️polarisation","⚛️fréquence","⚛️longueur","⚛️amplitude","⚛️phase","⚛️vitesse","⚛️accélération","⚛️momentum","⚛️énergie","⚛️travail","⚛️puissance","⚛️chaleur","⚛️froid","⚛️entropie","⚛️enthalpie","⚛️thermodynamique","⚛️mécanique","⚛️optique","⚛️acoustique","⚛️électricité","⚛️magnétisme","⚛️chimie","⚛️biologie","⚛️géologie","⚛️astronomie","⚛️météorologie","⚛️océanographie","⚛️écologie","⚛️paléontologie","⚛️archéologie","⚛️histoire","⚛️géographie","⚛️sociologie","⚛️psychologie","⚛️philosophie","⚛️éthique","⚛️justice","⚛️liberté","⚛️égalité","⚛️fraternité","⚛️démocratie","⚛️république","⚛️monarchie","⚛️tyrannie","⚛️anarchie","⚛️communisme","⚛️socialisme","⚛️capitalisme","⚛️économie","⚛️commerce","⚛️finance","⚛️banque","⚛️monnaie","⚛️impôt","⚛️dette","⚛️crédit","⚛️marché","⚛️offre","⚛️demande","⚛️production","⚛️consommation","⚛️investissement","⚛️travail","⚛️emploi","⚛️chômage","⚛️salaire","⚛️pauvreté","⚛️richesse","⚛️classe","⚛️société","⚛️culture","⚛️tradition","⚛️coutume","⚛️religion","⚛️mythe","⚛️légende","⚛️folklore","⚛️art","🎨peinture","🎨sculpture","🎨dessin","🎨gravure","🎨musique","🎶chant","🎶danse","🎭théâtre","🎬cinéma","📚littérature","📜poésie","📖roman","📜nouvelle","📜essai","📜biographie","📜autobiographie","📜dictionnaire","📜encyclopédie","📜manuel","📜journal","📰magazine","🌐site","📲application","🎮jeu","🏆sport","⚽football","🏀basketball","🎾tennis","🏐volleyball","🏉rugby","⚾baseball","🏒hockey","🥊boxe","🥋judo","🧘yoga","🏃athlétisme","🚴cyclisme","🏊natation","⛵voile","🎣pêche","🏹chasse","🏕️camping","🚶randonnée","⛰️escalade","⛷️ski","🏂snowboard","🏄surf","🧘méditation","🙏prière","🕯️rituel","⛪temple","🕌mosquée","🕍synagogue","⛪église","🙏culte","🕊️paix","⚔️guerre","🔫arme","🛡️armure","💥bombe","💣missile","💥explosion","💥ruine","💥destruction","💥catastrophe","💥désastre","💥crise","💥chaos","💥ordre","💥harmonie","💥équilibre","💥justice","💥loi","💥règle","💥principe","💥valeur","💥vertu","💥vice","💥péché","💥pardon","💥rédemption","💥salut","💥enfer","💥paradis","💥ange","💥démon","💥fantôme","💥monstre","💥dragon","💥fée","💥gnome","💥elfe","💥nain","💥géant","💥humain","💥homme","💥femme","💥enfant","💥famille","💥amour","💥amitié","💥haine","💥peur","💥joie","💥tristesse","💥colère","💥surprise","💥dégout","💥honte","💥culpabilité","💥fierté","💥courage","💥lâcheté","💥espoir","💥désespoir","💥optimisme","💥pessimisme","💥sourire","💥pleur","💥rire","💥chuchotement","💥cri","💥silence","💥bruit","💥musique","💥rythme","💥mélodie","💥harmonie","💥dissonance","💥accord","💥note","💥clé","💥gamme","💥instrument","💥voix","💥chœur","💥orchestre","💥bande","💥groupe","💥soliste","💥duo","💥trio","💥quatuor","💥quintette","💥sextuor","💥septuor","💥octuor","💥ensemble","💥concert","💥récital","💥spectacle","💥représentation","💥performance","💥artisanat","💥savoir-faire","💥compétence","💥talent","💥don","💥aptitude","💥capacité","💥potentiel","💥limite","💥défi","💥opportunité","💥choix","💥décision","💥action","💥conséquence","💥résultat","💥succès","💥échec","💥victoire","💥défaite","💥progrès","💥régression","💥stagnation","💥développement","💥croissance","💥déclin","💥cycle","💥saison","💥printemps","💥été","💥automne","💥hiver","💥matin","💥jour","💥soir","💥nuit","💥aube","💥crépuscule","💥minuit","💥midi","💥heure","💥minute","💥seconde","💥instant","💥éternité","💥passé","💥présent","💥futur","💥mémoire","💥oubli","💥souvenir","💥nostalgie","💥anticipation","💥attente","💥surprise","💥hasard","💥destin","💥fortune","💥malheur","💥chance","💥malchance","💥événement","💥circonstance","💥situation","💥contexte","💥relation","💥connexion","💥lien","💥réseau","💥système","💥structure","💥organisation","💥hiérarchie","💥communauté","💥groupe","💥individu","💥société","💥civilisation","💥culture","💥tradition","💥innovation","💥progrès","💥révolution","💥évolution","💥changement","💥continuité","💥stabilité","💥équilibre","💥déséquilibre","💥conflit","💥coopération","💥collaboration","💥compétition","💥rivalité","💥paix","💥guerre","💥alliance","💥traité","💥accord","💥pacte","💥serment","💥promesse","💥vérité","💥mensonge","💥secret","💥révélation","💥doute","💥certitude","💥foi","💥croyance","💥religion","💥dogme","💥hérésie","💥rite","💥cérémonie","💥fête","💥célébration","💥jubilé","💥anniversaire","💥naissance","💥baptême","💥mariage","💥enterrement","💥deuil","💥commémoration","💥héritage","💥patrimoine","💥légat","💥testament","💥don","💥cadeau","💥dette","💥créance","💥prêt","💥emprunt","💥argent","💥pièce","💥billet","💥monnaie","💥fortune","💥richesse","💥pauvreté","💥misère","💥abondance","💥manque","💥besoin","💥désir","💥envie","💥satisfaction","💥frustration","💥plaisir","💥douleur","💥bonheur","💥malheur","💥bien","💥mal","💥vertu","💥vice","💥péché","💥grâce","💥bénédiction","💥malédiction","💥châtiment","💥récompense","💥punition","💥justice","💥injustice","💥droit","💥devoir","💥responsabilité","💥liberté","💥esclavage","💥tyrannie","💥oppression","💥rébellion","💥révolution","💥changement","💥progrès","💥déclin","💥cycle","💥fin","💥début","🇫🇷Paris","🗽New York","🗼Tokyo","🇬🇧Londres","🇮🇹Rome","🇪🇬Le Caire","🇧🇷Rio de Janeiro","🇨🇳Shanghai","🇮🇳New Delhi","🇦🇺Sydney","🇦🇷Buenos Aires","🇨🇦Toronto","🇲🇽Mexico","🇿🇦Johannesburg","🇷🇺Moscou","🇩🇪Berlin","🇪🇸Madrid","🇳🇱Amsterdam","🇧🇪Bruxelles","🇦🇹Vienne","🇨🇭Genève","🇸🇬Singapour","🇹🇭Bangkok","🇰🇷Séoul","🇮🇱Jérusalem","🇬🇷Athènes","🇮🇪Dublin","🇵🇹Lisbonne","🇹🇷Istanbul","🇨🇱Santiago","🇵🇪Lima","🇨🇴Bogota","🇻🇪Caracas","🇵🇰Karachi","🇧🇩Dhaka","🇳🇬Lagos","🇸🇦Riyad","🇶🇦Doha","🇦🇪Dubaï","🇮🇩Jakarta","🇵🇭Manille","🇻🇳Hanoï","🇰🇪Nairobi","🇲🇦Casablanca","🇨🇺La Havane","🇮🇸Reykjavik","🇫🇮Helsinki","🇳🇴Oslo","🇸🇪Stockholm","🇩🇰Copenhague","👨‍🔬Einstein","👩‍🔬Marie Curie","🎨Léonard de Vinci","✍️Shakespeare","👑Cléopâtre","⚔️Napoléon","✝️Jésus","🌍Christophe Colomb","🎤Michael Jackson","👑Élizabeth II","☯️Confucius","🧘Bouddha","🎤Elvis Presley","✍️Victor Hugo","🔬Galilée","👑Jeanne d'Arc","🎨Picasso","🎼Mozart","🎸Jimi Hendrix","🏀Michael Jordan","🥋Bruce Lee","🗳️Nelson Mandela","🗳️Abraham Lincoln","🗳️Gandhi","📚Jane Austen","💻Steve Jobs","💻Bill Gates","🚀Elon Musk","📚J.K. Rowling","🎤Freddie Mercury","🎭Charlie Chaplin","💃Marilyn Monroe","👨‍🚀Neil Armstrong","👨‍🍳Gordon Ramsay","👩‍🍳Julia Child","🎩Walt Disney","📚Stephen King","🎤Beyoncé","⚽Pelé","⚽Maradona","🏎️Michael Schumacher","🎿Roger Federer","🎾Serena Williams","🏎️Lewis Hamilton","🏎️Ayrton Senna","👩‍⚕️Florence Nightingale","🗳️Martin Luther King","👑Louis XIV","✍️Molière","🎨Vincent van Gogh","🧱Minecraft","🍄Super Mario","🔫Fortnite","🧩Tetris","🗡️The Legend of Zelda","🌍World of Warcraft","🚗Grand Theft Auto","💻Cyberpunk 2077","👽Halo","🗡️Elder Scrolls","🤖Pac-Man","👻Among Us","💥Call of Duty","🏎️Mario Kart","🚀Space Invaders","👾Pokémon","⚔️Final Fantasy","🪓God of War","🌃Red Dead Redemption","📦Portal","🕵️Assassin's Creed","🎮FIFA","🏀NBA 2K","🥋Mortal Kombat","🥋Street Fighter","🏎️Gran Turismo","📦Fallout","🏹Skyrim","🤖Detroit: Become Human","🐺The Witcher","🧟Resident Evil","🌃Silent Hill","🎮Overwatch","⚽Rocket League","🎵Guitar Hero","💃Just Dance","🎯Destiny","🤖Borderlands","🤖Apex Legends","🕹️Pong","👾Donkey Kong","🚀Asteroids","🐍Snake","🎮Candy Crush","🕵️Hitman","🎮Dark Souls","🐉Elden Ring","💥Doom","👾Half-Life","🦁lion","🐘éléphant","🦒girafe","🐅tigre","🐻ours","🐼panda","🦊renard","🐺loup","🦌cerf","🐇lapin","🐿️écureuil","🦇chauve-souris","🦉hibou","🦅aigle","🦜perroquet","🦢cygne","🕊️colombe","🦋papillon","🐝abeille","🐞coccinelle","🐜fourmi","🦗sauterelle","🕷️araignée","🐍cobra","🐊alligator","🐠requin","🐙pieuvre","🐳dauphin","🦍gorille","🐵singe","🐨koala","🦙lama","🐪chameau","🦘kangourou","🐧manchot","🦩flamant rose","🦉chouette","🦉harfang","🐺coyote","🐻grizzly","🐅léopard","🦌renne","🦨mouffette","🦡blaireau","🦦loutre","🦫castor","🦝raton laveur","🦊fennec","🐒chimpanzé","🦒okapi","🦓zèbre","🦛hippopotame","🦏rhinocéros","🐘mammouth","🦖dinosaure","🐉dragon","🦄licorne","🧜‍♀️sirène","🧚fée","🧙magicien","🧟zombie","🧛vampire","🐺loup-garou","👻fantôme","👽alien","🤖robot","🚀fusée","🛰️satellite","🔭télescope","🔬microscope","📱smartphone","💻ordinateur","🖥️écran","⌨️clavier","🖱️souris","🔌prise","🔋batterie","💡ampoule","🔦lampe de poche","📻radio","📺télévision","📸appareil photo","🎥caméra","🎤microphone","🎧casque","🗣️haut-parleur","🖨️imprimante","💿disque","💾clé USB","🌐internet","☁️nuage (informatique)","🔐cybersécurité","🔑clé (cryptographie)","📈graphique","📊tableau","📝document","📚livre","📰journal","📝plume","✏️crayon","✒️encre","📏règle","✂️ciseaux","📎trombone","📌épingle","🗓️calendrier","⏰réveil","⏱️chronomètre","⏳sablier","🗺️carte","📍épingle de carte","🧭boussole","🔭jumelles","🎒sac à dos","💼mallette","👛porte-monnaie","🔑clé (physique)","🚪porte","🪟fenêtre","🏠maison","🏢immeuble","🏫école","🏥hôpital","🏪magasin","🏭usine","🚜tracteur","🏗️grue","🚛camion","🚚fourgonnette","🚐minibus","🚌bus","🚂train","🚇métro","🚄TGV","🚢navire","🛥️yacht","🛶kayak","⛵voilier","🚤hors-bord","🚁hélicoptère","✈️avion","🛰️navette spatiale","🌠étoile filante","🌌nébuleuse","🔭constellation","🪐galaxie","☀️comète","☄️astéroïde","🌕planète","🌑mercure","⚪vénus","🔴mars","🔵jupiter","🟢saturne","🟠uranus","🟣neptune","🔵pluton","🪐lune","💫étoile","☀️soleil","✨univers","🌈arc-en-ciel","⚡orage","🌪️tornade","🌊tsunami","🌋volcan","⛰️montagne","🏞️vallée","🏜️canyon","🏝️île","🏖️plage","🌲forêt","🌳arbre fruitier","🌿arbuste","🎋bambou","🌾blé","🌽maïs","🥕carotte","🥔pomme de terre","🧅oignon","🍅tomate","🌶️piment","🥒concombre","🍆aubergine","🥦brocoli","🥬laitue","🍊orange","🍋citron","🍎pomme","🍐poire","🍓fraise","🍇raisin","🍉pastèque","🥝kiwi","🍍ananas","🥥noix de coco","🥭mangue","🥑avocat","🍌banane","🍒cerise","🍑pêche","🫐myrtille","🌰châtaigne","🥜cacahuète","🍞pain","🥐croissant","🥖baguette","🍕pizza","🍔hamburger","🍟frites","🌭hot-dog","🌮taco","🍜nouilles","🍣sushi","🍚riz","🍝pâtes","🍲soupe","🍛curry","🍳œuf (plat)","🥞crêpe","🧇gaufre","🍩donut","🍪cookie","🍰gâteau","🍦glace","🍫chocolat","🍬bonbon","🍭sucre d'orge","🍯miel","☕café","🍵thé","🥛lait","🥤soda","🍷vin","🍺bière","🍸cocktail","🥂champagne","🍾bouteille","🍴fourchette","🥄cuillère","🔪couteau","🍽️assiette","🥣bol","🥛verre","☕tasse","🍳poêle","🍲casserole","🔪planche à découper","🧊glaçon","🧂sel","🌶️poivre","🌿herbe aromatique","🧄ail","🧅oignon","🥔gingembre","🥕carotte","🥦chou","💨vapeur","🌫️brume","☁️nuage","🌧️pluie","🌈arc-en-ciel","❄️neige","🧊glace","❄️gel","🌊océan","🏞️lac","💧rivière","💦goutte","🌋lave","🪨pierre","⛰️roche","🏔️montagne","🏖️sable","🏜️désert","🌬️dune","🌳arbre","🪵bois","🌿feuille","🌸fleur","🍄champignon","🌾herbe","🌱graine","🍎fruit","🥕légume","🌾céréale","🌻pollen","🍯miel","🐝cire","🥚œuf","🦴os","🪶plume","🧶laine","🧵coton","🎋fibre","🪹nid","🕸️toile","🐚coquille","💎cristal","✨gemme","💡lumière","🌑obscurité","⚡foudre","💥étincelle","⭐étoile","☄️météore","🌕lune","☀️soleil","🌌galaxie","🌀vent","🌪️tornade","🧊grêle","🌨️givre","💧rosée","🧊stalagmite","🧊stalactite","💧source","🌫️brouillard","💧flotte","💧humide","💧mouillé","☀️sec","🟤glaise","🪨gravier","🗿rocher","⚪galet","🔪silex","💎quartz","🪨granit","⚪calcaire","🌋basalte","🏺argile","🖊️craie","🗿marbre","🖋️ardoise","🪨gneiss","🪨obsidienne","🫧ponce","⛏️schiste","⏳grès","🧪gypse","🍂tourbe","⛏️minerai","⬛charbon","💎diamant","🌟or","🥈argent","🟫cuivre","⛓️fer","🥫étain","🥉bronze","🔪acier","🧪mercure","🧪soufre","🥛verre","🧱ciment","🩹plâtre","⚫goudron","⚫bitume","🛢️pétrole","⛽gaz","🛍️plastique","🚗caoutchouc","🌲résine","🌳sève","🧼gomme"," ashes","📜papier","📦carton","👕tissu","👜cuir","👘soie","🌿lin","🎋chanvre","🎍jute","🌿bambou","🧺rotin","🌊corail","🩸cendres"
+      ];
+      
+      function parseElements(list) {
+        const baseElements = { "air": "🌬️", "eau": "💧", "feu": "🔥", "terre": "🌍" };
+        for (const name in baseElements) {
+            if (!emojis[name]) {
+                emojis[name] = baseElements[name];
+                allElementNames.push(name);
+            }
+        }
+        list.forEach(item => {
+          const firstLetterMatch = item.match(/[a-zA-ZÀ-ÿ]/);
+          if (firstLetterMatch) {
+            const index = firstLetterMatch.index;
+            const emoji = item.substring(0, index).trim();
+            const name = item.substring(index).trim();
+            if (name && !emojis[name]) {
+              emojis[name] = emoji;
+              allElementNames.push(name);
+            }
+          }
+        });
+      }
+      parseElements(elementsJsonContent);
+
+      const startingElements = ["air", "eau", "feu", "terre"];
+      const discovered = new Map();
+      const FUSION_TOLERANCE = 50;
+
+      // Références aux éléments du DOM
+      const elementsList = document.getElementById("elements-list");
+      const undiscoveredList = document.getElementById("undiscovered-list");
+      const tabDiscovered = document.getElementById("tab-discovered");
+      const tabUndiscovered = document.getElementById("tab-undiscovered");
+      const sortButtonsContainer = document.getElementById("sort-buttons");
+      
+      const workspace = document.getElementById("workspace");
+      const searchInput = document.getElementById("search");
+      const themeToggle = document.getElementById("themeToggle");
+      const cleanWorkspaceBtn = document.getElementById("cleanWorkspaceBtn");
+      const sortByAgeBtn = document.getElementById("sortByAge");
+      const sortByNameBtn = document.getElementById("sortByName");
+      const sortByEmojiBtn = document.getElementById("sortByEmoji");
+      const sortByRandomBtn = document.getElementById("sortByRandom");
+      const backgroundCanvas = document.getElementById("backgroundCanvas");
+      const backgroundCtx = backgroundCanvas.getContext("2d");
+      const constellationCanvas = document.getElementById("constellationCanvas");
+      const constellationCtx = constellationCanvas.getContext("2d");
+      const sidebar = document.getElementById("sidebar");
+
+      let currentSortType = 'age';
+
+      // Code pour le fond animé (inchangé)
+      const POINT_COUNT = 150;
+      const points = [];
+      function randomSpeed() { return (Math.random() - 0.5) * 0.1; }
+      function initializeConstellationPoints() {
+        points.length = 0;
+        for(let i=0; i<POINT_COUNT; i++) {
+          points.push({ x: Math.random() * constellationCanvas.width, y: Math.random() * constellationCanvas.height, vx: randomSpeed(), vy: randomSpeed(), radius: 1.5 + Math.random() * 1.5, highlighted: false });
+        }
+      }
+      function resizeCanvas() {
+        const workspaceRect = workspace.getBoundingClientRect();
+        backgroundCanvas.width = workspaceRect.width;
+        backgroundCanvas.height = workspaceRect.height;
+        constellationCanvas.width = workspaceRect.width;
+        constellationCanvas.height = workspaceRect.height;
+        if(workspaceRect.width > 0) { // Ne redessine que si la zone est visible
+            initializeConstellationPoints();
+        }
+      }
+      window.addEventListener("resize", resizeCanvas);
+      const gridSpacing = 30;
+      function drawGrid() {
+        backgroundCtx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+        const isDark = document.body.classList.contains("dark");
+        backgroundCtx.fillStyle = isDark ? "rgba(255,255,255,0.1)" : "rgba(50,50,50,0.15)";
+        for(let x=0; x < backgroundCanvas.width; x += gridSpacing) {
+          for(let y=0; y < backgroundCanvas.height; y += gridSpacing) {
+            backgroundCtx.beginPath();
+            backgroundCtx.arc(x, y, 1, 0, 2 * Math.PI);
+            backgroundCtx.fill();
+          }
+        }
+      }
+      const maxDistance = 100;
+      function drawConstellations() {
+        constellationCtx.clearRect(0, 0, constellationCanvas.width, constellationCanvas.height);
+        const isDark = document.body.classList.contains("dark");
+        const pointColor = isDark ? "rgba(255,255,255,0.8)" : "rgba(30,30,30,0.8)";
+        const lineColor = isDark ? "rgba(255,255,255,0.3)" : "rgba(30,30,30,0.3)";
+        constellationCtx.lineWidth = 1;
+        points.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if(p.x < 0 || p.x > constellationCanvas.width) p.vx = -p.vx;
+          if(p.y < 0 || p.y > constellationCanvas.height) p.vy = -p.vy;
+        });
+        points.forEach(p => {
+          constellationCtx.beginPath();
+          constellationCtx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+          constellationCtx.fillStyle = p.highlighted ? "rgba(255, 255, 0, 1)" : pointColor;
+          constellationCtx.shadowBlur = p.highlighted ? 15 : 0;
+          constellationCtx.shadowColor = p.highlighted ? "rgba(255, 255, 0, 0.8)" : "transparent";
+          constellationCtx.fill();
+        });
+        for(let i=0; i < POINT_COUNT; i++) {
+          for(let j=i+1; j < POINT_COUNT; j++) {
+            const p1 = points[i];
+            const p2 = points[j];
+            const dist = Math.hypot(p1.x-p2.x, p1.y-p2.y);
+            if(dist < maxDistance) {
+              constellationCtx.beginPath();
+              constellationCtx.moveTo(p1.x, p1.y);
+              constellationCtx.lineTo(p2.x, p2.y);
+              constellationCtx.strokeStyle = lineColor;
+              constellationCtx.stroke();
+            }
+          }
+        }
+        const floatingElements = document.querySelectorAll(".floating-element");
+        floatingElements.forEach(el => {
+            const elRect = el.getBoundingClientRect();
+            const elCenterX = (elRect.left + elRect.width / 2) - workspace.getBoundingClientRect().left;
+            const elCenterY = (elRect.top + elRect.height / 2) - workspace.getBoundingClientRect().top;
+            let closestPoint = null;
+            let minDistance = Infinity;
+            points.forEach(p => {
+                const dist = Math.hypot(elCenterX - p.x, elCenterY - p.y);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestPoint = p;
+                }
+            });
+            if (closestPoint) {
+                constellationCtx.beginPath();
+                constellationCtx.moveTo(elCenterX, elCenterY);
+                constellationCtx.lineTo(closestPoint.x, closestPoint.y);
+                constellationCtx.strokeStyle = lineColor;
+                constellationCtx.lineWidth = 1;
+                constellationCtx.stroke();
+            }
+        });
+      }
+      function animateBackground() {
+        drawGrid();
+        drawConstellations();
+        requestAnimationFrame(animateBackground);
+      }
+
+      function addElementToSidebar(name) {
+        const el = document.createElement("div");
+        el.className = "element";
+        el.setAttribute("data-name", name);
+        el.textContent = emojis[name] ? emojis[name] + " " + name : name;
+        el.setAttribute("draggable", "true");
+        el.addEventListener("dragstart", e => {
+          e.dataTransfer.setData("text/plain", name);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+        el.addEventListener("click", () => spawnElementRandomly(name));
+        elementsList.appendChild(el);
+        setTimeout(() => el.classList.add('animate-in'), 10);
+      }
+      
+      function addUndiscoveredElementToSidebar(name) {
+        const el = document.createElement("div");
+        el.className = "element undiscovered-element";
+        el.setAttribute("data-name", name);
+        el.textContent = emojis[name] ? emojis[name] + " " + name : "? " + name;
+        undiscoveredList.appendChild(el);
+      }
+
+      function renderElementsList(sortType = currentSortType) {
+        elementsList.innerHTML = '';
+        undiscoveredList.innerHTML = '';
+        currentSortType = sortType;
+
+        document.querySelectorAll('#sort-buttons button').forEach(button => {
+          button.classList.toggle('active', button.id === `sortBy${sortType.charAt(0).toUpperCase() + sortType.slice(1)}`);
+        });
+
+        let discoveredArray = Array.from(discovered.entries()).map(([name, time]) => ({ name: name, time: time, emoji: emojis[name] || '' }));
+        switch (sortType) {
+          case 'age': discoveredArray.sort((a, b) => a.time - b.time); break;
+          case 'name': discoveredArray.sort((a, b) => a.name.localeCompare(b.name)); break;
+          case 'random': discoveredArray.sort(() => Math.random() - 0.5); break;
+          case 'emoji': discoveredArray.sort((a, b) => a.emoji.localeCompare(b.emoji)); break;
+        }
+        discoveredArray.forEach(elData => addElementToSidebar(elData.name));
+
+        const undiscoveredNames = allElementNames.filter(name => !discovered.has(name));
+        undiscoveredNames.sort((a, b) => a.localeCompare(b));
+        undiscoveredNames.forEach(name => addUndiscoveredElementToSidebar(name));
+
+        tabDiscovered.textContent = `Découverts (${discovered.size})`;
+        tabUndiscovered.textContent = `À découvrir (${undiscoveredNames.length})`;
+      }
+
+      function saveDiscoveredElements() { localStorage.setItem('littleAlchemyDiscovered', JSON.stringify(Array.from(discovered.entries()))); }
+      function loadDiscoveredElements() {
+        const storedData = localStorage.getItem('littleAlchemyDiscovered');
+        if (storedData) { JSON.parse(storedData).forEach(([name, time]) => discovered.set(name, time)); } 
+        else { startingElements.forEach(name => discovered.set(name, Date.now())); }
+      }
+
+      function spawnFloatingElement(name, x, y, animate) {
+        const el = document.createElement("div");
+        el.className = "floating-element";
+        el.textContent = emojis[name] ? emojis[name] + " " + name : name;
+        el.style.left = x + "px";
+        el.style.top = y + "px";
+        el.setAttribute("data-name", name);
+        el.setAttribute("draggable", "true");
+        el.addEventListener("dragstart", e => {
+          e.dataTransfer.setData("text/plain", name);
+          e.dataTransfer.setData("offsetX", e.offsetX);
+          e.dataTransfer.setData("offsetY", e.offsetY);
+          draggingElement = el;
+        });
+        el.addEventListener("dragend", e => { draggingElement = null; });
+        workspace.appendChild(el);
+        if(animate) {
+          el.classList.add("combine-animation");
+          setTimeout(() => el.classList.remove("combine-animation"), 400);
+        }
+        return el;
+      }
+      
+      function spawnElementRandomly(name) {
+        const x = Math.random() * (workspace.clientWidth - 100);
+        const y = Math.random() * (workspace.clientHeight - 40);
+        spawnFloatingElement(name, x, y, true);
+      }
+
+      function combine(name1, name2) {
+        const possibleResults = allElementNames.filter(name => name !== name1 && name !== name2);
+        if (possibleResults.length === 0) { return allElementNames[Math.floor(Math.random() * allElementNames.length)]; }
+        const randomIndex = Math.floor(Math.random() * possibleResults.length);
+        return possibleResults[randomIndex];
+      }
+
+      function tryCombineWithOthers(movingEl) {
+        const floatingEls = [...workspace.querySelectorAll(".floating-element")].filter(el => el !== movingEl);
+        const movingRect = movingEl.getBoundingClientRect();
+        for(let el of floatingEls) {
+          const r = el.getBoundingClientRect();
+          const overlapX = Math.abs((movingRect.left + movingRect.width/2) - (r.left + r.width/2)) < FUSION_TOLERANCE;
+          const overlapY = Math.abs((movingRect.top + movingRect.height/2) - (r.top + r.height/2)) < FUSION_TOLERANCE;
+          if(overlapX && overlapY) {
+            const name1 = movingEl.getAttribute("data-name");
+            const name2 = el.getAttribute("data-name");
+            const result = combine(name1, name2);
+            if(result) {
+              const x = (movingRect.left + r.left)/2 - workspace.getBoundingClientRect().left;
+              const y = (movingRect.top + r.top)/2 - workspace.getBoundingClientRect().top;
+              const isNewDiscovery = !discovered.has(result);
+              if(isNewDiscovery) {
+                discovered.set(result, Date.now());
+                saveDiscoveredElements();
+                renderElementsList();
+              }
+              const newEl = spawnFloatingElement(result, x, y, true);
+              if (isNewDiscovery) {
+                newEl.classList.add('new-element-animation');
+                newEl.addEventListener('animationend', () => newEl.classList.remove('new-element-animation'), { once: true });
+              }
+              movingEl.remove();
+              el.remove();
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      let draggingElement = null;
+      workspace.addEventListener("dragover", e => { e.preventDefault(); });
+      workspace.addEventListener("drop", e => {
+        e.preventDefault();
+        const workspaceRect = workspace.getBoundingClientRect();
+        let dropX = e.clientX - workspaceRect.left;
+        let dropY = e.clientY - workspaceRect.top;
+        const name = e.dataTransfer.getData("text/plain");
+
+        if (draggingElement) {
+            const offsetX = parseInt(e.dataTransfer.getData("offsetX"));
+            const offsetY = parseInt(e.dataTransfer.getData("offsetY"));
+            draggingElement.style.left = (dropX - offsetX) + "px";
+            draggingElement.style.top = (dropY - offsetY) + "px";
+            tryCombineWithOthers(draggingElement);
+        } else {
+            let fused = false;
+            for (let el of [...workspace.querySelectorAll(".floating-element")]) {
+                const r = el.getBoundingClientRect();
+                const elCenterX = r.left - workspaceRect.left + r.width / 2;
+                const elCenterY = r.top - workspaceRect.top + r.height / 2;
+                if (Math.hypot(dropX - elCenterX, dropY - elCenterY) < FUSION_TOLERANCE) {
+                    const result = combine(name, el.getAttribute("data-name"));
+                    if (result) {
+                        const isNew = !discovered.has(result);
+                        if(isNew) { discovered.set(result, Date.now()); saveDiscoveredElements(); renderElementsList(); }
+                        const newEl = spawnFloatingElement(result, elCenterX, elCenterY, true);
+                        if(isNew) { newEl.classList.add('new-element-animation'); newEl.addEventListener('animationend', () => newEl.classList.remove('new-element-animation'), { once: true }); }
+                        el.remove();
+                        fused = true;
+                        break;
+                    }
+                }
+            }
+            if (!fused) {
+                const tempEl = document.createElement("div");
+                tempEl.className = "floating-element"; tempEl.style.visibility = "hidden"; tempEl.textContent = name;
+                workspace.appendChild(tempEl);
+                const elWidth = tempEl.offsetWidth; const elHeight = tempEl.offsetHeight;
+                workspace.removeChild(tempEl);
+                spawnFloatingElement(name, dropX - elWidth / 2, dropY - elHeight / 2);
+            }
+        }
+      });
+
+      sidebar.addEventListener("dragover", e => { e.preventDefault(); });
+      sidebar.addEventListener("drop", e => {
+        e.preventDefault();
+        if (draggingElement) {
+          draggingElement.classList.add('disappear-animation');
+          setTimeout(() => { draggingElement.remove(); }, 300);
+        }
+      });
+      
+      // Listeners pour les boutons
+      function toggleTheme() {
+        document.body.classList.toggle("dark");
+        themeToggle.textContent = document.body.classList.contains("dark") ? "⚫" : "⚪";
+      }
+      themeToggle.addEventListener("click", toggleTheme);
+      cleanWorkspaceBtn.addEventListener("click", () => {
+        [...workspace.querySelectorAll(".floating-element")].forEach(el => {
+          el.classList.add('disappear-animation');
+          setTimeout(() => el.remove(), 300);
+        });
+      });
+      sortByAgeBtn.addEventListener('click', () => renderElementsList('age'));
+      sortByNameBtn.addEventListener('click', () => renderElementsList('name'));
+      sortByEmojiBtn.addEventListener('click', () => renderElementsList('emoji'));
+      sortByRandomBtn.addEventListener('click', () => renderElementsList('random'));
+      
+      // Logique des onglets
+      function switchTab(activeTab) {
+          if (activeTab === 'discovered') {
+              tabDiscovered.classList.add('active');
+              tabUndiscovered.classList.remove('active');
+              elementsList.style.display = 'block';
+              undiscoveredList.style.display = 'none';
+              sortButtonsContainer.style.display = 'flex';
+          } else {
+              tabDiscovered.classList.remove('active');
+              tabUndiscovered.classList.add('active');
+              elementsList.style.display = 'none';
+              undiscoveredList.style.display = 'block';
+              sortButtonsContainer.style.display = 'none';
+          }
+      }
+      tabDiscovered.addEventListener('click', () => switchTab('discovered'));
+      tabUndiscovered.addEventListener('click', () => switchTab('undiscovered'));
+
+      // Initialisation finale
+      loadDiscoveredElements();
+      renderElementsList('age');
+      switchTab('discovered');
+      themeToggle.textContent = document.body.classList.contains("dark") ? "⚫" : "⚪";
+      resizeCanvas();
+      animateBackground();
+    });
+  </script>
+</body>
+</html>
