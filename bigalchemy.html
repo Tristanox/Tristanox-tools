@@ -21,6 +21,18 @@
 
       --glow-color: #3fe03f;
       --transition-speed: 0.3s;
+
+      /* Couleurs de rareté (mode clair) */
+      --legendary-light: #87ffe9;
+      --epic-light: #c787ff;
+      --rare-light: #ffba70;
+      /* Communs utilisent --element-bg-light */
+
+      /* Couleurs de rareté (mode sombre) */
+      --legendary-dark: #00bcd4; /* Un bleu-vert plus distinct pour le sombre */
+      --epic-dark: #9c27b0;     /* Un violet plus profond pour le sombre */
+      --rare-dark: #ff9800;      /* Un orange plus foncé pour le sombre */
+      /* Communs utilisent --element-bg-dark */
     }
 
     body {
@@ -194,10 +206,10 @@
         min-height: 0; /* Essentiel pour que flexbox fonctionne correctement */
     }
 
-    #elements-list, #undiscovered-list {
+    #elements-list, #undiscovered-list, #achievements-content { /* Added #achievements-content */
       user-select:none;
     }
-    #undiscovered-list {
+    #undiscovered-list { /* #achievements-content display is handled by JS */
         display: none;
     }
 
@@ -236,12 +248,13 @@
       border-radius: 8px;
       cursor: pointer;
       user-select: none;
-      transition: background var(--transition-speed), color var(--transition-speed), box-shadow 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease;
+      transition: background var(--transition-speed), color var(--transition-speed), box-shadow 0.2s ease, text-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease; /* Added border-color to transition */
       color: #000;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4);
       text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
       position: relative;
       z-index: 1;
+      border: 1px solid transparent; /* Added a transparent border for smooth glow transition */
     }
     .element:hover {
       transform: translateY(-2px);
@@ -260,6 +273,15 @@
     .element:active {
       cursor: grabbing;
     }
+
+    /* Styles de rareté */
+    .element.legendary { background-color: var(--legendary-light); color: #000; }
+    body.dark .element.legendary { background-color: var(--legendary-dark); color: #fff; }
+    .element.epic { background-color: var(--epic-light); color: #000; }
+    body.dark .element.epic { background-color: var(--epic-dark); color: #fff; }
+    .element.rare { background-color: var(--rare-light); color: #000; }
+    body.dark .element.rare { background-color: var(--rare-dark); color: #fff; }
+    /* Pas de classe pour "common" car il utilise déjà les couleurs par default */
     
     .floating-element {
       position: absolute;
@@ -299,9 +321,70 @@
       box-shadow: 0 6px 15px rgba(0,0,0,0.95);
     }
 
+    /* Styles de rareté pour les éléments flottants */
+    .floating-element.legendary { background-color: var(--legendary-light); border-color: var(--legendary-light); color: #000; }
+    body.dark .floating-element.legendary { background-color: var(--legendary-dark); border-color: var(--legendary-dark); color: #fff; }
+    .floating-element.epic { background-color: var(--epic-light); border-color: var(--epic-light); color: #000; }
+    body.dark .floating-element.epic { background-color: var(--epic-dark); border-color: var(--epic-dark); color: #fff; }
+    .floating-element.rare { background-color: var(--rare-light); border-color: var(--rare-light); color: #000; }
+    body.dark .floating-element.rare { background-color: var(--rare-dark); border-color: var(--rare-dark); color: #fff; }
+
+
     .combine-animation { animation: pop 0.4s ease forwards; }
-    .glow { box-shadow: 0 0 12px 4px var(--glow-color); border-color: var(--glow-color); transition: box-shadow 0.2s ease, border-color 0.2s ease; }
-    .can-combine-glow { box-shadow: 0 0 15px 5px var(--glow-color); border-color: var(--glow-color); transition: box-shadow 0.15s ease, border-color 0.15s ease; }
+    /* General glow for any element (floating-element or sidebar element) */
+    .glow { 
+        box-shadow: 0 0 15px 6px var(--glow-color); /* Increased blur and spread */
+        border-color: var(--glow-color); 
+        transition: box-shadow 0.2s ease, border-color 0.2s ease; 
+    }
+    .can-combine-glow { 
+        box-shadow: 0 0 20px 8px var(--glow-color); /* Increased blur and spread */
+        border-color: var(--glow-color); 
+        transition: box-shadow 0.15s ease, border-color 0.15s ease; 
+    }
+
+    /* Specific rules for .element when it has .glow or .can-combine-glow */
+    .element.glow {
+        box-shadow: 0 0 15px 6px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.4); /* Apply stronger glow */
+        border-color: var(--glow-color);
+    }
+    body.dark .element.glow {
+        box-shadow: 0 0 15px 6px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.1);
+        border-color: var(--glow-color);
+    }
+
+    .element.can-combine-glow {
+        box-shadow: 0 0 20px 8px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.4); /* Apply stronger glow */
+        border-color: var(--glow-color);
+    }
+    body.dark .element.can-combine-glow {
+        box-shadow: 0 0 20px 8px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.1);
+        border-color: var(--glow-color);
+    }
+
+    /* Enhanced glow for legendary elements when they glow */
+    .element.legendary.glow,
+    .floating-element.legendary.glow {
+        box-shadow: 0 0 25px 12px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.6); /* Even stronger glow */
+        border-color: var(--glow-color);
+    }
+    body.dark .element.legendary.glow,
+    body.dark .floating-element.legendary.glow {
+        box-shadow: 0 0 25px 12px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.2);
+        border-color: var(--glow-color);
+    }
+
+    .element.legendary.can-combine-glow,
+    .floating-element.legendary.can-combine-glow {
+        box-shadow: 0 0 30px 15px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.6); /* Even stronger glow */
+        border-color: var(--glow-color);
+    }
+    body.dark .element.legendary.can-combine-glow,
+    body.dark .floating-element.legendary.can-combine-glow {
+        box-shadow: 0 0 30px 15px var(--glow-color), inset 0 1px 0 rgba(255,255,255,0.2);
+        border-color: var(--glow-color);
+    }
+
     @keyframes pop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
     @keyframes fadeOutAndShrink { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.5); } }
     .disappear-animation { animation: fadeOutAndShrink 0.3s ease-out forwards; pointer-events: none; }
@@ -309,6 +392,77 @@
     .new-element-animation { animation: newElementHighlight 1s ease-out; }
     @keyframes fadeInScale { 0% { opacity: 0; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
     .element.animate-in { animation: fadeInScale 0.3s ease-out forwards; }
+
+    /* Styles pour la section des succès */
+    #achievements-content {
+        padding: 10px;
+        display: none; /* Managed by JS */
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+    }
+
+    .achievement-item {
+        background: var(--element-bg-light);
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: background 0.3s ease, transform 0.2s ease;
+        opacity: 0.6; /* Default for unachieved */
+        filter: grayscale(100%);
+        border: 1px solid transparent;
+    }
+    body.dark .achievement-item {
+        background: var(--element-bg-dark);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+    }
+
+    .achievement-item.achieved {
+        opacity: 1;
+        filter: grayscale(0%);
+        box-shadow: 0 0 10px 3px var(--glow-color); /* Glow for achieved */
+        border-color: var(--glow-color);
+        transform: translateY(-2px);
+    }
+
+    .achievement-item .icon {
+        font-size: 1.8em;
+        line-height: 1;
+    }
+
+    .achievement-item .details {
+        flex-grow: 1;
+    }
+
+    .achievement-item .title {
+        font-weight: bold;
+        font-size: 1.1em;
+        margin-bottom: 3px;
+    }
+
+    .achievement-item .description {
+        font-size: 0.9em;
+        color: #555;
+    }
+    body.dark .achievement-item .description {
+        color: #bbb;
+    }
+    .achievement-item.achieved .description {
+        color: #333; /* Darker text for achieved in light mode */
+    }
+    body.dark .achievement-item.achieved .description {
+        color: #eee; /* Lighter text for achieved in dark mode */
+    }
+    .achievement-item .progress {
+        font-size: 0.8em;
+        color: #777;
+    }
+    body.dark .achievement-item .progress {
+        color: #ccc;
+    }
   </style>
 </head>
 <body class="dark">
@@ -321,11 +475,15 @@
     <div id="tab-container">
         <button id="tab-discovered" class="tab-button active">Découverts</button>
         <button id="tab-undiscovered" class="tab-button">À découvrir</button>
+        <button id="tab-achievements" class="tab-button">🏆</button>
     </div>
 
     <div class="list-container">
         <div id="elements-list"></div>
         <div id="undiscovered-list"></div>
+        <div id="achievements-content">
+            <!-- Achievements will be rendered here by JavaScript -->
+        </div>
     </div>
     
     <div id="sort-buttons">
@@ -345,13 +503,14 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       
-      const recipes = {};
+      const recipes = {}; // Non utilisé dans cette version de "fusion aléatoire"
       const emojis = {};
       let allElementNames = [];
+      const rarities = {}; // Nouveau: pour stocker la rareté de chaque élément
 
       // --- CORRECTION : Voici la liste COMPLÈTE de vos éléments ---
       const elementsJsonContent = [
-        "🧬ADN","🧲aimant","✈️avion","💡ampoule","🧡ambre","💜améthyste","🐜fourmi","🧭boussole","🏹chasse","🏛️temple","⛺camping","🚗conduite","⚙️engrenage","🪓hache","🐴crin","🐃corne","🐘ivoire","🐢écaille","💀os","🩸sang","🥛lait","🧈graisse","🥩viande","🐟poisson","🧹poussière","⚪chaux","🌳mousse","🍄lichen","🌿algue","🔬plancton","🍽️nutriment","🍬sucre","🧂sel","🌶️épice","🍶huile","🧪vinaigre","🍷alcool","🍞levure","🦠bactérie","🦠virus","🧬gène","🔬protéine","🧪acide","🧪base","🧪solution","⚗️mélange","💨gaz","💧liquide","🧱solide","✨plasma","🌌vide","⏳temps","🌐espace","✊force","🎯pression","🌡️température","🔊son","🌟lumière","🌑ombre","🎨couleur","👃odeur","👅goût","✋toucher","👀vision","👂ouïe","👃odorat","🤸équilibre","🤕douleur","😊plaisir","🤔conscience","🧠pensée","💡mémoire","😴rêve","👻esprit","🙏âme","🚶corps","💖vie","💀mort","👶naissance","🌱croissance","📈évolution","🔄changement","🏃mouvement","🧘repos","💼travail","⚡énergie","🚀vitesse","📏distance","⚖️masse","🏺volume","⚖️densité","⚖️poids","♨️chaleur","🥶froid","〰️onde","⚛️particule","⚛️atome","⚛️molécule","🔬cellule","🩸tissu","🧡organe","⚙️système","🌿organisme","🐾espèce","👥population","🌲écosystème","🌍biosphère","🪐planète","💫cosmos","🌌univers","🪨ardoise","💎opale","🔶topaze","💙saphir","💚émeraude","🔴rubis","🟡citrine","⚪zircon","🖤onyx","⚪nacre","🦷défense","🦴phalange","🦴vertèbre","🦴crâne","🦴mâchoire","🦴clavicule","🦴côte","🦴tibia","🦴fémur","🧬cartilage","💅kératine","🦷émail","🦷dentine","🦷pulpe","🪵écorce","🌳rameau","🌲tronc","🌳racine","🪵souche","🪵planche","🪵poutre","🪵copeau","🪵sciure","🪵bûche","🪵sarment","🪚liège","🧺osier","🎋roseau","🌾paille","🌾foin","🌾son","🌾farine","🍞levain","🍞mie","🍞croûte","🍚amidon","🍚grain","🍬sirop","🍮mélasse","🍯nectar","🍯pollen","🐝ruche","🪱ver","🐛chenille","🦋chrysalide","🦋papillon","🦗criquet","🐞coccinelle","🕷️araignée","🦂scorpion","🦟moustique","🪰mouche","🪲scarabée","🦗cigale","🦗grillon","🐌escargot","🦪moule","🦪huître","🦞crabe","🦐crevette","🦑calamar","🐙pieuvre","🐠nageoire","🐠écaille","🦈aileron","🐡poisson","🐬dauphin","🐳baleine","🐊reptile","🐍serpent","🦎lézard","🐢tortue","🐸grenouille","🐥oisillon","🐣poussin","🥚coque","🥚blanc","🥚jaune","🦢duvet","🐓crête","🐓barbillon","🐓plume","🐈poil","🐕mue","🐑toison","🐐corne","🐴sabot","🐄pis","🐖lard","🥩filet","🥩côte","🥩gigot","🥩jarret","🍗cuisse","🍗poitrine","🥓bacon","🌭saucisse","🍕jambon","🧂saumure","🍶laiton","🔩boulon","🧲aimant","💡bobine","🔌fil","⚡circuit","🔌diode","💻puce","📡antenne","📡onde","📻radio","📺écran","🔦lampe","💡ampoule","🔌câble","⛓️chaîne","🔗maillon","🪢nœud","🎗️ruban","🧣écharpe","🧤gant","🧦chaussette","👚manche","👖jambe","👗jupe","🧥col","👕bouton","👕fermeture","🎒bretelle","👛fermoir","🔑serrure","🚪charnière","🪟vitre","🧱brique","🪨moellon","🪨granulat","🪨pavé","🪨dallage","🪨tuile","🪨bardeaux","🪚planche","🪚poutre","🪚chevrons","🔩vis","🔨clou","🔩écrou","🔨rondelle","🔨rivet","🔨goujon","🔨goupille","🪛tournevis","🔧clé","🪚scie","🪓hache","⛏️pelle","⛏️pioche","⛏️marteau","🪚rabot","🪛burin","🪛ciseau","🪛lime","🪛râpe","🪛étau","🪛perceuse","🪛foret","⚙️moteur","⚙️roue","⚙️essieu","⚙️piston","⚙️cylindre","⚙️arbre","⚙️palier","⚙️ressort","⚙️frein","⚙️embrayage","⚙️radiateur","⚙️carburateur","⚙️injecteur","⚙️pompe","⚙️valve","⚙️joint","⚙️turbine","⚙️hélice","⚙️réacteur","⚙️propulseur","⚙️fusée","🚀satelite","🛰️sonde","🔭télescope","🔬microscope","⚖️balance","📏mètre","📐règle","📐compas","📐équerre","🧮calculatrice","🧮ordinateur","🖥️clavier","🖱️souris","🖨️imprimante","⚙️processeur","💾mémoire","💿disque","📡routeur","🌐internet","☁️cloud","💾fichier","📄document","🖼️image","🎶son","🎬vidéo","📧email","💬message","📞appel","🗣️voix","🗣️parole","👂écoute","👁️regard","👃respiration","👅gustation","🖐️sensation","🧠intuition","🧠raison","🧠logique","🧠créativité","🧠imagination","🧠mémoire","🧠apprentissage","🧠sagesse","🧠connaissance","🧠compréhension","🧠intelligence","🧠réflexion","🧠conscience","🧠subconscient","🧠inconscient","💭rêve","🌙sommeil","☀️éveil","🚶marche","🏃course","🤸saut","🏊nage","🚴vélo","🚗conduite","✈️vol","🚀propulsion","⚓ancre","🗺️carte","📍point","📏ligne","📐angle","📐courbe","📐cercle","📐spirale","📐triangle","📐carré","📐rectangle","📐polygone","📐sphère","📐cube","📐cône","📐cylindre","📐pyramide","📐prisme","📐tore","⚛️quantum","⚛️photon","⚛️électron","⚛️proton","⚛️neutron","⚛️noyau","⚛️quarks","⚛️leptons","⚛️bosons","⚛️fermions","⚛️graviton","⚛️gluon","⚛️onde","⚛️champ","⚛️force","⚛️gravité","⚛️électromagnétisme","⚛️nucléaire","⚛️faible","⚛️fort","⚛️température","⚛️pression","⚛️densité","⚛️viscosité","⚛️conductivité","⚛️résistivité","⚛️réfraction","⚛️réflexion","⚛️absorption","⚛️émission","⚛️diffusion","⚛️dispersion","⚛️interférence","⚛️diffraction","⚛️polarisation","⚛️fréquence","⚛️longueur","⚛️amplitude","⚛️phase","⚛️vitesse","⚛️accélération","⚛️momentum","⚛️énergie","⚛️travail","⚛️puissance","⚛️chaleur","⚛️froid","⚛️entropie","⚛️enthalpie","⚛️thermodynamique","⚛️mécanique","⚛️optique","⚛️acoustique","⚛️électricité","⚛️magnétisme","⚛️chimie","⚛️biologie","⚛️géologie","⚛️astronomie","⚛️météorologie","⚛️océanographie","⚛️écologie","⚛️paléontologie","⚛️archéologie","⚛️histoire","⚛️géographie","⚛️sociologie","⚛️psychologie","⚛️philosophie","⚛️éthique","⚛️justice","⚛️liberté","⚛️égalité","⚛️fraternité","⚛️démocratie","⚛️république","⚛️monarchie","⚛️tyrannie","⚛️anarchie","⚛️communisme","⚛️socialisme","⚛️capitalisme","⚛️économie","⚛️commerce","⚛️finance","⚛️banque","⚛️monnaie","⚛️impôt","⚛️dette","⚛️crédit","⚛️marché","⚛️offre","⚛️demande","⚛️production","⚛️consommation","⚛️investissement","⚛️travail","⚛️emploi","⚛️chômage","⚛️salaire","⚛️pauvreté","⚛️richesse","⚛️classe","⚛️société","⚛️culture","⚛️tradition","⚛️coutume","⚛️religion","⚛️mythe","⚛️légende","⚛️folklore","⚛️art","🎨peinture","🎨sculpture","🎨dessin","🎨gravure","🎨musique","🎶chant","🎶danse","🎭théâtre","🎬cinéma","📚littérature","📜poésie","📖roman","📜nouvelle","📜essai","📜biographie","📜autobiographie","📜dictionnaire","📜encyclopédie","📜manuel","📜journal","📰magazine","🌐site","📲application","🎮jeu","🏆sport","⚽football","🏀basketball","🎾tennis","🏐volleyball","🏉rugby","⚾baseball","🏒hockey","🥊boxe","🥋judo","🧘yoga","🏃athlétisme","🚴cyclisme","🏊natation","⛵voile","🎣pêche","🏹chasse","🏕️camping","🚶randonnée","⛰️escalade","⛷️ski","🏂snowboard","🏄surf","🧘méditation","🙏prière","🕯️rituel","⛪temple","🕌mosquée","🕍synagogue","⛪église","🙏culte","🕊️paix","⚔️guerre","🔫arme","🛡️armure","💥bombe","💣missile","💥explosion","💥ruine","💥destruction","💥catastrophe","💥désastre","💥crise","💥chaos","💥ordre","💥harmonie","💥équilibre","💥justice","💥loi","💥règle","💥principe","💥valeur","💥vertu","💥vice","💥péché","💥pardon","💥rédemption","💥salut","💥enfer","💥paradis","💥ange","💥démon","💥fantôme","💥monstre","💥dragon","💥fée","💥gnome","💥elfe","💥nain","💥géant","💥humain","💥homme","💥femme","💥enfant","💥famille","💥amour","💥amitié","💥haine","💥peur","💥joie","💥tristesse","💥colère","💥surprise","💥dégout","💥honte","💥culpabilité","💥fierté","💥courage","💥lâcheté","💥espoir","💥désespoir","💥optimisme","💥pessimisme","💥sourire","💥pleur","💥rire","💥chuchotement","💥cri","💥silence","💥bruit","💥musique","💥rythme","💥mélodie","💥harmonie","💥dissonance","💥accord","💥note","💥clé","💥gamme","💥instrument","💥voix","💥chœur","💥orchestre","💥bande","💥groupe","💥soliste","💥duo","💥trio","💥quatuor","💥quintette","💥sextuor","💥septuor","💥octuor","💥ensemble","💥concert","💥récital","💥spectacle","💥représentation","💥performance","💥artisanat","💥savoir-faire","💥compétence","💥talent","💥don","💥aptitude","💥capacité","💥potentiel","💥limite","💥défi","💥opportunité","💥choix","💥décision","💥action","💥conséquence","💥résultat","💥succès","💥échec","💥victoire","💥défaite","💥progrès","💥régression","💥stagnation","💥développement","💥croissance","💥déclin","💥cycle","💥saison","💥printemps","💥été","💥automne","💥hiver","💥matin","💥jour","💥soir","💥nuit","💥aube","💥crépuscule","💥minuit","💥midi","💥heure","💥minute","💥seconde","💥instant","💥éternité","💥passé","💥présent","💥futur","💥mémoire","💥oubli","💥souvenir","💥nostalgie","💥anticipation","💥attente","💥surprise","💥hasard","💥destin","💥fortune","💥malheur","💥chance","💥malchance","💥événement","💥circonstance","💥situation","💥contexte","💥relation","💥connexion","💥lien","💥réseau","💥système","💥structure","💥organisation","💥hiérarchie","💥communauté","💥groupe","💥individu","💥société","💥civilisation","💥culture","💥tradition","💥innovation","💥progrès","💥révolution","💥évolution","💥changement","💥continuité","💥stabilité","💥équilibre","💥déséquilibre","💥conflit","💥coopération","💥collaboration","💥compétition","💥rivalité","💥paix","💥guerre","💥alliance","💥traité","💥accord","💥pacte","💥serment","💥promesse","💥vérité","💥mensonge","💥secret","💥révélation","💥doute","💥certitude","💥foi","💥croyance","💥religion","💥dogme","💥hérésie","💥rite","💥cérémonie","💥fête","💥célébration","💥jubilé","💥anniversaire","💥naissance","💥baptême","💥mariage","💥enterrement","💥deuil","💥commémoration","💥héritage","💥patrimoine","💥légat","💥testament","💥don","💥cadeau","💥dette","💥créance","💥prêt","💥emprunt","💥argent","💥pièce","💥billet","💥monnaie","💥fortune","💥richesse","💥pauvreté","💥misère","💥abondance","💥manque","💥besoin","💥désir","💥envie","💥satisfaction","💥frustration","💥plaisir","💥douleur","💥bonheur","💥malheur","💥bien","💥mal","💥vertu","💥vice","💥péché","💥grâce","💥bénédiction","💥malédiction","💥châtiment","💥récompense","💥punition","💥justice","💥injustice","💥droit","💥devoir","💥responsabilité","💥liberté","💥esclavage","💥tyrannie","💥oppression","💥rébellion","💥révolution","💥changement","💥progrès","💥déclin","💥cycle","💥fin","💥début","🇫🇷Paris","🗽New York","🗼Tokyo","🇬🇧Londres","🇮🇹Rome","🇪🇬Le Caire","🇧🇷Rio de Janeiro","🇨🇳Shanghai","🇮🇳New Delhi","🇦🇺Sydney","🇦🇷Buenos Aires","🇨🇦Toronto","🇲🇽Mexico","🇿🇦Johannesburg","🇷🇺Moscou","🇩🇪Berlin","🇪🇸Madrid","🇳🇱Amsterdam","🇧🇪Bruxelles","🇦🇹Vienne","🇨🇭Genève","🇸🇬Singapour","🇹🇭Bangkok","🇰🇷Séoul","🇮🇱Jérusalem","🇬🇷Athènes","🇮🇪Dublin","🇵🇹Lisbonne","🇹🇷Istanbul","🇨🇱Santiago","🇵🇪Lima","🇨🇴Bogota","🇻🇪Caracas","🇵🇰Karachi","🇧🇩Dhaka","🇳🇬Lagos","🇸🇦Riyad","🇶🇦Doha","🇦🇪Dubaï","🇮🇩Jakarta","🇵🇭Manille","🇻🇳Hanoï","🇰🇪Nairobi","🇲🇦Casablanca","🇨🇺La Havane","🇮🇸Reykjavik","🇫🇮Helsinki","🇳🇴Oslo","🇸🇪Stockholm","🇩🇰Copenhague","👨‍🔬Einstein","👩‍🔬Marie Curie","🎨Léonard de Vinci","✍️Shakespeare","👑Cléopâtre","⚔️Napoléon","✝️Jésus","🌍Christophe Colomb","🎤Michael Jackson","👑Élizabeth II","☯️Confucius","🧘Bouddha","🎤Elvis Presley","✍️Victor Hugo","🔬Galilée","👑Jeanne d'Arc","🎨Picasso","🎼Mozart","🎸Jimi Hendrix","🏀Michael Jordan","🥋Bruce Lee","🗳️Nelson Mandela","🗳️Abraham Lincoln","🗳️Gandhi","📚Jane Austen","💻Steve Jobs","💻Bill Gates","🚀Elon Musk","📚J.K. Rowling","🎤Freddie Mercury","🎭Charlie Chaplin","💃Marilyn Monroe","👨‍🚀Neil Armstrong","👨‍🍳Gordon Ramsay","👩‍🍳Julia Child","🎩Walt Disney","📚Stephen King","🎤Beyoncé","⚽Pelé","⚽Maradona","🏎️Michael Schumacher","🎿Roger Federer","🎾Serena Williams","🏎️Lewis Hamilton","🏎️Ayrton Senna","👩‍⚕️Florence Nightingale","🗳️Martin Luther King","👑Louis XIV","✍️Molière","🎨Vincent van Gogh","🧱Minecraft","🍄Super Mario","🔫Fortnite","🧩Tetris","🗡️The Legend of Zelda","🌍World of Warcraft","🚗Grand Theft Auto","💻Cyberpunk 2077","👽Halo","🗡️Elder Scrolls","🤖Pac-Man","👻Among Us","💥Call of Duty","🏎️Mario Kart","🚀Space Invaders","👾Pokémon","⚔️Final Fantasy","🪓God of War","🌃Red Dead Redemption","📦Portal","🕵️Assassin's Creed","🎮FIFA","🏀NBA 2K","🥋Mortal Kombat","🥋Street Fighter","🏎️Gran Turismo","📦Fallout","🏹Skyrim","🤖Detroit: Become Human","🐺The Witcher","🧟Resident Evil","🌃Silent Hill","🎮Overwatch","⚽Rocket League","🎵Guitar Hero","💃Just Dance","🎯Destiny","🤖Borderlands","🤖Apex Legends","🕹️Pong","👾Donkey Kong","🚀Asteroids","🐍Snake","🎮Candy Crush","🕵️Hitman","🎮Dark Souls","🐉Elden Ring","💥Doom","👾Half-Life","🦁lion","🐘éléphant","🦒girafe","🐅tigre","🐻ours","🐼panda","🦊renard","🐺loup","🦌cerf","🐇lapin","🐿️écureuil","🦇chauve-souris","🦉hibou","🦅aigle","🦜perroquet","🦢cygne","🕊️colombe","🦋papillon","🐝abeille","🐞coccinelle","🐜fourmi","🦗sauterelle","🕷️araignée","🐍cobra","🐊alligator","🐠requin","🐙pieuvre","🐳dauphin","🦍gorille","🐵singe","🐨koala","🦙lama","🐪chameau","🦘kangourou","🐧manchot","🦩flamant rose","🦉chouette","🦉harfang","🐺coyote","🐻grizzly","🐅léopard","🦌renne","🦨mouffette","🦡blaireau","🦦loutre","🦫castor","🦝raton laveur","🦊fennec","🐒chimpanzé","🦒okapi","🦓zèbre","🦛hippopotame","🦏rhinocéros","🐘mammouth","🦖dinosaure","🐉dragon","🦄licorne","🧜‍♀️sirène","🧚fée","🧙magicien","🧟zombie","🧛vampire","🐺loup-garou","👻fantôme","👽alien","🤖robot","🚀fusée","🛰️satellite","🔭télescope","🔬microscope","📱smartphone","💻ordinateur","🖥️écran","⌨️clavier","🖱️souris","🔌prise","🔋batterie","💡ampoule","🔦lampe de poche","📻radio","📺télévision","📸appareil photo","🎥caméra","🎤microphone","🎧casque","🗣️haut-parleur","🖨️imprimante","💿disque","💾clé USB","🌐internet","☁️nuage (informatique)","🔐cybersécurité","🔑clé (cryptographie)","📈graphique","📊tableau","📝document","📚livre","📰journal","📝plume","✏️crayon","✒️encre","📏règle","✂️ciseaux","📎trombone","📌épingle","🗓️calendrier","⏰réveil","⏱️chronomètre","⏳sablier","🗺️carte","📍épingle de carte","🧭boussole","🔭jumelles","🎒sac à dos","💼mallette","👛porte-monnaie","🔑clé (physique)","🚪porte","🪟fenêtre","🏠maison","🏢immeuble","🏫école","🏥hôpital","🏪magasin","🏭usine","🚜tracteur","🏗️grue","🚛camion","🚚fourgonnette","🚐minibus","🚌bus","🚂train","🚇métro","🚄TGV","🚢navire","🛥️yacht","🛶kayak","⛵voilier","🚤hors-bord","🚁hélicoptère","✈️avion","🛰️navette spatiale","🌠étoile filante","🌌nébuleuse","🔭constellation","🪐galaxie","☀️comète","☄️astéroïde","🌕planète","🌑mercure","⚪vénus","🔴mars","🔵jupiter","🟢saturne","🟠uranus","🟣neptune","🔵pluton","🪐lune","💫étoile","☀️soleil","✨univers","🌈arc-en-ciel","⚡orage","🌪️tornade","🌊tsunami","🌋volcan","⛰️montagne","🏞️vallée","🏜️canyon","🏝️île","🏖️plage","🌲forêt","🌳arbre fruitier","🌿arbuste","🎋bambou","🌾blé","🌽maïs","🥕carotte","🥔pomme de terre","🧅oignon","🍅tomate","🌶️piment","🥒concombre","🍆aubergine","🥦brocoli","🥬laitue","🍊orange","🍋citron","🍎pomme","🍐poire","🍓fraise","🍇raisin","🍉pastèque","🥝kiwi","🍍ananas","🥥noix de coco","🥭mangue","🥑avocat","🍌banane","🍒cerise","🍑pêche","🫐myrtille","🌰châtaigne","🥜cacahuète","🍞pain","🥐croissant","🥖baguette","🍕pizza","🍔hamburger","🍟frites","🌭hot-dog","🌮taco","🍜nouilles","🍣sushi","🍚riz","🍝pâtes","🍲soupe","🍛curry","🍳œuf (plat)","🥞crêpe","🧇gaufre","🍩donut","🍪cookie","🍰gâteau","🍦glace","🍫chocolat","🍬bonbon","🍭sucre d'orge","🍯miel","☕café","🍵thé","🥛lait","🥤soda","🍷vin","🍺bière","🍸cocktail","🥂champagne","🍾bouteille","🍴fourchette","🥄cuillère","🔪couteau","🍽️assiette","🥣bol","🥛verre","☕tasse","🍳poêle","🍲casserole","🔪planche à découper","🧊glaçon","🧂sel","🌶️poivre","🌿herbe aromatique","🧄ail","🧅oignon","🥔gingembre","🥕carotte","🥦chou","💨vapeur","🌫️brume","☁️nuage","🌧️pluie","🌈arc-en-ciel","❄️neige","🧊glace","❄️gel","🌊océan","🏞️lac","💧rivière","💦goutte","🌋lave","🪨pierre","⛰️roche","🏔️montagne","🏖️sable","🏜️désert","🌬️dune","🌳arbre","🪵bois","🌿feuille","🌸fleur","🍄champignon","🌾herbe","🌱graine","🍎fruit","🥕légume","🌾céréale","🌻pollen","🍯miel","🐝cire","🥚œuf","🦴os","🪶plume","🧶laine","🧵coton","🎋fibre","🪹nid","🕸️toile","🐚coquille","💎cristal","✨gemme","💡lumière","🌑obscurité","⚡foudre","💥étincelle","⭐étoile","☄️météore","🌕lune","☀️soleil","🌌galaxie","🌀vent","🌪️tornade","🧊grêle","🌨️givre","💧rosée","🧊stalagmite","🧊stalactite","💧source","🌫️brouillard","💧flotte","💧humide","💧mouillé","☀️sec","🟤glaise","🪨gravier","🗿rocher","⚪galet","🔪silex","💎quartz","🪨granit","⚪calcaire","🌋basalte","🏺argile","🖊️craie","🗿marbre","🖋️ardoise","🪨gneiss","🪨obsidienne","🫧ponce","⛏️schiste","⏳grès","🧪gypse","🍂tourbe","⛏️minerai","⬛charbon","💎diamant","🌟or","🥈argent","🟫cuivre","⛓️fer","🥫étain","🥉bronze","🔪acier","🧪mercure","🧪soufre","🥛verre","🧱ciment","🩹plâtre","⚫goudron","⚫bitume","🛢️pétrole","⛽gaz","🛍️plastique","🚗caoutchouc","🌲résine","🌳sève","🧼gomme"," ashes","📜papier","📦carton","👕tissu","👜cuir","👘soie","🌿lin","🎋chanvre","🎍jute","🌿bambou","🧺rotin","🌊corail","🩸cendres"
+        "🧬ADN","🧲aimant","✈️avion","💡ampoule","🧡ambre","💜améthyste","🐜fourmi","🧭boussole","🏹chasse","🏛️temple","⛺camping","🚗conduite","⚙️engrenage","🪓hache","🐴crin","🐃corne","🐘ivoire","🐢écaille","💀os","🩸sang","🥛lait","🧈graisse","🥩viande","🐟poisson","🧹poussière","⚪chaux","🌳mousse","🍄lichen","🌿algue","🔬plancton","🍽️nutriment","🍬sucre","🧂sel","🌶️épice","🍶huile","🧪vinaigre","🍷alcool","🍞levure","🦠bactérie","🦠virus","🧬gène","🔬protéine","🧪acide","🧪base","🧪solution","⚗️mélange","💨gaz","💧liquide","🧱solide","✨plasma","🌌vide","⏳temps","🌐espace","✊force","🎯pression","🌡️température","🔊son","🌟lumière","🌑ombre","🎨couleur","👃odeur","👅goût","✋toucher","👀vision","👂ouïe","👃odorat","🤸équilibre","🤕douleur","😊plaisir","🤔conscience","🧠pensée","💡mémoire","😴rêve","👻esprit","🙏âme","🚶corps","💖vie","💀mort","👶naissance","🌱croissance","📈évolution","🔄changement","🏃mouvement","🧘repos","💼travail","⚡énergie","🚀vitesse","📏distance","⚖️masse","🏺volume","⚖️densité","⚖️poids","♨️chaleur","🥶froid","〰️onde","⚛️particule","⚛️atome","⚛️molécule","🔬cellule","🩸tissu","🧡organe","⚙️système","🌿organisme","🐾espèce","👥population","🌲écosystème","🌍biosphère","🪐planète","💫cosmos","🌌univers","🪨ardoise","💎opale","🔶topaze","💙saphir","💚émeraude","🔴rubis","🟡citrine","⚪zircon","🖤onyx","⚪nacre","🦷défense","🦴phalange","🦴vertèbre","🦴crâne","🦴mâchoire","🦴clavicule","🦴côte","🦴tibia","🦴fémur","🧬cartilage","💅kératine","🦷émail","🦷dentine","🦷pulpe","🪵écorce","🌳rameau","🌲tronc","🌳racine","🪵souche","🪵planche","🪵poutre","🪵copeau","🪵sciure","🪵bûche","🪵sarment","🪚liège","🧺osier","🎋roseau","🌾paille","🌾foin","🌾son","🌾farine","🍞levain","🍞mie","🍞croûte","🍚amidon","🍚grain","🍬sirop","🍮mélasse","🍯nectar","🍯pollen","🐝ruche","🪱ver","🐛chenille","🦋chrysalide","🦋papillon","🦗criquet","🐞coccinelle","🕷️araignée","🦂scorpion","🦟moustique","🪰mouche","🪲scarabée","🦗cigale","🦗grillon","🐌escargot","🦪moule","🦪huître","🦞crabe","🦐crevette","🦑calamar","🐙pieuvre","🐠nageoire","🐠écaille","🦈aileron","🐡poisson","🐬dauphin","🐳baleine","🐊reptile","🐍serpent","🦎lézard","🐢tortue","🐸grenouille","🐥oisillon","🐣poussin","🥚coque","🥚blanc","🥚jaune","🦢duvet","🐓crête","🐓barbillon","🐓plume","🐈poil","🐕mue","🐑toison","🐐corne","🐴sabot","🐄pis","🐖lard","🥩filet","🥩côte","🥩gigot","🥩jarret","🍗cuisse","🍗poitrine","🥓bacon","🌭saucisse","🍕jambon","🧂saumure","🍶laiton","🔩boulon","🧲aimant","💡bobine","🔌fil","⚡circuit","🔌diode","💻puce","📡antenne","📡onde","📻radio","📺écran","🔦lampe","💡ampoule","🔌câble","⛓️chaîne","🔗maillon","🪢nœud","🎗️ruban","🧣écharpe","🧤gant","🧦chaussette","👚manche","👖jambe","👗jupe","🧥col","👕bouton","👕fermeture","🎒bretelle","👛fermoir","🔑serrure","🚪charnière","🪟vitre","🧱brique","🪨moellon","🪨granulat","🪨pavé","🪨dallage","🪨tuile","🪨bardeaux","🪚planche","🪚poutre","🪚chevrons","🔩vis","🔨clou","🔩écrou","🔨rondelle","🔨rivet","🔨goujon","🔨goupille","🪛tournevis","🔧clé","🪚scie","🪓hache","⛏️pelle","⛏️pioche","⛏️marteau","🪚rabot","🪛burin","🪛ciseau","🪛lime","🪛râpe","🪛étau","🪛perceuse","🪛foret","⚙️moteur","⚙️roue","⚙️essieu","⚙️piston","⚙️cylindre","⚙️arbre","⚙️palier","⚙️ressort","⚙️frein","⚙️embrayage","⚙️radiateur","⚙️carburateur","⚙️injecteur","⚙️pompe","⚙️valve","⚙️joint","⚙️turbine","⚙️hélice","⚙️réacteur","⚙️propulseur","⚙️fusée","🚀satelite","🛰️sonde","🔭télescope","🔬microscope","⚖️balance","📏mètre","📐règle","📐compas","📐équerre","🧮calculatrice","🧮ordinateur","🖥️clavier","🖱️souris","🖨️imprimante","⚙️processeur","💾mémoire","💿disque","📡routeur","🌐internet","☁️cloud","💾fichier","📄document","🖼️image","🎶son","🎬vidéo","📧email","💬message","📞appel","🗣️voix","🗣️parole","👂écoute","👁️regard","👃respiration","👅gustation","🖐️sensation","🧠intuition","🧠raison","🧠logique","🧠créativité","🧠imagination","🧠mémoire","🧠apprentissage","🧠sagesse","🧠connaissance","🧠compréhension","🧠intelligence","🧠réflexion","🧠conscience","🧠subconscient","🧠inconscient","💭rêve","🌙sommeil","☀️éveil","🚶marche","🏃course","🤸saut","🏊nage","🚴vélo","🚗conduite","✈️vol","🚀propulsion","⚓ancre","🗺️carte","📍point","📏ligne","📐angle","📐courbe","📐cercle","📐spirale","📐triangle","📐carré","📐rectangle","📐polygone","📐sphère","📐cube","📐cône","📐cylindre","📐pyramide","📐prisme","📐tore","⚛️quantum","⚛️photon","⚛️électron","⚛️proton","⚛️neutron","⚛️noyau","⚛️quarks","⚛️leptons","⚛️bosons","⚛️fermions","⚛️graviton","⚛️gluon","⚛️onde","⚛️champ","⚛️force","⚛️gravité","⚛️électromagnétisme","⚛️nucléaire","⚛️faible","⚛️fort","⚛️température","⚛️pression","⚛️densité","⚛️viscosité","⚛️conductivité","⚛️résistivité","⚛️réfraction","⚛️réflexion","⚛️absorption","⚛️émission","⚛️diffusion","⚛️dispersion","⚛️interférence","⚛️diffraction","⚛️polarisation","⚛️fréquence","⚛️longueur","⚛️amplitude","⚛️phase","⚛️vitesse","⚛️accélération","⚛️momentum","⚛️énergie","⚛️travail","⚛️puissance","⚛️chaleur","🥶froid","⚛️entropie","⚛️enthalpie","⚛️thermodynamique","⚛️mécanique","⚛️optique","⚛️acoustique","⚛️électricité","⚛️magnétisme","⚛️chimie","⚛️biologie","⚛️géologie","⚛️astronomie","⚛️météorologie","⚛️océanographie","⚛️écologie","⚛️paléontologie","⚛️archéologie","⚛️histoire","⚛️géographie","⚛️sociologie","⚛️psychologie","⚛️philosophie","⚛️éthique","⚛️justice","⚛️liberté","⚛️égalité","⚛️fraternité","⚛️démocratie","⚛️république","⚛️monarchie","⚛️tyrannie","⚛️anarchie","⚛️communisme","⚛️socialisme","⚛️capitalisme","⚛️économie","⚛️commerce","⚛️finance","⚛️banque","⚛️monnaie","⚛️impôt","⚛️dette","⚛️crédit","⚛️marché","⚛️offre","⚛️demande","⚛️production","⚛️consommation","⚛️investissement","⚛️travail","⚛️emploi","⚛️chômage","⚛️salaire","⚛️pauvreté","⚛️richesse","⚛️classe","⚛️société","⚛️culture","⚛️tradition","⚛️coutume","⚛️religion","⚛️mythe","⚛️légende","⚛️folklore","⚛️art","🎨peinture","🎨sculpture","🎨dessin","🎨gravure","🎨musique","🎶chant","🎶danse","🎭théâtre","🎬cinéma","📚littérature","📜poésie","📖roman","📜nouvelle","📜essai","📜biographie","📜autobiographie","📜dictionnaire","📜encyclopédie","📜manuel","📜journal","📰magazine","🌐site","📲application","🎮jeu","🏆sport","⚽football","🏀basketball","🎾tennis","🏐volleyball","🏉rugby","⚾baseball","🏒hockey","🥊boxe","🥋judo","🧘yoga","🏃athlétisme","🚴cyclisme","🏊natation","⛵voile","🎣pêche","🏹chasse","🏕️camping","🚶randonnée","⛰️escalade","⛷️ski","🏂snowboard","🏄surf","🧘méditation","🙏prière","🕯️rituel","⛪temple","🕌mosquée","🕍synagogue","⛪église","🙏culte","🕊️paix","⚔️guerre","🔫arme","🛡️armure","💥bombe","💣missile","💥explosion","💥ruine","💥destruction","💥catastrophe","💥désastre","💥crise","💥chaos","💥ordre","💥harmonie","💥équilibre","💥justice","💥loi","💥règle","💥principe","💥valeur","💥vertu","💥vice","💥péché","💥pardon","💥rédemption","💥salut","💥enfer","💥paradis","💥ange","💥démon","💥fantôme","💥monstre","💥dragon","💥fée","💥gnome","💥elfe","💥nain","💥géant","💥humain","💥homme","💥femme","enfant","famille","amour","amitié","haine","peur","joie","tristesse","colère","surprise","dégout","shame","culpabilité","fierté","courage","lâcheté","espoir","désespoir","optimisme","pessimisme","sourire","pleur","rire","chuchotement","cri","silence","bruit","musique","rythme","mélodie","harmonie","dissonance","accord","note","clé","gamme","instrument","voix","chœur","orchestre","bande","groupe","soliste","duo","trio","quatuor","quintette","sextuor","septuor","octuor","ensemble","concert","récital","spectacle","représentation","performance","artisanat","savoir-faire","compétence","talent","don","aptitude","capacité","potentiel","limite","défi","opportunité","choix","décision","action","conséquence","résultat","succès","échec","victoire","défaite","progrès","régression","stagnation","développement","croissance","déclin","cycle","saison","printemps","été","automne","hiver","matin","jour","soir","nuit","aube","crépuscule","minuit","midi","heure","minute","seconde","instant","éternité","passé","présent","futur","mémoire","oubli","souvenir","nostalgie","anticipation","attente","surprise","hasard","destin","fortune","malheur","chance","malchance","événement","circonstance","situation","contexte","relation","connexion","lien","réseau","système","structure","organisation","hiérarchie","communauté","groupe","individu","société","civilisation","culture","tradition","innovation","progrès","révolution","évolution","changement","continuité","stabilité","équilibre","déséquilibre","conflit","coopération","collaboration","compétition","rivalité","paix","guerre","alliance","traité","accord","pacte","serment","promesse","vérité","mensonge","secret","révélation","doute","certitude","foi","croyance","religion","dogme","hérésie","rite","cérémonie","fête","célébration","jubilé","anniversaire","naissance","baptême","mariage","enterrement","deuil","commémoration","héritage","patrimoine","légat","testament","don","cadeau","dette","créance","prêt","emprunt","argent","pièce","billet","monnaie","fortune","richesse","pauvreté","misère","abondance","manque","besoin","désir","envie","satisfaction","frustration","plaisir","douleur","bonheur","malheur","bien","mal","vertu","vice","péché","grâce","bénédiction","malédiction","châtiment","récompense","punition","justice","injustice","droit","devoir","responsabilité","liberté","esclavage","tyrannie","oppression","rébellion","révolution","changement","progrès","déclin","cycle","fin","début","🇫🇷Paris","🗽New York","🗼Tokyo","🇬🇧Londres","🇮🇹Rome","🇪🇬Le Caire","🇧🇷Rio de Janeiro","🇨🇳Shanghai","🇮🇳New Delhi","🇦🇺Sydney","🇦🇷Buenos Aires","🇨🇦Toronto","🇲🇽Mexico","🇿🇦Johannesburg","🇷🇺Moscou","🇩🇪Berlin","🇪🇸Madrid","🇳🇱Amsterdam","🇧🇪Bruxelles","🇦🇹Vienne","🇨🇭Genève","🇸🇬Singapour","🇹🇭Bangkok","🇰🇷Séoul","🇮🇱Jérusalem","🇬🇷Athènes","🇮🇪Dublin","🇵🇹Lisbonne","🇹🇷Istanbul","🇨🇱Santiago","🇵🇪Lima","🇨🇴Bogota","🇻🇪Caracas","🇵🇰Karachi","🇧🇩Dhaka","🇳🇬Lagos","🇸🇦Riyad","🇶🇦Doha","🇦🇪Dubaï","🇮🇩Jakarta","🇵🇭Manille","🇻🇳Hanoï","🇰🇪Nairobi","🇲🇦Casablanca","🇨🇺La Havane","🇮🇸Reykjavik","🇫🇮Helsinki","🇳🇴Oslo","🇸🇪Stockholm","🇩🇰Copenhague","👨‍🔬Einstein","👩‍🔬Marie Curie","🎨Léonard de Vinci","✍️Shakespeare","👑Cléopâtre","⚔️Napoléon","✝️Jésus","🌍Christophe Colomb","🎤Michael Jackson","👑Élizabeth II","☯️Confucius","🧘Bouddha","🎤Elvis Presley","✍️Victor Hugo","🔬Galilée","👑Jeanne d'Arc","🎨Picasso","🎼Mozart","🎸Jimi Hendrix","🏀Michael Jordan","🥋Bruce Lee","🗳️Nelson Mandela","🗳️Abraham Lincoln","🗳️Gandhi","📚Jane Austen","💻Steve Jobs","💻Bill Gates","🚀Elon Musk","📚J.K. Rowling","🎤Freddie Mercury","🎭Charlie Chaplin","💃Marilyn Monroe","👨‍🚀Neil Armstrong","👨‍🍳Gordon Ramsay","👩‍🍳Julia Child","🎩Walt Disney","📚Stephen King","🎤Beyoncé","⚽Pelé","⚽Maradona","🏎️Michael Schumacher","🎿Roger Federer","🎾Serena Williams","🏎️Lewis Hamilton","🏎️Ayrton Senna","👩‍⚕️Florence Nightingale","🗳️Martin Luther King","👑Louis XIV","✍️Molière","🎨Vincent van Gogh","🧱Minecraft","🍄Super Mario","🔫Fortnite","🧩Tetris","🗡️The Legend of Zelda","🌍World of Warcraft","🚗Grand Theft Auto","💻Cyberpunk 2077","👽Halo","🗡️Elder Scrolls","🤖Pac-Man","👻Among Us","💥Call of Duty","🏎️Mario Kart","🚀Space Invaders","👾Pokémon","⚔️Final Fantasy","🪓God of War","🌃Red Dead Redemption","📦Portal","🕵️Assassin's Creed","🎮FIFA","🏀NBA 2K","🥋Mortal Kombat","🥋Street Fighter","🏎️Gran Turismo","📦Fallout","🏹Skyrim","🤖Detroit: Become Human","🐺The Witcher","🧟Resident Evil","🌃Silent Hill","🎮Overwatch","⚽Rocket League","🎵Guitar Hero","💃Just Dance","🎯Destiny","🤖Borderlands","🤖Apex Legends","🕹️Pong","👾Donkey Kong","🚀Asteroids","🐍Snake","🎮Candy Crush","🕵️Hitman","🎮Dark Souls","🐉Elden Ring","💥Doom","👾Half-Life","🦁lion","🐘éléphant","🦒girafe","🐅tigre","🐻ours","🐼panda","🦊renard","🐺loup","🦌cerf","🐇lapin","🐿️écureuil","🦇chauve-souris","🦉hibou","🦅aigle","🦜perroquet","🦢cygne","🕊️colombe","🦋papillon","🐝abeille","🐞coccinelle","🐜fourmi","🦗sauterelle","🕷️araignée","🐍cobra","🐊alligator","🐠requin","🐙pieuvre","🐳dauphin","🦍gorille","🐵singe","🐨koala","🦙lama","🐪chameau","🦘kangourou","🐧manchot","🦩flamant rose","🦉chouette","🦉harfang","🐺coyote","🐻grizzly","🐅léopard","🦌renne","🦨mouffette","🦡blaireau","🦦loutre","🦫castor","🦝raton laveur","🦊fennec","🐒chimpanzé","🦒okapi","🦓zébre","🦛hippopotame","🦏rhinocéros","🐘mammouth","🦖dinosaure","🐉dragon","🦄licorne","🧜‍♀️sirène","🧚fée","🧙magicien","🧟zombie","🧛vampire","🐺loup-garou","👻fantôme","👽alien","🤖robot","🚀fusée","🛰️satellite","🔭télescope","🔬microscope","📱smartphone","💻ordinateur","🖥️écran","⌨️clavier","🖱️souris","🔌prise","🔋batterie","💡ampoule","🔦lampe de poche","📻radio","📺télévision","📸appareil photo","🎥caméra","🎤microphone","🎧casque","🗣️haut-parleur","🖨️imprimante","💿disque","💾clé USB","🌐internet","☁️nuage (informatique)","🔐cybersécurité","🔑clé (cryptographie)","📈graphique","📊tableau","📝document","📚livre","📰journal","📝plume","✏️crayon","✒️encre","📏règle","✂️ciseaux","📎trombone","📌épingle","🗓️calendrier","⏰réveil","⏱️chronomètre","⏳sablier","🗺️carte","📍épingle de carte","🧭boussole","🔭jumelles","🎒sac à dos","💼mallette","👛porte-monnaie","🔑clé (physique)","🚪porte","🪟fenêtre","🏠maison","🏢immeuble","🏫école","🏥hôpital","🏪magasin","🏭usine","🚜tracteur","🏗️grue","🚛camion","🚚fourgonnette","🚐minibus","🚌bus","🚂train","🚇métro","🚄TGV","🚢navire","🛥️yacht","🛶kayak","⛵voilier","🚤hors-bord","🚁hélicoptère","✈️avion","🛰️navette spatiale","🌠étoile filante","🌌nébuleuse","🔭constellation","🪐galaxie","☀️comète","☄️astéroïde","🌕planète","🌑mercure","⚪vénus","🔴mars","🔵jupiter","🟢saturne","🟠uranus","🟣neptune","🔵pluton","🪐lune","💫étoile","☀️soleil","✨univers","🌈arc-en-ciel","⚡orage","🌪️tornade","🌊tsunami","🌋volcan","⛰️montagne","🏞️vallée","🏜️canyon","🏝️île","🏖️plage","🌲forêt","🌳arbre fruitier","🌿arbuste","🎋bambou","🌾blé","🌽maïs","🥕carotte","🥔pomme de terre","🧅oignon","🍅tomate","🌶️piment","🥒concombre","🍆aubergine","🥦brocoli","🥬laitue","🍊orange","🍋citron","🍎pomme","🍐poire","🍓fraise","🍇raisin","🍉pastèque","🥝kiwi","🍍ananas","🥥noix de coco","🥭mangue","🥑avocat","🍌banane","🍒cerise","🍑pêche","🫐myrtille","🌰châtaigne","🥜cacahuète","🍞pain","🥐croissant","🥖baguette","🍕pizza","🍔hamburger","🍟frites","🌭hot-dog","🌮taco","🍜nouilles","🍣sushi","🍚riz","🍝pâtes","🍲soupe","🍛curry","🍳œuf (plat)","🥞crêpe","🧇gaufre","🍩donut","🍪cookie","🍰gâteau","🍦glace","🍫chocolat","🍬bonbon","🍭sucre d'orge","🍯miel","☕café","🍵thé","🥛lait","🥤soda","🍷vin","🍺bière","🍸cocktail","🥂champagne","🍾bouteille","🍴fourchette","🥄cuillère","🔪couteau","🍽️assiette","🥣bol","🥛verre","☕tasse","🍳poêle","🍲casserole","🔪planche à découper","🧊glaçon","🧂sel","🌶️poivre","🌿herbe aromatique","🧄ail","🧅oignon","🥔gingembre","🥕carotte","🥦chou","💨vapeur","🌫️brume","☁️nuage","🌧️pluie","🌈arc-en-ciel","❄️neige","🧊glace","❄️gel","🌊océan","🏞️lac","💧rivière","💦goutte","🌋lave","🪨pierre","⛰️roche","🏔️montagne","🏖️sable","🏜️désert","🌬️dune","🌳arbre","🪵bois","🌿feuille","🌸fleur","🍄champignon","🌾herbe","🌱graine","🍎fruit","🥕légume","🌾céréale","🌻pollen","🍯miel","🐝cire","🥚œuf","🦴os","🪶plume","🧶laine","🧵coton","🎋fibre","🪹nid","🕸️toile","🐚coquille","💎cristal","✨gemme","💡lumière","🌑obscurité","⚡foudre","💥étincelle","⭐étoile","☄️météore","🌕lune","☀️soleil","🌌galaxie","🌀vent","🌪️tornade","🧊grêle","🌨️givre","💧rosée","🧊stalagmite","🧊stalactite","💧source","🌫️brouillard","💧flotte","💧humide","💧mouillé","☀️sec","🟤glaise","🪨gravier","🗿rocher","⚪galet","🔪silex","💎quartz","🪨granit","⚪calcaire","🌋basalte","🏺argile","🖊️craie","🗿marbre","🖋️ardoise","🪨gneiss","🪨obsidienne","🫧ponce","⛏️schiste","⏳grès","🧪gypse","🍂tourbe","⛏️minerai","⬛charbon","💎diamant","🌟or","🥈argent","🟫cuivre","⛓️fer","🥫étain","🥉bronze","🔪acier","🧪mercure","🧪soufre","🥛verre","🧱ciment","🩹plâtre","⚫goudron","⚫bitume","🛢️pétrole","⛽gaz","🛍️plastique","🚗caoutchouc","🌲résine","🌳sève","🧼gomme"," ashes","📜papier","📦carton","👕tissu","👜cuir","👘soie","🌿lin","🎋chanvre","🎍jute","🌿bambou","🧺rotin","🌊corail","🩸cendres"
       ];
       
       function parseElements(list) {
@@ -384,8 +543,10 @@
       // Références aux éléments du DOM
       const elementsList = document.getElementById("elements-list");
       const undiscoveredList = document.getElementById("undiscovered-list");
+      const achievementsContent = document.getElementById("achievements-content");
       const tabDiscovered = document.getElementById("tab-discovered");
       const tabUndiscovered = document.getElementById("tab-undiscovered");
+      const tabAchievements = document.getElementById("tab-achievements");
       const sortButtonsContainer = document.getElementById("sort-buttons");
       
       const workspace = document.getElementById("workspace");
@@ -503,12 +664,63 @@
         requestAnimationFrame(animateBackground);
       }
 
+      // --- NOUVEAU : Fonction pour attribuer la rareté ---
+      function assignRarities() {
+        const totalElements = allElementNames.length;
+        const elementsToAssign = [...allElementNames]; // Copie pour ne pas modifier l'original
+        
+        // Mélanger les éléments pour une attribution aléatoire
+        for (let i = elementsToAssign.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [elementsToAssign[i], elementsToAssign[j]] = [elementsToAssign[j], elementsToAssign[i]];
+        }
+
+        const numLegendary = 25;
+        const numEpic = 100;
+        const numRare = 300;
+
+        let assignedCount = 0;
+
+        // Légendaires
+        for (let i = 0; i < numLegendary && assignedCount < totalElements; i++) {
+            rarities[elementsToAssign[assignedCount]] = 'legendary';
+            assignedCount++;
+        }
+        // Épiques
+        for (let i = 0; i < numEpic && assignedCount < totalElements; i++) {
+            rarities[elementsToAssign[assignedCount]] = 'epic';
+            assignedCount++;
+        }
+        // Rares
+        for (let i = 0; i < numRare && assignedCount < totalElements; i++) {
+            rarities[elementsToAssign[assignedCount]] = 'rare';
+            assignedCount++;
+        }
+        // Communs (le reste)
+        while (assignedCount < totalElements) {
+            rarities[elementsToAssign[assignedCount]] = 'common';
+            assignedCount++;
+        }
+
+        // Assurer que les 4 éléments de base sont "communs" pour la cohérence
+        startingElements.forEach(name => {
+            rarities[name] = 'common';
+        });
+      }
+
       function addElementToSidebar(name) {
         const el = document.createElement("div");
         el.className = "element";
         el.setAttribute("data-name", name);
         el.textContent = emojis[name] ? emojis[name] + " " + name : name;
         el.setAttribute("draggable", "true");
+        
+        // --- NOUVEAU : Ajouter la classe de rareté ---
+        const rarityClass = rarities[name];
+        if (rarityClass) {
+            el.classList.add(rarityClass);
+        }
+
         el.addEventListener("dragstart", e => {
           e.dataTransfer.setData("text/plain", name);
           e.dataTransfer.effectAllowed = "copy";
@@ -523,6 +735,11 @@
         el.className = "element undiscovered-element";
         el.setAttribute("data-name", name);
         el.textContent = emojis[name] ? emojis[name] + " " + name : "? " + name;
+        // --- NOUVEAU : Ajouter la classe de rareté même pour les éléments non découverts (grisés) ---
+        const rarityClass = rarities[name];
+        if (rarityClass) {
+            el.classList.add(rarityClass);
+        }
         undiscoveredList.appendChild(el);
       }
 
@@ -567,6 +784,13 @@
         el.style.top = y + "px";
         el.setAttribute("data-name", name);
         el.setAttribute("draggable", "true");
+
+        // --- NOUVEAU : Ajouter la classe de rareté aux éléments flottants ---
+        const rarityClass = rarities[name];
+        if (rarityClass) {
+            el.classList.add(rarityClass);
+        }
+
         el.addEventListener("dragstart", e => {
           e.dataTransfer.setData("text/plain", name);
           e.dataTransfer.setData("offsetX", e.offsetX);
@@ -601,7 +825,7 @@
         for(let el of floatingEls) {
           const r = el.getBoundingClientRect();
           const overlapX = Math.abs((movingRect.left + movingRect.width/2) - (r.left + r.width/2)) < FUSION_TOLERANCE;
-          const overlapY = Math.abs((movingRect.top + movingRect.height/2) - (r.top + r.height/2)) < FUSION_TOLERANCE;
+          const overlapY = Math.abs((movingRect.top + r.top)/2 - (r.top + r.height/2)) < FUSION_TOLERANCE;
           if(overlapX && overlapY) {
             const name1 = movingEl.getAttribute("data-name");
             const name2 = el.getAttribute("data-name");
@@ -614,6 +838,7 @@
                 discovered.set(result, Date.now());
                 saveDiscoveredElements();
                 renderElementsList();
+                checkAchievements('newElement', result); // Vérifier les succès après une nouvelle découverte
               }
               const newEl = spawnFloatingElement(result, x, y, true);
               if (isNewDiscovery) {
@@ -622,6 +847,8 @@
               }
               movingEl.remove();
               el.remove();
+              checkAchievements('combinationMade'); // Vérifier le succès de la première combinaison
+              checkAchievements('floatingElementsState'); // Vérifier les succès liés aux éléments flottants
               return true;
             }
           }
@@ -654,22 +881,26 @@
                     const result = combine(name, el.getAttribute("data-name"));
                     if (result) {
                         const isNew = !discovered.has(result);
-                        if(isNew) { discovered.set(result, Date.now()); saveDiscoveredElements(); renderElementsList(); }
+                        if(isNew) { discovered.set(result, Date.now()); saveDiscoveredElements(); renderElementsList(); checkAchievements('newElement', result); }
                         const newEl = spawnFloatingElement(result, elCenterX, elCenterY, true);
                         if(isNew) { newEl.classList.add('new-element-animation'); newEl.addEventListener('animationend', () => newEl.classList.remove('new-element-animation'), { once: true }); }
                         el.remove();
                         fused = true;
+                        checkAchievements('combinationMade'); // Vérifier le succès de la première combinaison
+                        checkAchievements('floatingElementsState'); // Vérifier les succès liés aux éléments flottants
                         break;
                     }
                 }
             }
             if (!fused) {
                 const tempEl = document.createElement("div");
-                tempEl.className = "floating-element"; tempEl.style.visibility = "hidden"; tempEl.textContent = name;
+                tempEl.className = "floating-element"; // Utilise la classe pour obtenir les dimensions réelles
+                tempEl.style.visibility = "hidden"; tempEl.textContent = name;
                 workspace.appendChild(tempEl);
                 const elWidth = tempEl.offsetWidth; const elHeight = tempEl.offsetHeight;
                 workspace.removeChild(tempEl);
                 spawnFloatingElement(name, dropX - elWidth / 2, dropY - elHeight / 2);
+                checkAchievements('floatingElementsState'); // Vérifier les succès liés aux éléments flottants
             }
         }
       });
@@ -680,20 +911,45 @@
         if (draggingElement) {
           draggingElement.classList.add('disappear-animation');
           setTimeout(() => { draggingElement.remove(); }, 300);
+          checkAchievements('floatingElementsState'); // Vérifier les succès liés aux éléments flottants
         }
       });
       
       // Listeners pour les boutons
+      let themeLightTimer = null;
+      let themeLightStartTime = 0;
+
       function toggleTheme() {
         document.body.classList.toggle("dark");
-        themeToggle.textContent = document.body.classList.contains("dark") ? "⚫" : "⚪";
+        const isDark = document.body.classList.contains("dark");
+        themeToggle.textContent = isDark ? "⚫" : "⚪";
+        drawGrid(); // Redessine la grille avec la nouvelle couleur
+        drawConstellations(); // Redessine les constellations avec la nouvelle couleur
+
+        if (!isDark) { // Switched to light theme
+            themeLightStartTime = Date.now();
+            if (themeLightTimer) clearTimeout(themeLightTimer);
+            themeLightTimer = setTimeout(() => {
+                // Only achieve if still in light mode after 1 minute
+                if (!document.body.classList.contains("dark")) {
+                    unlockAchievement('AH MES YEUX !');
+                }
+            }, 60 * 1000); // 1 minute in milliseconds
+        } else { // Switched to dark theme
+            if (themeLightTimer) {
+                clearTimeout(themeLightTimer);
+                themeLightTimer = null;
+            }
+        }
       }
       themeToggle.addEventListener("click", toggleTheme);
+      
       cleanWorkspaceBtn.addEventListener("click", () => {
         [...workspace.querySelectorAll(".floating-element")].forEach(el => {
           el.classList.add('disappear-animation');
           setTimeout(() => el.remove(), 300);
         });
+        checkAchievements('floatingElementsState'); // Vérifier les succès liés aux éléments flottants
       });
       sortByAgeBtn.addEventListener('click', () => renderElementsList('age'));
       sortByNameBtn.addEventListener('click', () => renderElementsList('name'));
@@ -702,30 +958,640 @@
       
       // Logique des onglets
       function switchTab(activeTab) {
+          // Hide all content areas and controls by default
+          elementsList.style.display = 'none';
+          undiscoveredList.style.display = 'none';
+          achievementsContent.style.display = 'none';
+          sortButtonsContainer.style.display = 'none';
+          searchInput.style.display = 'none';
+
+          // Deactivate all tab buttons
+          tabDiscovered.classList.remove('active');
+          tabUndiscovered.classList.remove('active');
+          tabAchievements.classList.remove('active');
+
+          // Activate the selected tab and show its content
           if (activeTab === 'discovered') {
               tabDiscovered.classList.add('active');
-              tabUndiscovered.classList.remove('active');
               elementsList.style.display = 'block';
-              undiscoveredList.style.display = 'none';
               sortButtonsContainer.style.display = 'flex';
-          } else {
-              tabDiscovered.classList.remove('active');
+              searchInput.style.display = 'block';
+          } else if (activeTab === 'undiscovered') {
               tabUndiscovered.classList.add('active');
-              elementsList.style.display = 'none';
               undiscoveredList.style.display = 'block';
-              sortButtonsContainer.style.display = 'none';
+          } else if (activeTab === 'achievements') {
+              tabAchievements.classList.add('active');
+              achievementsContent.style.display = 'flex'; // Use flex for achievements content
+              renderAchievements(); // Render achievements when tab is switched to
           }
       }
       tabDiscovered.addEventListener('click', () => switchTab('discovered'));
       tabUndiscovered.addEventListener('click', () => switchTab('undiscovered'));
+      tabAchievements.addEventListener('click', () => switchTab('achievements'));
+
+      // --- Logique des Succès ---
+      const achievements = {
+        "Premier Pas": {
+          icon: "🍼",
+          description: "Crée ta toute première combinaison.",
+          achieved: false,
+          check: () => totalCombinationsMade >= 1
+        },
+        "Combinaison Inédite": {
+          icon: "🪖",
+          description: "Découvre un élément épique.",
+          achieved: false,
+          check: () => {
+            for (const [name] of discovered.entries()) {
+              if (rarities[name] === 'epic') return true;
+            }
+            return false;
+          }
+        },
+        "Roi de la combine": {
+          icon: "👑",
+          description: "Découvre un élément légendaire.",
+          achieved: false,
+          check: () => {
+            for (const [name] of discovered.entries()) {
+              if (rarities[name] === 'legendary') return true;
+            }
+            return false;
+          }
+        },
+        "Copy-Paste": {
+          icon: "📒",
+          description: "Trouve 10 éléments avec le même émoji.",
+          achieved: false,
+          check: () => {
+            const emojiCounts = {};
+            for (const [name] of discovered.entries()) {
+              const emoji = emojis[name];
+              if (emoji) {
+                emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
+                if (emojiCounts[emoji] >= 10) return true;
+              }
+            }
+            return false;
+          }
+        },
+        "Famille": {
+          icon: "👩‍👧‍👦",
+          description: "Trouve \"Homme\", \"Femme\", \"Donkey Kong\".",
+          achieved: false,
+          check: () => discovered.has("homme") && discovered.has("femme") && discovered.has("Donkey Kong")
+        },
+        "Curieux Créateur": {
+          icon: "🧠",
+          description: "Crée 10 éléments.",
+          achieved: false,
+          check: () => discovered.size - startingElements.length >= 10,
+          progress: () => `${Math.min(10, discovered.size - startingElements.length)}/10`
+        },
+        "Créateur Fou": {
+          icon: "🧼",
+          description: "Crée 100 éléments.",
+          achieved: false,
+          check: () => discovered.size - startingElements.length >= 100,
+          progress: () => `${Math.min(100, discovered.size - startingElements.length)}/100`
+        },
+        "Combinateur Compulsif": {
+          icon: "💉",
+          description: "Crée 1 000 éléments.",
+          achieved: false,
+          check: () => discovered.size - startingElements.length >= 1000,
+          progress: () => `${Math.min(1000, discovered.size - startingElements.length)}/1000`
+        },
+        "Collectionneur": {
+          icon: "📁",
+          description: "Crée 10 minéraux.",
+          achieved: false,
+          check: () => {
+              const mineralList = ["Ambre", "Améthyste", "Ardoise", "Argent", "Argile", "Basalte", "Bitume", "Bronze", "Calcaire", "Cendres", "Charbon", "Craie", "Cristal", "Cuivre", "Diamant", "Émeraude", "Étain", "Fer", "Gemme", "Gneiss", "Goudron", "Granit", "Grès", "Gypse", "Mercure", "Minerai", "Nacre", "Obsidienne", "Onyx", "Opale", "Or", "Plâtre", "Ponce", "Quartz", "Rubis", "Sable", "Saphir", "Schiste", "Silex", "Soufre", "Topaze", "Tourbe", "Verre", "Zircon"];
+              let count = 0;
+              for (const mineral of mineralList) {
+                  if (discovered.has(mineral.toLowerCase())) { // Convert to lowercase for consistent checking
+                      count++;
+                  }
+              }
+              return count >= 10;
+          },
+          progress: () => {
+              const mineralList = ["Ambre", "Améthyste", "Ardoise", "Argent", "Argile", "Basalte", "Bitume", "Bronze", "Calcaire", "Cendres", "Charbon", "Craie", "Cristal", "Cuivre", "Diamant", "Émeraude", "Étain", "Fer", "Gemme", "Gneiss", "Goudron", "Granit", "Grès", "Gypse", "Mercure", "Minerai", "Nacre", "Obsidienne", "Onyx", "Opale", "Or", "Plâtre", "Ponce", "Quartz", "Rubis", "Sable", "Saphir", "Schiste", "Silex", "Soufre", "Topaze", "Tourbe", "Verre", "Zircon"];
+              let count = 0;
+              for (const mineral of mineralList) {
+                  if (discovered.has(mineral.toLowerCase())) {
+                      count++;
+                  }
+              }
+              return `${Math.min(10, count)}/10`;
+          }
+        },
+        "Alcoolique": {
+          icon: "🍷",
+          description: "Trouve l'élément \"Alcool\".",
+          achieved: false,
+          check: () => discovered.has("alcool")
+        },
+        "Flexeur": {
+          icon: "💲",
+          description: "Met un élément de chaque rareté dans la constellation.",
+          achieved: false,
+          check: () => {
+            const floatingElements = [...workspace.querySelectorAll(".floating-element")];
+            const foundRarities = new Set();
+            floatingElements.forEach(el => {
+              const name = el.getAttribute("data-name");
+              const rarity = rarities[name];
+              if (rarity) {
+                foundRarities.add(rarity);
+              }
+            });
+            return foundRarities.has('common') && foundRarities.has('rare') && foundRarities.has('epic') && foundRarities.has('legendary');
+          }
+        },
+        "Jambon": {
+          icon: "🍖",
+          description: "Trouve \"Jambon\".",
+          achieved: false,
+          check: () => discovered.has("jambon")
+        },
+        "Imposteur": {
+          icon: "🔪",
+          description: "Trouve l'élément \"Among Us\".",
+          achieved: false,
+          check: () => discovered.has("Among Us")
+        },
+        "AH MES YEUX !": {
+          icon: "👀",
+          description: "Met le thème clair pendant 1 minute.",
+          achieved: false,
+          // Check logic is handled by the themeToggle event listener
+          check: () => false // This achievement is checked by the timer, not directly here
+        },
+        "Maître de la création": {
+          icon: "👩‍🍳",
+          description: "Trouve 3 concepts.",
+          achieved: false,
+          check: () => {
+            const conceptsList = ["Absorption", "Accélération", "Accord", "Action", "Acoustique", "Âge", "Aide", "Aileron", "Alliance", "Amour", "Amplitude", "Amitié", "Anarchie", "Angle", "Anniversaire", "Anticipation", "Application", "Aptitude", "Arc-en-ciel", "Archéologie", "Argent (monnaie)", "Armure", "Art", "Artisanat", "Astéroïde", "Astronomie", "Athlétisme", "Atome", "Attente", "Aube", "Autobiographie", "Automne", "Avion (concept de vol)", "Axe", "Bactérie", "Balance", "Bande", "Banque", "Basketball", "Batterie", "Bénédiction", "Besoin", "Bien", "Billet", "Biologie", "Biosphère", "Bitume", "Boisson", "Bois", "Bouton", "Boxe", "Brume", "Bûche", "Câble", "Café", "Calculatrice", "Camping", "Canal", "Capacité", "Capitalisme", "Catastrophe", "Célébration", "Cellule", "Cendres", "Cercle", "Certitude", "Chaîne", "Chaleur", "Changement", "Chant", "Chaos", "Chasse", "Chasse (gibier)", "Châtiment", "Champ", "Champagne", "Chanvre", "Charnière", "Château", "Chimie", "Choix", "Chômage", "Chœur", "Chronomètre", "Cigale", "Ciment", "Cinéma", "Circonférence", "Circuit", "Citadine", "Civilisation", "Clavier", "Clé (musique)", "Clé (cryptographie)", "Clé (physique)", "Cloud", "Coiffure", "Col", "Colère", "Collaboration", "Collection", "Colorant", "Comète", "Commerce", "Commémoration", "Communisme", "Compas", "Compétence", "Compétition", "Compréhension", "Concert", "Conduction", "Conductivité", "Cône", "Conflit", "Connaissance", "Connexion", "Conscience", "Conséquence", "Constellation", "Consommation", "Context", "Continuité", "Coopération", "Corail", "Corde", "Cosmos", "Coton", "Couleur", "Courage", "Courbe", "Créativité", "Crédit", "Crépuscule", "Crise", "Croissance", "Croûte", "Cruche", "Culte", "Culpabilité", "Culture", "Curry", "Cuillère", "Cycle", "Cylindre", "Cybersécurité", "Danse", "Défense (protection)", "Défense (animal)", "Défi", "Dégoût", "Déjeuner", "Démocratie", "Densité", "Dépendance", "Désastre", "Déséquilibre", "Désespoir", "Désir", "Destin", "Destruction", "Dette", "Développement", "Diamètre", "Diffusion", "Diffraction", "Diode", "Direction", "Disque (informatique)", "Distance", "Dissonance", "Document", "Dogme", "Don (cadeau)", "Don (talent)", "Doute", "Douleur", "Droit", "Dune", "Duplex", "Échec", "Échange", "Écharpe", "Écologie", "Économie", "Écran", "Écoute", "Écrou", "Écosystème", "Égalité", "Éléphant", "Énergie", "Enfer", "Engrenage", "Enregistrement", "Ensemble", "Entropie", "Envie", "Épice", "Épingle", "Équateur", "Équerre", "Équilibre", "Escalade", "Esclavage", "Esprit", "Essai", "Essieu", "Est", "Estomac", "Étain", "Éternité", "Éthique", "Étincelle", "Étoile", "Étoile filante", "Étrier", "Évolution", "Éveil", "Événement", "Explosion", "Extinction", "Fade", "Faible", "Famille", "Fantôme", "Fée", "Fenêtre", "Fermeture", "Fermoir", "Fermeture", "Fête", "Fibre", "Fichier", "Finance", "Fin", "Fierté", "Fil", "Film", "Flacon", "Flamme", "Flore", "Foie", "Folklore", "Force", "Forêt", "Fortune (chance)", "Fortune (richesse)", "Fosse", "Foudre", "Fraternité", "Fréquence", "Froid", "Fumée", "Fusion", "Futur", "Galaxie", "Galet", "Gamme", "Gaz", "Gène", "Génétique", "Géographie", "Géologie", "Givre", "Glace", "Glaçon", "Glaise", "Gnome", "Goutte", "Gouvernement", "Grâce", "Gravier", "Gravitation", "Grille", "Grotte", "Groupe", "Guerre", "Guêtre", "Hache", "Haine", "Halo", "Harmonie", "Hasard", "Hélice", "Hérésie", "Héritage", "Hiérarchie", "Histoire", "Horloge", "Humide", "Hydroélectricité", "Île", "Imagination", "Imprimante", "Impôt", "Individu", "Informatique", "Ingénierie", "Injecteur", "Innovation", "Inconscient", "Insecte", "Instant", "Instrument", "Intelligence", "Interférence", "Internet", "Intuition", "Investissement", "Ivoire", "Jambe", "Jardin", "Jaune", "Jeu", "Jeu de société", "Joint", "Jours", "Jubilé", "Juge", "Justice", "Jute", "Kératine", "Kyoto", "Lac", "Lâcheté", "Laiton", "Lampe", "Lave", "Lecture", "Légende", "Légal", "Légat", "Liberté", "Lichen", "Lien", "Ligne", "Limite", "Lin", "Liquide", "Lit", "Littérature", "Logique", "Longueur", "Lumière", "Lune", "Machine", "Maillon", "Main", "Mal", "Malchance", "Malédiction", "Malheur", "Mammouth", "Mangue", "Maniement", "Manque", "Manuel", "Marbre", "Marché", "Marche", "Masque", "Masse", "Matériel", "Matériau", "Mécanique", "Mélange", "Mélodie", "Mémoire", "Mensonge", "Mer", "Météore", "Météorologie", "Mètre", "Microphone", "Microscope", "Midi", "Minerai", "Minuit", "Misère", "Missile", "Module", "Molécule", "Momentum", "Monarchie", "Monde", "Monnaie", "Mois", "Montagne", "Mouvement", "Mouillé", "Mousse", "Musique", "Mythe", "Nage", "Naissance", "Narration", "Nébuleuse", "Nid", "Niveau", "Nord", "Nord-ouest", "Nostalgie", "Nouvelle", "Noyau", "Nuage (météo)", "Nuage (informatique)", "Numérique", "Nutriment", "Nuit", "Objectif", "Obscurité", "Océan", "Océanographie", "Odeur", "Odyssée", "Oeuf (nourriture)", "Offre", "Onde", "Onde (son)", "Onglet", "Opération", "Opportunité", "Optique", "Optimisme", "Ordre", "Organe", "Organisation", "Os", "Ouïe", "Ouest", "Ours", "Pacte", "Paille", "Paléontologie", "Panneau", "Papier", "Paradis", "Particule", "Passé", "Patrimoine", "Paume", "Pavé", "Pêche", "Péché", "Peinture", "Pensée", "Performance", "Perte", "Pessimisme", "Pétrole", "Phase", "Philosophie", "Photon", "Pied", "Pierre", "Pièce", "Piège", "Piston", "Planète", "Plancton", "Planche", "Plante", "Plastique", "Pleur", "Pluie", "Plume", "Poids", "Point", "Poison", "Polarisation", "Pollen", "Polygone", "Pompe", "Pont", "Population", "Porte", "Porte-monnaie", "Potentiel", "Poussière", "Pauvreté", "Poésie", "Pression", "Présent", "Prêt", "Principe", "Prisme", "Production", "Profondeur", "Progrès", "Promesse", "Propulsion", "Protéine", "Proton", "Psychanalyse", "Psychologie", "Puissance", "Pulpe", "Punition", "Pyramide", "Quantité", "Quantum", "Quatuor", "Queue", "Randonnée", "Râpe", "Rareté", "Raison", "Réaction", "Réacteur", "Réalité", "Recherche", "Récital", "Récolte", "Récompense", "Rectangle", "Rédaction", "Rédemption", "Réflexion", "Réflexion (optique)", "Réfrigérateur", "Réfraction", "Régression", "Règle", "Règle (mathématique)", "Relation", "Religion", "Remède", "Repas", "Réponse", "Repos", "Représentation", "République", "Réseau", "Résine", "Résistivité", "Ressort", "Restaurant", "Résultat", "Rêve", "Réveil", "Révélation", "Révolution", "Rhum", "Rhinocéros", "Rhythm", "Richesses", "Rire", "Rite", "Rivière", "Roche", "Romance", "Roman", "Rondelle", "Roseau", "Rosée", "Rotin", "Rouille", "Roue", "Route", "Ruban", "Ruine", "Rythme", "Sablier", "Sabot", "Sac à dos", "Sagesse", "Salaire", "Salive", "Salut", "Saison", "Sanctuaire", "Santé", "Sarment", "Satellite", "Satisfaction", "Sauce", "Sauge", "Savoir-faire", "Sciure", "Sculpture", "Sec", "Secret", "Seconde", "Serment", "Service", "Siècle", "Silence", "Silicium", "Sirop", "Situation", "Socialisme", "Sociologie", "Soie", "Soir", "Solide", "Sommeil", "Son", "Sonde", "Sorcellerie", "Sortie", "Souche", "Source", "Sud", "Sud-Est", "Sud-Ouest", "Sucre", "Succès", "Sueur", "Surprise", "Système", "Tableau", "Tablier", "Taco", "Talent", "Tasse", "Taux", "Technologie", "Téléphone", "Télescope", "Télévision", "Température", "Temple", "Temps", "Tension", "Testament", "Thé", "Théâtre", "Thème", "Thermodynamique", "Tissu", "Toile", "Tonnerre", "Tore", "Tornade", "Toucher", "Tournevis", "Traction", "Tracteur", "Tradition", "Trafic", "Train", "Transition", "Transport", "Travail", "Traité", "Tremblement", "Triangle", "Tricot", "Trombone", "Tronc", "Tsunami", "Tuile", "Turbine", "Tyrannie", "Uranium", "Usine", "Utilisation", "Vallée", "Valeur", "Valve", "Vapeur", "Vecteur", "Véhicule", "Vent", "Verre", "Vertu", "Vie", "Vitesse", "Vidéo", "Vin", "Vinaigre", "Virus", "Vis", "Viscosité", "Vision", "Vitre", "Voile", "Voiture", "Voix", "Volcan", "Volume", "Voyage", "Vêtement", "Weekend", "Zodiaque"];
+            let count = 0;
+            for (const concept of conceptsList) {
+                if (discovered.has(concept.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 3;
+          },
+          progress: () => {
+            const conceptsList = ["Absorption", "Accélération", "Accord", "Action", "Acoustique", "Âge", "Aide", "Aileron", "Alliance", "Amour", "Amplitude", "Amitié", "Anarchie", "Angle", "Anniversaire", "Anticipation", "Application", "Aptitude", "Arc-en-ciel", "Archéologie", "Argent (monnaie)", "Armure", "Art", "Artisanat", "Astéroïde", "Astronomie", "Athlétisme", "Atome", "Attente", "Aube", "Autobiographie", "Automne", "Avion (concept de vol)", "Axe", "Bactérie", "Balance", "Bande", "Banque", "Basketball", "Batterie", "Bénédiction", "Besoin", "Bien", "Billet", "Biologie", "Biosphère", "Bitume", "Boisson", "Bois", "Bouton", "Boxe", "Brume", "Bûche", "Câble", "Café", "Calculatrice", "Camping", "Canal", "Capacité", "Capitalisme", "Catastrophe", "Célébration", "Cellule", "Cendres", "Cercle", "Certitude", "Chaîne", "Chaleur", "Changement", "Chant", "Chaos", "Chasse", "Chasse (gibier)", "Châtiment", "Champ", "Champagne", "Chanvre", "Charnière", "Château", "Chimie", "Choix", "Chômage", "Chœur", "Chronomètre", "Cigale", "Ciment", "Cinéma", "Circonférence", "Circuit", "Citadine", "Civilisation", "Clavier", "Clé (musique)", "Clé (cryptographie)", "Clé (physique)", "Cloud", "Coiffure", "Col", "Colère", "Collaboration", "Collection", "Colorant", "Comète", "Commerce", "Commémoration", "Communisme", "Compas", "Compétence", "Compétition", "Compréhension", "Concert", "Conduction", "Conductivité", "Cône", "Conflit", "Connaissance", "Connexion", "Conscience", "Conséquence", "Constellation", "Consommation", "Context", "Continuité", "Coopération", "Corail", "Corde", "Cosmos", "Coton", "Couleur", "Courage", "Courbe", "Créativité", "Crédit", "Crépuscule", "Crise", "Croissance", "Croûte", "Cruche", "Culte", "Culpabilité", "Culture", "Curry", "Cuillère", "Cycle", "Cylindre", "Cybersécurité", "Danse", "Défense (protection)", "Défense (animal)", "Défi", "Dégoût", "Déjeuner", "Démocratie", "Densité", "Dépendance", "Désastre", "Déséquilibre", "Désespoir", "Désir", "Destin", "Destruction", "Dette", "Développement", "Diamètre", "Diffusion", "Diffraction", "Diode", "Direction", "Disque (informatique)", "Distance", "Dissonance", "Document", "Dogme", "Don (cadeau)", "Don (talent)", "Doute", "Douleur", "Droit", "Dune", "Duplex", "Échec", "Échange", "Écharpe", "Écologie", "Économie", "Écran", "Écoute", "Écrou", "Écosystème", "Égalité", "Éléphant", "Énergie", "Enfer", "Engrenage", "Enregistrement", "Ensemble", "Entropie", "Envie", "Épice", "Épingle", "Équateur", "Équerre", "Équilibre", "Escalade", "Esclavage", "Esprit", "Essai", "Essieu", "Est", "Estomac", "Étain", "Éternité", "Éthique", "Étincelle", "Étoile", "Étoile filante", "Étrier", "Évolution", "Éveil", "Événement", "Explosion", "Extinction", "Fade", "Faible", "Famille", "Fantôme", "Fée", "Fenêtre", "Fermeture", "Fermoir", "Fermeture", "Fête", "Fibre", "Fichier", "Finance", "Fin", "Fierté", "Fil", "Film", "Flacon", "Flamme", "Flore", "Foie", "Folklore", "Force", "Forêt", "Fortune (chance)", "Fortune (richesse)", "Fosse", "Foudre", "Fraternité", "Fréquence", "Froid", "Fumée", "Fusion", "Futur", "Galaxie", "Galet", "Gamme", "Gaz", "Gène", "Génétique", "Géographie", "Géologie", "Givre", "Glace", "Glaçon", "Glaise", "Gnome", "Goutte", "Gouvernement", "Grâce", "Gravier", "Gravitation", "Grille", "Grotte", "Groupe", "Guerre", "Guêtre", "Hache", "Haine", "Halo", "Harmonie", "Hasard", "Hélice", "Hérésie", "Héritage", "Hiérarchie", "Histoire", "Horloge", "Humide", "Hydroélectricité", "Île", "Imagination", "Imprimante", "Impôt", "Individu", "Informatique", "Ingénierie", "Injecteur", "Innovation", "Inconscient", "Insecte", "Instant", "Instrument", "Intelligence", "Interférence", "Internet", "Intuition", "Investissement", "Ivoire", "Jambe", "Jardin", "Jaune", "Jeu", "Jeu de société", "Joint", "Jours", "Jubilé", "Juge", "Justice", "Jute", "Kératine", "Kyoto", "Lac", "Lâcheté", "Laiton", "Lampe", "Lave", "Lecture", "Légende", "Légal", "Légat", "Liberté", "Lichen", "Lien", "Ligne", "Limite", "Lin", "Liquide", "Lit", "Littérature", "Logique", "Longueur", "Lumière", "Lune", "Machine", "Maillon", "Main", "Mal", "Malchance", "Malédiction", "Malheur", "Mammouth", "Mangue", "Maniement", "Manque", "Manuel", "Marbre", "Marché", "Marche", "Masque", "Masse", "Matériel", "Matériau", "Mécanique", "Mélange", "Mélodie", "Mémoire", "Mensonge", "Mer", "Météore", "Météorologie", "Mètre", "Microphone", "Microscope", "Midi", "Minerai", "Minuit", "Misère", "Missile", "Module", "Molécule", "Momentum", "Monarchie", "Monde", "Monnaie", "Mois", "Montagne", "Mouvement", "Mouillé", "Mousse", "Musique", "Mythe", "Nage", "Naissance", "Narration", "Nébuleuse", "Nid", "Niveau", "Nord", "Nord-ouest", "Nostalgie", "Nouvelle", "Noyau", "Nuage (météo)", "Nuage (informatique)", "Numérique", "Nutriment", "Nuit", "Objectif", "Obscurité", "Océan", "Océanographie", "Odeur", "Odyssée", "Oeuf (nourriture)", "Offre", "Onde", "Onde (son)", "Onglet", "Opération", "Opportunité", "Optique", "Optimisme", "Ordre", "Organe", "Organisation", "Os", "Ouïe", "Ouest", "Ours", "Pacte", "Paille", "Paléontologie", "Panneau", "Papier", "Paradis", "Particule", "Passé", "Patrimoine", "Paume", "Pavé", "Pêche", "Péché", "Peinture", "Pensée", "Performance", "Perte", "Pessimisme", "Pétrole", "Phase", "Philosophie", "Photon", "Pied", "Pierre", "Pièce", "Piège", "Piston", "Planète", "Plancton", "Planche", "Plante", "Plastique", "Pleur", "Pluie", "Plume", "Poids", "Point", "Poison", "Polarisation", "Pollen", "Polygone", "Pompe", "Pont", "Population", "Porte", "Porte-monnaie", "Potentiel", "Poussière", "Pauvreté", "Poésie", "Pression", "Présent", "Prêt", "Principe", "Prisme", "Production", "Profondeur", "Progrès", "Promesse", "Propulsion", "Protéine", "Proton", "Psychanalyse", "Psychologie", "Puissance", "Pulpe", "Punition", "Pyramide", "Quantité", "Quantum", "Quatuor", "Queue", "Randonnée", "Râpe", "Rareté", "Raison", "Réaction", "Réacteur", "Réalité", "Recherche", "Récital", "Récolte", "Récompense", "Rectangle", "Rédaction", "Rédemption", "Réflexion", "Réflexion (optique)", "Réfrigérateur", "Réfraction", "Régression", "Règle", "Règle (mathématique)", "Relation", "Religion", "Remède", "Repas", "Réponse", "Repos", "Représentation", "République", "Réseau", "Résine", "Résistivité", "Ressort", "Restaurant", "Résultat", "Rêve", "Réveil", "Révélation", "Révolution", "Rhum", "Rhinocéros", "Rhythm", "Richesses", "Rire", "Rite", "Rivière", "Roche", "Romance", "Roman", "Rondelle", "Roseau", "Rosée", "Rotin", "Rouille", "Roue", "Route", "Ruban", "Ruine", "Rythme", "Sablier", "Sabot", "Sac à dos", "Sagesse", "Salaire", "Salive", "Salut", "Saison", "Sanctuaire", "Santé", "Sarment", "Satellite", "Satisfaction", "Sauce", "Sauge", "Savoir-faire", "Sciure", "Sculpture", "Sec", "Secret", "Seconde", "Serment", "Service", "Siècle", "Silence", "Silicium", "Sirop", "Situation", "Socialisme", "Sociologie", "Soie", "Soir", "Solide", "Sommeil", "Son", "Sonde", "Sorcellerie", "Sortie", "Souche", "Source", "Sud", "Sud-Est", "Sud-Ouest", "Sucre", "Succès", "Sueur", "Surprise", "Système", "Tableau", "Tablier", "Taco", "Talent", "Tasse", "Taux", "Technologie", "Téléphone", "Télescope", "Télévision", "Température", "Temple", "Temps", "Tension", "Testament", "Thé", "Théâtre", "Thème", "Thermodynamique", "Tissu", "Toile", "Tonnerre", "Tore", "Tornade", "Toucher", "Tournevis", "Traction", "Tracteur", "Tradition", "Trafic", "Train", "Transition", "Transport", "Travail", "Traité", "Tremblement", "Triangle", "Tricot", "Trombone", "Tronc", "Tsunami", "Tuile", "Turbine", "Tyrannie", "Uranium", "Usine", "Utilisation", "Vallée", "Valeur", "Valve", "Vapeur", "Vecteur", "Véhicule", "Vent", "Verre", "Vertu", "Vie", "Vitesse", "Vidéo", "Vin", "Vinaigre", "Virus", "Vis", "Viscosité", "Vision", "Vitre", "Voile", "Voiture", "Voix", "Volcan", "Volume", "Voyage", "Vêtement", "Weekend", "Zodiaque"];
+            let count = 0;
+            for (const concept of conceptsList) {
+                if (discovered.has(concept.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(3, count)}/3`;
+          }
+        },
+        "Le meilleur jeu": {
+          icon: "🌳",
+          description: "Trouve \"Minecraft\".",
+          achieved: false,
+          check: () => discovered.has("Minecraft")
+        },
+        "Gamer pro": {
+          icon: "🪴",
+          description: "Trouve 5 jeux vidéos.",
+          achieved: false,
+          check: () => {
+            const gamesList = ["Apex Legends", "Assassin's Creed", "Asteroids", "Among Us", "Borderlands", "Call of Duty", "Candy Crush", "Cyberpunk 2077", "Dark Souls", "Destiny", "Detroit: Become Human", "Donkey Kong", "Doom", "Elden Ring", "Elder Scrolls", "FIFA", "Final Fantasy", "Fortnite", "Fallout", "God of War", "Grand Theft Auto", "Gran Turismo", "Guitar Hero", "Halo", "Half-Life", "Hitman", "Just Dance", "Mario Kart", "Minecraft", "Mortal Kombat", "NBA 2K", "Overwatch", "Pac-Man", "Pokémon", "Pong", "Portal", "Red Dead Redemption", "Resident Evil", "Rocket League", "Skyrim", "Silent Hill", "Snake", "Space Invaders", "Street Fighter", "Super Mario", "Tetris", "The Legend of Zelda", "The Witcher", "World of Warcraft"];
+            let count = 0;
+            for (const game of gamesList) {
+                if (discovered.has(game.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 5;
+          },
+          progress: () => {
+            const gamesList = ["Apex Legends", "Assassin's Creed", "Asteroids", "Among Us", "Borderlands", "Call of Duty", "Candy Crush", "Cyberpunk 2077", "Dark Souls", "Destiny", "Detroit: Become Human", "Donkey Kong", "Doom", "Elden Ring", "Elder Scrolls", "FIFA", "Final Fantasy", "Fortnite", "Fallout", "God of War", "Grand Theft Auto", "Gran Turismo", "Guitar Hero", "Halo", "Half-Life", "Hitman", "Just Dance", "Mario Kart", "Minecraft", "Mortal Kombat", "NBA 2K", "Overwatch", "Pac-Man", "Pokémon", "Pong", "Portal", "Red Dead Redemption", "Resident Evil", "Rocket League", "Skyrim", "Silent Hill", "Snake", "Space Invaders", "Street Fighter", "Super Mario", "Tetris", "The Legend of Zelda", "The Witcher", "World of Warcraft"];
+            let count = 0;
+            for (const game of gamesList) {
+                if (discovered.has(game.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(5, count)}/5`;
+          }
+        },
+        "Alter ego": {
+          icon: "💰",
+          description: "Trouve \"pauvreté\" et \"richesse\".",
+          achieved: false,
+          check: () => discovered.has("pauvreté") && discovered.has("richesse")
+        },
+        "Globe-Trotteur": {
+          icon: "🌏",
+          description: "Trouve 3 villes.",
+          achieved: false,
+          check: () => {
+            const citiesList = ["Amsterdam", "Athènes", "Bangkok", "Berlin", "Bogota", "Bruxelles", "Buenos Aires", "Casablanca", "Caracas", "Copenhague", "Dakar", "Dhaka", "Doha", "Dublin", "Dubaï", "Genève", "Hanoï", "Helsinki", "Istanbul", "Jakarta", "Jérusalem", "Johannesburg", "Karachi", "La Havane", "Lagos", "Le Caire", "Lima", "Lisbonne", "Londres", "Madrid", "Manille", "Mexico", "Moscou", "Nairobi", "New Delhi", "New York", "Oslo", "Paris", "Reykjavik", "Rio de Janeiro", "Riyad", "Rome", "Santiago", "Séoul", "Shanghai", "Singapour", "Stockholm", "Sydney", "Tokyo", "Toronto", "Vienne"];
+            let count = 0;
+            for (const city of citiesList) {
+                if (discovered.has(city.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 3;
+          },
+          progress: () => {
+            const citiesList = ["Amsterdam", "Athènes", "Bangkok", "Berlin", "Bogota", "Bruxelles", "Buenos Aires", "Casablanca", "Caracas", "Copenhague", "Dakar", "Dhaka", "Doha", "Dublin", "Dubaï", "Genève", "Hanoï", "Helsinki", "Istanbul", "Jakarta", "Jérusalem", "Johannesburg", "Karachi", "La Havane", "Lagos", "Le Caire", "Lima", "Lisbonne", "Londres", "Madrid", "Manille", "Mexico", "Moscou", "Nairobi", "New Delhi", "New York", "Oslo", "Paris", "Reykjavik", "Rio de Janeiro", "Riyad", "Rome", "Santiago", "Séoul", "Shanghai", "Singapour", "Stockholm", "Sydney", "Tokyo", "Toronto", "Vienne"];
+            let count = 0;
+            for (const city of citiesList) {
+                if (discovered.has(city.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(3, count)}/3`;
+          }
+        },
+        "Tour du monde": {
+          icon: "🌐",
+          description: "Trouve 10 villes.",
+          achieved: false,
+          check: () => {
+            const citiesList = ["Amsterdam", "Athènes", "Bangkok", "Berlin", "Bogota", "Bruxelles", "Buenos Aires", "Casablanca", "Caracas", "Copenhague", "Dakar", "Dhaka", "Doha", "Dublin", "Dubaï", "Genève", "Hanoï", "Helsinki", "Istanbul", "Jakarta", "Jérusalem", "Johannesburg", "Karachi", "La Havane", "Lagos", "Le Caire", "Lima", "Lisbonne", "Londres", "Madrid", "Manille", "Mexico", "Moscou", "Nairobi", "New Delhi", "New York", "Oslo", "Paris", "Reykjavik", "Rio de Janeiro", "Riyad", "Rome", "Santiago", "Séoul", "Shanghai", "Singapour", "Stockholm", "Sydney", "Tokyo", "Toronto", "Vienne"];
+            let count = 0;
+            for (const city of citiesList) {
+                if (discovered.has(city.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 10;
+          },
+          progress: () => {
+            const citiesList = ["Amsterdam", "Athènes", "Bangkok", "Berlin", "Bogota", "Bruxelles", "Buenos Aires", "Casablanca", "Caracas", "Copenhague", "Dakar", "Dhaka", "Doha", "Dublin", "Dubaï", "Genève", "Hanoï", "Helsinki", "Istanbul", "Jakarta", "Jérusalem", "Johannesburg", "Karachi", "La Havane", "Lagos", "Le Caire", "Lima", "Lisbonne", "Londres", "Madrid", "Manille", "Mexico", "Moscou", "Nairobi", "New Delhi", "New York", "Oslo", "Paris", "Reykjavik", "Rio de Janeiro", "Riyad", "Rome", "Santiago", "Séoul", "Shanghai", "Singapour", "Stockholm", "Sydney", "Tokyo", "Toronto", "Vienne"];
+            let count = 0;
+            for (const city of citiesList) {
+                if (discovered.has(city.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(10, count)}/10`;
+          }
+        },
+        "Salade de fruits": {
+          icon: "🍎",
+          description: "Trouve 10 fruits.",
+          achieved: false,
+          check: () => {
+            const fruitsList = ["Ananas", "Avocat", "Banane", "Cerise", "Citron", "Fraise", "Kiwi", "Mangue", "Myrtille", "Noix de coco", "Orange", "Pastèque", "Pêche", "Poire", "Pomme", "Raisin"];
+            let count = 0;
+            for (const fruit of fruitsList) {
+                if (discovered.has(fruit.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 10;
+          },
+          progress: () => {
+            const fruitsList = ["Ananas", "Avocat", "Banane", "Cerise", "Citron", "Fraise", "Kiwi", "Mangue", "Myrtille", "Noix de coco", "Orange", "Pastèque", "Pêche", "Poire", "Pomme", "Raisin"];
+            let count = 0;
+            for (const fruit of fruitsList) {
+                if (discovered.has(fruit.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(10, count)}/10`;
+          }
+        },
+        "Salade de légumes ?": {
+          icon: "🍆",
+          description: "Trouve 10 légumes.",
+          achieved: false,
+          check: () => {
+            const vegetablesList = ["Ail", "Aubergine", "Brocoli", "Carotte", "Chou", "Concombre", "Gingembre", "Laitue", "Oignon", "Piment", "Pomme de terre", "Tomate"];
+            let count = 0;
+            for (const veg of vegetablesList) {
+                if (discovered.has(veg.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 10;
+          },
+          progress: () => {
+            const vegetablesList = ["Ail", "Aubergine", "Brocoli", "Carotte", "Chou", "Concombre", "Gingembre", "Laitue", "Oignon", "Piment", "Pomme de terre", "Tomate"];
+            let count = 0;
+            for (const veg of vegetablesList) {
+                if (discovered.has(veg.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(10, count)}/10`;
+          }
+        },
+        "Éleveur": {
+          icon: "🧺",
+          description: "Crée 10 animaux.",
+          achieved: false,
+          check: () => {
+            const animalsList = ["Abeille", "Aigle", "Alligator", "Araignée", "Baleine", "Belette", "Bête", "Blaireau", "Castor", "Cerf", "Chameau", "Chat", "Chauve-souris", "Chenille", "Cheval", "Chimpanzé", "Chouette", "Chrysalide", "Cigale", "Cobra", "Coccinelle", "Colombe", "Corail", "Corbeau", "Coyote", "Crabe", "Crévette", "Criquet", "Crocodile", "Cyprée", "Dauphin", "Dinosaure", "Dragon", "Écureuil", "Éléphant", "Éléphant (défense)", "Escargot", "Fennec", "Flamant rose", "Fourmi", "Grenouille", "Grillon", "Grizzly", "Gorille", "Harfang", "Hérisson", "Hibou", "Hippopotame", "Huître", "Kangourou", "Koala", "Lama", "Lapin", "Lézard", "Lion", "Loup", "Loutre", "Mammouth", "Manchot", "Mite", "Mouche", "Mouffette", "Moule", "Moustique", "Mouton", "Okapi", "Oisillon", "Oiseau", "Panda", "Papillon", "Perroquet", "Pieuvre", "Pigeon", "Poisson", "Porc", "Poussin", "Poulet", "Puce", "Raton laveur", "Requin", "Renne", "Rhinocéros", "Renard", "Sauterelle", "Scarabée", "Scorpion", "Serpent", "Singe", "Souris", "Taureau", "Tigre", "Tortue", "Ver", "Vache", "Zèbre", "Zombie", "Loup-garou", "Vampire"];
+            let count = 0;
+            for (const animal of animalsList) {
+                if (discovered.has(animal.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 10;
+          },
+          progress: () => {
+            const animalsList = ["Abeille", "Aigle", "Alligator", "Araignée", "Baleine", "Belette", "Bête", "Blaireau", "Castor", "Cerf", "Chameau", "Chat", "Chauve-souris", "Chenille", "Cheval", "Chimpanzé", "Chouette", "Chrysalide", "Cigale", "Cobra", "Coccinelle", "Colombe", "Corail", "Corbeau", "Coyote", "Crabe", "Crévette", "Criquet", "Crocodile", "Cyprée", "Dauphin", "Dinosaure", "Dragon", "Écureuil", "Éléphant", "Éléphant (défense)", "Escargot", "Fennec", "Flamant rose", "Fourmi", "Grenouille", "Grillon", "Grizzly", "Gorille", "Harfang", "Hérisson", "Hibou", "Hippopotame", "Huître", "Kangourou", "Koala", "Lama", "Lapin", "Lézard", "Lion", "Loup", "Loutre", "Mammouth", "Manchot", "Mite", "Mouche", "Mouffette", "Moule", "Moustique", "Mouton", "Okapi", "Oisillon", "Oiseau", "Panda", "Papillon", "Perroquet", "Pieuvre", "Pigeon", "Poisson", "Porc", "Poussin", "Poulet", "Puce", "Raton laveur", "Requin", "Renne", "Rhinocéros", "Renard", "Sauterelle", "Scarabée", "Scorpion", "Serpent", "Singe", "Souris", "Taureau", "Tigre", "Tortue", "Ver", "Vache", "Zèbre", "Zombie", "Loup-garou", "Vampire"];
+            let count = 0;
+            for (const animal of animalsList) {
+                if (discovered.has(animal.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(10, count)}/10`;
+          }
+        },
+        "Artiste Conceptuel": {
+          icon: "🧬",
+          description: "Crée 5 émotions.",
+          achieved: false,
+          check: () => {
+            const emotionsList = ["Amour", "Amitié", "Colère", "Culpabilité", "Dégoût", "Désespoir", "Douleur", "Espoir", "Fierté", "Haine", "Honte", "Joie", "Lâcheté", "Peur", "Plaisir", "Surprise", "Tristesse"];
+            let count = 0;
+            for (const emotion of emotionsList) {
+                if (discovered.has(emotion.toLowerCase())) {
+                    count++;
+                }
+            }
+            return count >= 5;
+          },
+          progress: () => {
+            const emotionsList = ["Amour", "Amitié", "Colère", "Culpabilité", "Dégoût", "Désespoir", "Douleur", "Espoir", "Fierté", "Haine", "Honte", "Joie", "Lâcheté", "Peur", "Plaisir", "Surprise", "Tristesse"];
+            let count = 0;
+            for (const emotion of emotionsList) {
+                if (discovered.has(emotion.toLowerCase())) {
+                    count++;
+                }
+            }
+            return `${Math.min(5, count)}/5`;
+          }
+        },
+        "Créateur de Vie": {
+          icon: "🥐",
+          description: "Crée un être vivant.",
+          achieved: false,
+          check: () => {
+            const livingBeingsList = ["humain", "insecte", "licorne", "loup-garou", "papillon", "poussin", "sirène", "ver", "zèbre", "homme"];
+            for (const livingBeing of livingBeingsList) {
+                if (discovered.has(livingBeing.toLowerCase())) {
+                    return true;
+                }
+            }
+            return false;
+          }
+        },
+        "Trophée de chocolat": {
+          icon: "🍫",
+          description: "Trouve tous les éléments communs.",
+          achieved: false,
+          check: () => {
+            const commonElements = allElementNames.filter(name => rarities[name] === 'common');
+            return commonElements.every(name => discovered.has(name));
+          },
+          progress: () => {
+            const commonElements = allElementNames.filter(name => rarities[name] === 'common');
+            const discoveredCommon = commonElements.filter(name => discovered.has(name)).length;
+            return `${discoveredCommon}/${commonElements.length}`;
+          }
+        },
+        "Trophée de bronze": {
+          icon: "🧡",
+          description: "Trouve tous les éléments rares.",
+          achieved: false,
+          check: () => {
+            const rareElements = allElementNames.filter(name => rarities[name] === 'rare');
+            return rareElements.every(name => discovered.has(name));
+          },
+          progress: () => {
+            const rareElements = allElementNames.filter(name => rarities[name] === 'rare');
+            const discoveredRare = rareElements.filter(name => discovered.has(name)).length;
+            return `${discoveredRare}/${rareElements.length}`;
+          }
+        },
+        "Trophée d'améthyste": {
+          icon: "💜",
+          description: "Trouve tous les éléments épiques.",
+          achieved: false,
+          check: () => {
+            const epicElements = allElementNames.filter(name => rarities[name] === 'epic');
+            return epicElements.every(name => discovered.has(name));
+          },
+          progress: () => {
+            const epicElements = allElementNames.filter(name => rarities[name] === 'epic');
+            const discoveredEpic = epicElements.filter(name => discovered.has(name)).length;
+            return `${discoveredEpic}/${epicElements.length}`;
+          }
+        },
+        "Trophée de crystal": {
+          icon: "💙",
+          description: "Trouve tous les éléments légendaires.",
+          achieved: false,
+          check: () => {
+            const legendaryElements = allElementNames.filter(name => rarities[name] === 'legendary');
+            return legendaryElements.every(name => discovered.has(name));
+          },
+          progress: () => {
+            const legendaryElements = allElementNames.filter(name => rarities[name] === 'legendary');
+            const discoveredLegendary = legendaryElements.filter(name => discovered.has(name)).length;
+            return `${discoveredLegendary}/${legendaryElements.length}`;
+          }
+        },
+        "Trophée de platine": {
+          icon: "🏆",
+          description: "Trouve tous les éléments.",
+          achieved: false,
+          check: () => discovered.size === allElementNames.length,
+          progress: () => `${discovered.size}/${allElementNames.length}`
+        },
+        "Fin ?": {
+          icon: "♾️",
+          description: "Crée la fin, l'univers, le chaos, l'esprit, et le doute.",
+          achieved: false,
+          check: () => discovered.has("fin") && discovered.has("univers") && discovered.has("chaos") && discovered.has("esprit") && discovered.has("doute")
+        }
+      };
+
+      let totalCombinationsMade = 0; // Compteur pour "Premier Pas"
+
+      function saveAchievements() {
+        const achievedStates = {};
+        for (const key in achievements) {
+          achievedStates[key] = achievements[key].achieved;
+        }
+        localStorage.setItem('littleAlchemyAchievements', JSON.stringify(achievedStates));
+        localStorage.setItem('littleAlchemyTotalCombinations', totalCombinationsMade);
+      }
+
+      function loadAchievements() {
+        const storedAchievements = localStorage.getItem('littleAlchemyAchievements');
+        if (storedAchievements) {
+          const parsed = JSON.parse(storedAchievements);
+          for (const key in parsed) {
+            if (achievements[key]) {
+              achievements[key].achieved = parsed[key];
+            }
+          }
+        }
+        const storedCombinations = localStorage.getItem('littleAlchemyTotalCombinations');
+        if (storedCombinations) {
+            totalCombinationsMade = parseInt(storedCombinations, 10);
+        }
+      }
+
+      function unlockAchievement(achievementName) {
+        if (!achievements[achievementName].achieved) {
+          achievements[achievementName].achieved = true;
+          saveAchievements();
+          renderAchievements(); // Re-render to show unlocked status
+          // Optionnel: Ajouter une notification visuelle pour le succès débloqué
+          console.log(`Succès débloqué : ${achievementName}`);
+        }
+      }
+
+      function checkAchievements(triggerType, data = null) {
+        let anyAchievementUnlocked = false;
+        for (const key in achievements) {
+          if (!achievements[key].achieved) {
+            let shouldUnlock = false;
+            switch (key) {
+                case "Premier Pas":
+                    if (triggerType === 'combinationMade') {
+                        shouldUnlock = achievements[key].check();
+                    }
+                    break;
+                case "Combinaison Inédite":
+                case "Roi de la combine":
+                    if (triggerType === 'newElement' && data) {
+                        const rarity = rarities[data];
+                        if ((key === "Combinaison Inédite" && rarity === 'epic') || (key === "Roi de la combine" && rarity === 'legendary')) {
+                            shouldUnlock = achievements[key].check();
+                        }
+                    }
+                    break;
+                case "Copy-Paste":
+                case "Famille":
+                case "Curieux Créateur":
+                case "Créateur Fou":
+                case "Combinateur Compulsif":
+                case "Collectionneur":
+                case "Alcoolique":
+                case "Maître de la création":
+                case "Le meilleur jeu":
+                case "Gamer pro":
+                case "Alter ego":
+                case "Globe-Trotteur":
+                case "Tour du monde":
+                case "Salade de fruits":
+                case "Salade de légumes ?":
+                case "Éleveur":
+                case "Artiste Conceptuel":
+                case "Créateur de Vie":
+                case "Trophée de chocolat":
+                case "Trophée de bronze":
+                case "Trophée d'améthyste":
+                case "Trophée de crystal":
+                case "Trophée de platine":
+                case "Fin ?":
+                    if (triggerType === 'newElement' || triggerType === 'combinationMade') { // Check on any new discovery or combination
+                        shouldUnlock = achievements[key].check();
+                    }
+                    break;
+                case "Flexeur":
+                    if (triggerType === 'floatingElementsState') {
+                        shouldUnlock = achievements[key].check();
+                    }
+                    break;
+                case "Jambon":
+                case "Imposteur":
+                    if (triggerType === 'newElement' && data) {
+                        if ((key === "Jambon" && data === "jambon") || (key === "Imposteur" && data === "Among Us")) {
+                            shouldUnlock = achievements[key].check();
+                        }
+                    }
+                    break;
+                case "AH MES YEUX !":
+                    // This is handled by the themeToggle event listener directly
+                    break;
+            }
+
+            if (shouldUnlock) {
+                unlockAchievement(key);
+                anyAchievementUnlocked = true;
+            }
+          }
+        }
+        if (anyAchievementUnlocked && tabAchievements.classList.contains('active')) {
+            renderAchievements(); // Re-render achievements if any were unlocked and tab is active
+        }
+      }
+
+      function renderAchievements() {
+        achievementsContent.innerHTML = '';
+        for (const key in achievements) {
+          const achievement = achievements[key];
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'achievement-item';
+          if (achievement.achieved) {
+            itemDiv.classList.add('achieved');
+          }
+
+          const iconSpan = document.createElement('span');
+          iconSpan.className = 'icon';
+          iconSpan.textContent = achievement.icon;
+          itemDiv.appendChild(iconSpan);
+
+          const detailsDiv = document.createElement('div');
+          detailsDiv.className = 'details';
+
+          const titleP = document.createElement('p');
+          titleP.className = 'title';
+          titleP.textContent = key;
+          detailsDiv.appendChild(titleP);
+
+          const descriptionP = document.createElement('p');
+          descriptionP.className = 'description';
+          descriptionP.textContent = achievement.description;
+          detailsDiv.appendChild(descriptionP);
+
+          if (achievement.progress && !achievement.achieved) {
+            const progressP = document.createElement('p');
+            progressP.className = 'progress';
+            progressP.textContent = `Progrès : ${achievement.progress()}`;
+            detailsDiv.appendChild(progressP);
+          }
+
+          itemDiv.appendChild(detailsDiv);
+          achievementsContent.appendChild(itemDiv);
+        }
+      }
 
       // Initialisation finale
+      assignRarities(); // NOUVEAU : attribue les raretés au chargement
       loadDiscoveredElements();
+      loadAchievements(); // Charger les succès au démarrage
       renderElementsList('age');
       switchTab('discovered');
       themeToggle.textContent = document.body.classList.contains("dark") ? "⚫" : "⚪";
       resizeCanvas();
       animateBackground();
+
+      // Initial check for achievements that depend on initial state (e.g., already discovered elements)
+      checkAchievements('initialLoad');
     });
   </script>
 </body>
