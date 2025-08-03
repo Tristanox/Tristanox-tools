@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tristanox Games</title>
+    <title>Tristanox Tools</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/no_bg_logo-NoBG.png">
     <style>
         /* Importation de la police Babynotes */
         @font-face {
             font-family: 'Babynotes';
             src: url('https://dl.dafont.com/dl/?f=babynotes') format('truetype');
-            /* Pour une meilleure fiabilité, téléchargez le fichier .ttf et hébergez-le sur votre GitHub Pages.
+            /* Pour une meilleure fiabilité, téléchargez le fichier .ttf et hébergéz-le sur votre GitHub Pages.
                Exemple si le fichier est à la racine de votre dépôt : src: url('babynotes.ttf') format('truetype'); */
         }
 
@@ -172,27 +172,6 @@
             border-radius: 5px;
         }
 
-        /* Nouvelle section pour les commentaires */
-        .comments-section {
-            margin-top: 60px; /* Espace au-dessus de la section commentaires */
-            width: 100%;
-            max-width: 900px; /* Limite la largeur de la section commentaires */
-            padding: 20px;
-            background-color: #282b30; /* Fond légèrement différent pour la section */
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            text-align: left; /* Alignement du texte pour les commentaires */
-            margin-bottom: 50px; /* Ajout d'une marge en bas pour l'espace avant le footer */
-        }
-        .comments-section h2 {
-            font-family: 'Babynotes', cursive;
-            color: #9eff9e;
-            font-size: 2.5em;
-            margin-bottom: 30px;
-            text-align: center;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-        }
-
         /* Styles pour le Footer */
         footer {
             width: 100%;
@@ -212,15 +191,28 @@
         }
 
         footer .social-links a {
-            color: white; /* Couleur des liens */
             text-decoration: none; /* Pas de soulignement par défaut */
-            margin: 0 10px;
-            font-weight: bold;
-            transition: color 0.3s ease; /* Transition douce pour le survol */
+            margin: 0 15px;
+            transition: transform 0.2s ease-in-out;
+            color: inherit; /* Pour que la couleur du texte soit héritée du footer */
         }
 
-        footer .social-links a:hover {
-            color: #9eff9e; /* Couleur verte au survol, comme les autres éléments interactifs */
+        /* Styles pour les icônes de réseaux sociaux */
+        .social-links img {
+            height: 30px; /* Taille des icônes */
+            width: auto;
+            vertical-align: middle;
+            margin-right: 8px; /* Espace entre l'icône et le texte */
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+        }
+
+        .social-links a:hover img {
+            transform: scale(1.1); /* Zoom au survol */
+            filter: brightness(1.2) drop-shadow(0 0 5px rgba(158, 255, 158, 0.5)); /* Lumière verte au survol */
+        }
+        
+        .social-links a:hover {
+             color: #9eff9e; /* Couleur du texte au survol */
         }
 
         /* Styles responsives pour le footer */
@@ -232,8 +224,10 @@
             footer .social-links a {
                 margin: 0 5px;
             }
+            .social-links img {
+                margin-right: 4px;
+            }
         }
-
     </style>
 </head>
 <body>
@@ -307,44 +301,23 @@
 
     </div>
 
-    <div class="comments-section">
-        <h2>Vos Commentaires</h2>
-        <div id="disqus_thread"></div>
-        <script>
-            /**
-             * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-             * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-             */
-            /*
-            var disqus_config = function () {
-                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-            };
-            */
-            (function() { // DON'T EDIT BELOW THIS LINE
-                var d = document, s = d.createElement('script');
-                s.src = 'https://YOUR_DISQUS_SHORTNAME.disqus.com/embed.js'; // REMPLACEZ "YOUR_DISQUS_SHORTNAME" PAR VOTRE SHORTNAME DISQUS !
-                s.setAttribute('data-timestamp', +new Date());
-                (d.head || d.body).appendChild(s);
-            })();
-        </script>
-        <noscript>Veuillez activer JavaScript pour voir les commentaires propulsés par Disqus.</noscript>
-        <p style="text-align: center; font-size: 0.9em; color: gray; margin-top: 20px;">
-            Les commentaires sont gérés par Disqus.
-        </p>
-    </div>
-
     <footer>
-        <p>© 2025 Tristanox Games. Tous droits réservés.</p>
+        <p>© 2024 Tristanox Games. Tous droits réservés.</p>
         <div class="social-links">
-            <a href="https://www.youtube.com/@Tristanox" target="_blank" rel="noopener noreferrer">YouTube</a>
-            <a href="https://twitter.com/votreprofil" target="_blank" rel="noopener noreferrer">Twitter</a>
-            <a href="https://github.com/Tristanox" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href="https://tristanox.newgrounds.com/" target="_blank" rel="noopener noreferrer">Newgrounds</a>
+            <a href="https://www.youtube.com/@Tristanox" target="_blank" rel="noopener noreferrer">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="Icône YouTube">
+            YouTube</a>
+            <a href="https://twitter.com/votreprofil" target="_blank" rel="noopener noreferrer">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/X_logo_2023_original.svg" alt="Icône X (Twitter)">
+            Twitter</a>
+            <a href="https://github.com/Tristanox" target="_blank" rel="noopener noreferrer">
+                <img src="https://raw.githubusercontent.com/Tristanox/textures/49a9491c2726c8226ad5cc7b22631fc9119d99a7/Octicons-mark-github.svg" alt="Icône GitHub">
+            GitHub</a>
+            <a href="https://tristanox.newgrounds.com/" target="_blank" rel="noopener noreferrer">
+                <img src="https://raw.githubusercontent.com/2fasvg/2fasvg.github.io/master/assets/img/logo/newgrounds.com/newgrounds.com.svg" alt="Icône Newgrounds">
+            Newgrounds</a>
         </div>
     </footer>
 
 </body>
 </html>
-
-
