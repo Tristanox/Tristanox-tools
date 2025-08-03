@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Code Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    
+    <style>
+        body {
+            display: flex;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        #container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+        .gutter {
+            background-color: #eee;
+            background-repeat: no-repeat;
+            background-position: 50%;
+            cursor: col-resize;
+            width: 8px;
+        }
+        .gutter.gutter-horizontal {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAxCAYAAAAE79LdAAAAGElEQVQIW2M4c3f6z4o3D9H4v5j5wQAOAD7lB96VjGgAAAAASUVORK5CYII=')
+        }
+        .panel {
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        .panel.editor-panel {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            flex-grow: 1;
+            position: relative;
+        }
+        .panel.preview-panel {
+            background-color: #fff;
+            flex-grow: 1;
+        }
+        .CodeMirror {
+            height: 100%;
+            width: 100%;
+            font-size: 16px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #preview {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        /* Style des barres de défilement (WebKit/Blink) */
+        ::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #282c34;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #555;
+            border-radius: 6px;
+            border: 2px solid #282c34;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+
+        /* Styles de la fenêtre modale */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1a1b24; /* Nouvelle couleur de fond unie */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #modal-content {
+            background: linear-gradient(135deg, #282A36 0%, #3b405e 100%);
+            color: #d4d4d4;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            max-width: 600px;
+            border: 2px solid #555;
+        }
+        #modal-content h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+        #modal-content p {
+            font-size: 1.2em;
+            margin-top: 0;
+            color: #ffffff;
+        }
+        #modal-content small {
+            color: #ffffff;
+            font-size: 0.9em;
+            margin-top: 20px;
+            display: block;
+        }
+        #modal-content button {
+            background-color: #ffffff;
+            color: #1e1e1e;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 30px;
+            transition: background-color 0.3s ease;
+        }
+        #modal-content button:hover {
+            background-color: #eee;
+        }
+
+        /* Styles pour le bouton de langue */
+        #language-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            cursor: pointer;
+        }
+        #language-toggle img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* Styles pour le bouton d'exportation */
+        #export-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #888;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+            z-index: 999;
+            font-size: 0.9em;
+        }
+        #export-button:hover {
+            opacity: 0.8;
+        }
+        #export-button:active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="language-toggle">
+        <img id="flag-icon" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png" alt="English flag">
+    </div>
+
+    <div id="modal">
+        <div id="modal-content">
+            <h1 data-lang-key="modal_title">Live Code Editor</h1>
+            <p data-lang-key="modal_subtitle">Edit your code live, online!</p>
+            <small data-lang-key="modal_warning">Warning: This tool is primarily for MODIFYING code. To write code, you should use an editor like Visual Studio Code.</small>
+            <button id="close-modal-btn" data-lang-key="modal_button">OK</button>
+        </div>
+    </div>
+
+    <div id="container">
+        <div class="panel editor-panel">
+            <button id="export-button" data-lang-key="export_button">Export</button>
+            <textarea id="editor" style="display: none;"></textarea>
+        </div>
+        <div class="panel preview-panel">
+            <iframe id="preview"></iframe>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
+
+    <script>
+        // Objets de traduction
+        const translations = {
+            'fr': {
+                'modal_title': 'Éditeur de code live',
+                'modal_subtitle': 'Éditez votre code en direct, en ligne !',
+                'modal_warning': 'Attention : cet outil est principalement fait pour MODIFIER du code. Pour écrire du code, allez plutôt dans un éditeur, comme Visual Studio Code.',
+                'modal_button': 'OK',
+                'export_button': 'Exporter'
+            },
+            'en': {
+                'modal_title': 'Live Code Editor',
+                'modal_subtitle': 'Edit your code live, online!',
+                'modal_warning': 'Warning: This tool is primarily for MODIFYING code. To write code, you should use an editor like Visual Studio Code.',
+                'modal_button': 'OK',
+                'export_button': 'Export'
+            }
+        };
+
+        let currentLang = 'en';
+        const flagIcon = document.getElementById('flag-icon');
+        const languageToggle = document.getElementById('language-toggle');
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-lang-key]').forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    element.textContent = translations[currentLang][key];
+                }
+            });
+            const newFlagSrc = currentLang === 'fr' ? 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png' : 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+            flagIcon.src = newFlagSrc;
+            flagIcon.alt = currentLang === 'fr' ? 'Drapeau français' : 'UK flag';
+        }
+
+        languageToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'fr' ? 'en' : 'fr';
+            updateLanguage();
+        });
+
+        let editor;
+
+        function initializeEditor() {
+            editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+                mode: 'htmlmixed',
+                theme: 'dracula',
+                lineNumbers: true,
+                autofocus: true,
+                lineWrapping: false,
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete"
+                },
+                autoCloseTags: true,
+                autoCloseBrackets: true
+            });
+
+            const preview = document.getElementById('preview');
+            const exportButton = document.getElementById('export-button');
+
+            function updatePreview() {
+                const code = editor.getValue();
+                const doc = preview.contentWindow.document;
+                doc.open();
+                doc.write(code);
+                doc.close();
+            }
+
+            editor.on('change', updatePreview);
+            window.addEventListener('load', updatePreview);
+
+            Split(['.editor-panel', '.preview-panel'], {
+                sizes: [50, 50],
+                minSize: [100, 100],
+                gutterSize: 8
+            });
+
+            exportButton.addEventListener('click', () => {
+                const code = editor.getValue();
+                const blob = new Blob([code], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'code_export.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            languageToggle.style.display = 'none';
+            initializeEditor();
+        });
+
+        updateLanguage();
+    </script>
+</body>
+</html>
