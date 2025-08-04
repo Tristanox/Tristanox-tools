@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title class="title-changer">LA PAGE ÉNERVANTE</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #ff00ff;
+            font-family: 'Comic Sans MS', sans-serif;
+            text-align: center;
+            animation: blink-bg 0.5s infinite alternate;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            overflow: hidden;
+        }
+
+        @keyframes blink-bg {
+            from { background-color: #000000; }
+            to { background-color: #ffff00; }
+        }
+
+        h1 {
+            animation: blink-text 0.2s infinite alternate;
+        }
+
+        @keyframes blink-text {
+            from { color: #ff00ff; }
+            to { color: #00ffff; }
+        }
+
+        .main-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            border: 5px dashed red;
+            background-color: #00ff00;
+            z-index: 1000;
+            transition: all 0.1s ease-in-out;
+            animation: slide-button 5s infinite linear;
+        }
+
+        @keyframes slide-button {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            50% { transform: translateX(50%) rotate(5deg); }
+            100% { transform: translateX(-50%) rotate(0deg); }
+        }
+
+        .main-button:hover {
+            animation: move-around 0.2s infinite;
+        }
+
+        @keyframes move-around {
+            0% { transform: translate(-50%, -50%); }
+            25% { transform: translate(100px, 50px); }
+            50% { transform: translate(-80px, -30px); }
+            75% { transform: translate(40px, -100px); }
+            100% { transform: translate(-50%, -50%); }
+        }
+
+        .pump-button {
+            position: fixed;
+            top: 230px;
+            left: 20px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            background-color: #ff00ff;
+            color: #ffffff;
+            border: 3px solid #000000;
+            animation: pulse-button 1s infinite alternate;
+        }
+
+        @keyframes pulse-button {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: popup-bounce 0.1s infinite alternate;
+        }
+
+        @keyframes popup-bounce {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+
+        .popup-content {
+            position: relative;
+            background-color: #ffffff;
+            color: #000000;
+            padding: 50px;
+            border: 10px solid #ff0000;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            text-shadow: 2px 2px #ff00ff;
+        }
+
+        .close-popup-button {
+            position: absolute;
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffffff;
+            opacity: 1;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            background-color: #ff0000;
+            padding: 2px 8px;
+            border-radius: 5px;
+            transition: opacity 0.3s;
+        }
+
+        #closeButton1 { top: 5px; left: 5px; }
+        #closeButton2 { top: 5px; right: 5px; }
+        #closeButton3 { bottom: 5px; left: 5px; }
+        #closeButton4 { bottom: 5px; right: 5px; }
+
+        .volume-bar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 200px;
+            background-color: #333;
+            border: 2px solid #fff;
+            display: flex;
+            flex-direction: column-reverse;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .volume-fill {
+            width: 100%;
+            background-color: limegreen;
+            transition: height 0.1s ease-in-out;
+        }
+
+        .age-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .age-popup-content {
+            background-color: #ffffff;
+            padding: 40px;
+            border: 5px solid #ff0000;
+            text-align: center;
+        }
+
+        .age-buttons-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .age-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            border: 2px solid #000000;
+            transition: all 0.2s ease-in-out;
+        }
+
+        #annoyingInput, .form-group input[type="text"], #survey-text-input {
+            margin-top: 20px;
+            font-size: 20px;
+            padding: 10px;
+            width: 300px;
+            background-color: #f0f0f0;
+            border: 2px solid #000000;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+        }
+
+        .error-message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #ff0000;
+            color: #ffffff;
+            border: 5px solid #000000;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 10001;
+            display: none;
+            animation: bounce-error 0.5s infinite alternate;
+        }
+        
+        @keyframes bounce-error {
+            from { transform: translate(-50%, -50%) scale(1); }
+            to { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        #annoying-form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 999;
+            background-color: #ff00ff;
+            color: #000000;
+            padding: 30px;
+            border: 5px solid #00ffff;
+            animation: form-glitch 0.3s infinite alternate;
+        }
+
+        @keyframes form-glitch {
+            0% { transform: translate(-50.5%, -50.5%) scale(1); }
+            100% { transform: translate(-49.5%, -49.5%) scale(1.01); }
+        }
+
+        #annoying-form h2, #annoying-form label {
+            font-size: 20px;
+            margin-bottom: 10px;
+            animation: blink-text 0.5s infinite alternate;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: 5px;
+        }
+
+        .annoying-submit {
+            padding: 15px 30px;
+            font-size: 20px;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            background-color: #00ff00;
+            border: 3px dashed red;
+            transition: all 0.1s ease-in-out;
+        }
+
+        .name-error-popup {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            background-color: #00ffff;
+            color: #ff0000;
+            border: 3px solid #000000;
+            font-weight: bold;
+            display: none;
+            z-index: 10002;
+            white-space: nowrap;
+        }
+
+        .survey-popup-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.0);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10003;
+        }
+        
+        .survey-popup-content {
+            background-color: #ff00ff;
+            color: #000000;
+            padding: 40px;
+            border: 5px solid #00ffff;
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            position: relative;
+            animation: survey-zoom 0.5s ease-in-out;
+        }
+
+        @keyframes survey-zoom {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .survey-question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .survey-options label {
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .survey-next-button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #00ff00;
+            border: 3px dashed red;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+        }
+        
+        .click-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #ff00ff;
+            background-color: #000000;
+            padding: 10px;
+            border: 2px solid #00ffff;
+            z-index: 10007;
+            font-weight: bold;
+        }
+
+        .jumpscare {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 30000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .jumpscare-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .language-button {
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 10px 20px;
+            background-color: #fff;
+            color: #000;
+            border: 2px solid #ff0000;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10008;
+            pointer-events: all;
+            transition: none;
+        }
+        
+        #pub {
+            position: fixed; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100000;
+        }
+
+        #image-pub {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            border: 2px solid white;
+        }
+
+        #fermer-pub {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            color: white;
+            font-size: 20px;
+            line-height: 30px;
+            text-align: center;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+            border-radius: 50%;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #fff;
+            color: #000;
+            padding: 15px 30px;
+            border: 3px solid #ff0000;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 10004;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .windows-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #f0f0f0;
+            color: #000;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 10005;
+            opacity: 0.5;
+        }
+
+        .windows-notification img {
+            filter: grayscale(100%);
+        }
+
+        .title-changer {
+            animation: change-title 5s infinite alternate;
+        }
+
+        @keyframes change-title {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05) rotate(-1deg); }
+            100% { transform: scale(1); }
+        }
+
+        .footer-text {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ff00ff;
+            color: #000000;
+            font-size: 16px;
+            padding: 5px;
+            animation: scroll-text 15s infinite linear;
+            white-space: nowrap;
+        }
+
+        @keyframes scroll-text {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        .ad-container {
+            position: fixed;
+            padding: 10px;
+            background-color: rgba(255, 255, 0, 0.9);
+            border: 3px dashed #ff00ff;
+            z-index: 10006;
+            animation: move-ad 10s infinite alternate-reverse;
+            cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
+        }
+
+        @keyframes move-ad {
+            0% { top: 10%; left: 10%; }
+            25% { top: 80%; left: 30%; }
+            50% { top: 20%; left: 70%; }
+            75% { top: 60%; left: 20%; }
+            100% { top: 10%; left: 10%; }
+        }
+
+        .ad-text {
+            font-weight: bold;
+            color: #000000;
+            animation: ad-blink 1.5s infinite;
+        }
+        
+        @keyframes ad-blink {
+            0% { color: #000000; }
+            50% { color: #ff0000; }
+            100% { color: #000000; }
+        }
+
+        .corrupted-char {
+            font-family: monospace;
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .save-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            color: #ffffff;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .save-text {
+            margin-bottom: 20px;
+            animation: blink-save-text 1s infinite;
+        }
+
+        @keyframes blink-save-text {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .progress-bar-container {
+            width: 80%;
+            max-width: 500px;
+            height: 40px;
+            background-color: #333;
+            border: 2px solid #fff;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #00ff00;
+            width: 0%;
+            transition: width 0.1s ease-in;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000000;
+            font-size: 18px;
+        }
+        
+        .cursor-trail {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0);
+            animation: trail-fade 0.5s forwards, rainbow-colors 1s infinite;
+        }
+
+        @keyframes trail-fade {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0); }
+        }
+
+        @keyframes rainbow-colors {
+            0% { background-color: red; }
+            14% { background-color: orange; }
+            28% { background-color: yellow; }
+            42% { background-color: green; }
+            57% { background-color: blue; }
+            71% { background-color: indigo; }
+            85% { background-color: violet; }
+            100% { background-color: red; }
+        }
+
+        .validation-message {
+            color: #ff0000;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body onclick="playRandomSound()">
+    <h1 class="title-changer" data-fr="BIENVENUE SUR LA PAGE ÉNERVANTE !" data-tr="HOŞ GELDİNİZ, RAHATSIZ EDİCİ SAYFAYA !">BIENVENUE SUR LA PAGE ÉNERVANTE !</h1>
+    <p data-fr="Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper..." data-tr="Bu site, en büyük rahatsızlığınız için tasarlanmıştır. Kaçmaya çalışın...">Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...</p>
+
+    <div class="volume-bar">
+        <div class="volume-fill" id="volumeFill"></div>
+    </div>
+    <button class="pump-button" id="pumpButton" onclick="pumpSound()" data-fr="POMPER" data-tr="POMPA">POMPER</button>
+    <button class="language-button" id="translateButton" onclick="translatePage()">Traduire en turc</button>
+
+    <input type="text" id="annoyingInput" placeholder="Essayez de taper quelque chose...">
+
+    <div class="popup" id="annoying-popup">
+        <div class="popup-content" onclick="event.stopPropagation(); playRandomSound();">
+            <span class="close-popup-button" id="closeButton1" onclick="handlePopupClose(event)">X</span>
+            <span class="close-popup-button" id="closeButton2" onclick="handlePopupClose(event)">X</span>
+            <span class="close-popup-button" id="closeButton3" onclick="handlePopupClose(event)">X</span>
+            <span class="close-popup-button" id="closeButton4" onclick="handlePopupClose(event)">X</span>
+            <span data-fr="Bienvenue sur sondages.xyz.com.onion !" data-tr="sondages.xyz.com.onion'a Hoş Geldiniz !">Bienvenue sur sondages.xyz.com.onion !</span>
+        </div>
+    </div>
+
+    <div class="age-popup" id="agePopup">
+        <div class="age-popup-content">
+            <p data-fr="Avez-vous plus de 18 ans ?" data-tr="18 yaşından büyük müsünüz?">Avez-vous plus de 18 ans ?</p>
+            <div class="age-buttons-container" id="ageButtonsContainer">
+                <button class="age-button" id="over18" onmouseover="checkAndSwapButtons()" data-fr="J'ai plus de 18 ans" data-tr="18 yaşından büyüğüm">J'ai plus de 18 ans</button>
+                <button class="age-button" id="under18" onmouseover="checkAndSwapButtons()" data-fr="J'ai moins de 18 ans" data-tr="18 yaşından küçüğüm">J'ai moins de 18 ans</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="error-message-popup" id="errorMessagePopup">
+        <span id="errorMessageText"></span>
+    </div>
+
+    <form id="annoying-form">
+        <h2 data-fr="Sondage de satisfaction (obligatoire)" data-tr="Memnuniyet anketi (zorunlu)">Sondage de satisfaction (obligatoire)</h2>
+        <div class="form-group">
+            <label for="name" data-fr="Votre nom complet (incluant tous les prénoms) :" data-tr="Tam adınız (tüm ön adlar dahil) :">Votre nom complet (incluant tous les prénoms) :</label>
+            <input type="text" id="name" name="name" required>
+            <div class="name-error-popup" id="nameErrorPopup" data-fr="NON, CE N'EST PAS VOTRE NOM" data-tr="HAYIR, BU SİZİN ADINIZ DEĞİL">NON, CE N'EST PAS VOTRE NOM</div>
+        </div>
+        <div class="form-group">
+            <label for="birthplace" data-fr="Ville de naissance de votre grand-mère maternelle :" data-tr="Anneannenizin doğum şehri :">Ville de naissance de votre grand-mère maternelle :</label>
+            <input type="text" id="birthplace" name="birthplace" required>
+        </div>
+        <div class="form-group">
+            <label data-fr="Pourquoi le ciel est-il bleu ?" data-tr="Gökyüzü neden mavi?">Pourquoi le ciel est-il bleu ?</label>
+            <div class="radio-group">
+                <input type="radio" id="lait" name="sky" value="lait" required>
+                <label for="lait" data-fr="À cause du lait." data-tr="Süt yüzünden.">À cause du lait.</label>
+                <input type="radio" id="soleil" name="sky" value="soleil">
+                <label for="soleil" data-fr="À cause du soleil." data-tr="Güneş yüzünden.">À cause du soleil.</label>
+                <input type="radio" id="arc_en_ciel" name="sky" value="arc_en_ciel">
+                <label for="arc_en_ciel" data-fr="C'est un arc-en-ciel géant." data-tr="Dev bir gökkuşağı.">C'est un arc-en-ciel géant.</label>
+            </div>
+        </div>
+        <button type="submit" id="submit-button" class="annoying-submit" data-fr="Valider" data-tr="Doğrula">Valider</button>
+    </form>
+
+    <div class="survey-popup-container" id="surveyPopupContainer">
+        <div class="survey-popup-content">
+            <p class="survey-question" id="surveyQuestion"></p>
+            <div class="survey-options" id="surveyOptions"></div>
+            <p class="validation-message" id="survey-validation-message" data-fr="Veuillez répondre à la question pour continuer." data-tr="Devam etmek için lütfen soruyu yanıtlayın."></p>
+            <button class="survey-next-button" id="surveyNextButton" data-fr="Suivant" data-tr="Sonraki">Suivant</button>
+        </div>
+    </div>
+
+    <div class="windows-notification" id="windowsNotification">
+        <img src="https://worldvectorlogo.com/download/windows.svg" width="20" height="20">
+        <span data-fr="Activez Windows" data-tr="Windows'u etkinleştirin">Activez Windows</span>
+    </div>
+
+    <div class="ad-container" id="adContainer">
+        <span class="ad-text" id="adText"></span>
+    </div>
+
+    <div class="footer-text" id="footerText" data-fr="Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici." data-tr="Bu, müdahaleci bir reklam banner'ı! Daha fazla reklam için ortağımızı ziyaret edin! Bu site dikkatinize ihtiyaç duyuyor. Ayrılmayın. Başka bir yere tıklamayın. Mutluluk burada.">
+        Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.
+    </div>
+    
+    <div class="save-popup" id="savePopup">
+        <p class="save-text" data-fr="Sauvegarde en cours..." data-tr="Kaydediliyor...">Sauvegarde en cours...</p>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+        </div>
+    </div>
+    
+    <div class="click-counter" data-fr="Clics :" data-tr="Tıklama :">Clics : <span id="clickCount">0</span></div>
+
+    <div class="jumpscare" id="jumpscare">
+        <img id="jumpscareImage" class="jumpscare-image" src="https://static.wikia.nocookie.net/freddy-fazbears-pizzeria-simulator/images/e/ec/BabySalvageJumpscare.gif" alt="jumpscare">
+        <audio id="jumpscareSound" src="https://www.myinstants.com/media/sounds/final_60108db6919bc200b087a3a2_239343.mp3"></audio>
+    </div>
+
+    <audio id="annoying-sound" loop autoplay volume="0.5">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'audio.
+    </audio>
+    <audio id="errorSoundSource" src="https://www.myinstants.com/media/sounds/error_CDOxCYm.mp3"></audio>
+    <audio id="notificationSound" src="https://www.myinstants.com/media/sounds/notification_2019.mp3"></audio>
+
+    <button class="main-button" onclick="playRandomSound(); window.location.reload();" onmouseover="playRandomSound()" data-fr="ARGENT GRATUIT" data-tr="BEDAVA PARA">ARGENT GRATUIT</button>
+    
+    <div id="pub">
+        <div id="fermer-pub">X</div>
+        <img id="image-pub" src="https://i.ibb.co/pGmpFfG/panneaux-photovoltaique-en-toiture.png" alt="Publicité pour panneaux solaires">
+    </div>
+
+    <script>
+        const soundUrls = [
+            'https://www.myinstants.com/media/sounds/error_CDOxCYm.mp3',
+            'https://www.myinstants.com/media/sounds/tuco-get-out.mp3',
+            'https://www.myinstants.com/media/sounds/duck-toy-sound.mp3',
+            'https://www.myinstants.com/media/sounds/shocked-sound-effect.mp3',
+            'https://www.myinstants.com/media/sounds/goofy-ahh.mp3',
+            'https://www.myinstants.com/media/sounds/raaaah.mp3',
+            'https://www.myinstants.com/media/sounds/movie_1_C2K5NH0.mp3',
+            'https://www.myinstants.com/media/sounds/huh-cat.mp3',
+            'https://www.myinstants.com/media/sounds/raaar_FerSY7o.mp3',
+            'https://www.myinstants.com/media/sounds/goofy-ahh-samsung.mp3',
+            'https://www.myinstants.com/media/sounds/goofy-spring-sound.mp3',
+            'https://www.myinstants.com/media/sounds/cartoonslip.mp3',
+            'https://www.myinstants.com/media/sounds/punch-gaming-sound-effect-hd_RzlG1GE.mp3',
+            'https://www.myinstants.com/media/sounds/munch-sound-effect.mp3',
+            'https://www.myinstants.com/media/sounds/cartoon-boing_7vRWDlc.mp3',
+            'https://www.myinstants.com/media/sounds/strings_ofg6Kxg.mp3',
+            'https://www.myinstants.com/media/sounds/bo-womp.mp3',
+            'https://www.myinstants.com/media/sounds/cartoon-hammer.mp3',
+            'https://www.myinstants.com/media/sounds/cartoon_sound_effect.mp3',
+            'https://www.myinstants.com/media/sounds/couin.mp3',
+            'https://www.myinstants.com/media/sounds/lego-breaking.mp3'
+        ];
+
+        const errorMessages = {
+            fr: [
+                "Erreur système 404 : Le café a débordé du port USB.",
+                "Avertissement critique : Votre souris a trop cliqué.",
+                "Panne : L'univers a cessé de charger.",
+                "Échec de l'opération : Le chat a marché sur le clavier.",
+                "Erreur de gravité maximale : Les pixels se rebellent.",
+                "Votre session a expiré parce que vous existez trop fort."
+            ],
+            tr: [
+                "Sistem hatası 404: Kahve USB portundan taştı.",
+                "Kritik uyarı: Fareniz çok fazla tıkladı.",
+                "Arıza: Evren yüklenmeyi durdurdu.",
+                "İşlem başarısız: Kedi klavyenin üzerine yürüdü.",
+                "Maksimum ciddiyet hatası: Pikseller isyan ediyor.",
+                "Çok güçlü var olduğunuz için oturumunuzun süresi doldu."
+            ]
+        };
+
+        const surveyQuestions = [
+            {
+                fr: "Avez vous déjà gouté a l'alcool ?",
+                tr: "Daha önce hiç alkol tattınız mı?",
+                type: "radio",
+                options: { fr: ["oui", "oui"], tr: ["evet", "evet"] }
+            },
+            {
+                fr: "Voulez vous un IPhone 16 pro max ?",
+                tr: "Bir IPhone 16 Pro Max ister misiniz?",
+                type: "radio",
+                options: { fr: ["oui, bien sûr !", "non, je veut plutôt un abonnement à sondages.xyz.com.onion"], tr: ["evet, tabii ki!", "hayır, sondages.xyz.com.onion'a abone olmak isterim"] }
+            },
+            {
+                fr: "De quelle couleur est le ciel ?",
+                tr: "Gökyüzü ne renk?",
+                type: "radio",
+                options: { fr: ["A mi amor", "Fluo", "De quelle couleur est le ciel."], tr: ["A mi amor", "Floresan", "Gökyüzü ne renk."] }
+            },
+            {
+                fr: "Vous êtes-vous déjà chatouillé les tétons ?",
+                tr: "Hiç göğüs uçlarınızı gıdıkladınız mı?",
+                type: "radio",
+                options: { fr: ["oui, bien sûr !", "non, jamais."], tr: ["evet, tabii ki!", "hayır, hiç."] }
+            },
+            {
+                fr: "Oû habitez vous ?",
+                tr: "Nerede yaşıyorsunuz?",
+                type: "text"
+            },
+            {
+                fr: "Mangez vous des endives au moins 1 fois par mois ?",
+                tr: "Ayda en az bir kez hindiba yer misiniz?",
+                type: "radio",
+                options: { fr: ["oui", "non", "peut-être"], tr: ["evet", "hayır", "belki"] }
+            },
+            {
+                fr: "Quel est votre genre ?",
+                tr: "Cinsiyetiniz nedir?",
+                type: "radio",
+                options: {
+                    fr: [
+                        "Hétérosexuel(le)", "Homosexuel(le)", "Bisexuel(le)", "Pansexuel(le)", "Asexuel(le)",
+                        "Démisexuel(le)", "Sapiosexuel(le)", "Lithromantique", "Aromantique", "Skoliosexuel(le)",
+                        "Polyamoureux(se)", "Graysexuel(le)", "Queer", "Androromantique", "Gynoromantique",
+                        "Technosexual(le)", "Bibliophile romantique", "Caféromantique", "Meme-sexuel(le)", "Pastasexuel(le)",
+                        "Seriophile romantique", "Nocturnosexuel(le)", "Nostalgiaromantique", "Sushisexuel(le)",
+                        "Introvertisexuel(le)", "Emojiromantique", "Orgasme-affectif", "Sarcasmo-romantique",
+                        "Fanfiction-sexuel(le)", "Rétrogame-romantique", "hélicoptère BK-28", "escargot",
+                        "Lumière LED", "Zèbre", "Lunettes de soleil", "Radiateur"
+                    ],
+                    tr: [
+                        "Heteroseksüel", "Eşcinsel", "Biseksüel", "Panseksüel", "Aseksüel",
+                        "Demiseksüel", "Sapiyoseksüel", "Litromantik", "Aromantik", "Skoliyoseksüel",
+                        "Çoklu ilişki", "Grayseksüel", "Queer", "Andromantik", "Ginormantik",
+                        "Teknoseksüel", "Bibliyofilik romantik", "Kaféromantik", "Meme-seksüel", "Pastaseksüel",
+                        "Seriyofilik romantik", "Noktürnseksüel", "Nostaljiromantik", "Suşiseksüel",
+                        "İçedönükseksüel", "Emojiramantik", "Orgazm-duygusal", "Sarkazmo-romantik",
+                        "Fanfiction-seksüel", "Retrogaming-romantik", "BK-28 helikopter", "salyangoz",
+                        "LED ışık", "Zebra", "Güneş gözlüğü", "Radyatör"
+                    ]
+                }
+            },
+            {
+                fr: "Quel est la couleur du ?",
+                tr: "Ne renktir?",
+                type: "radio",
+                options: { fr: ["Jaune", "Bleu", "Mauve", "parabolique"], tr: ["Sarı", "Mavi", "Mor", "parabolik"] }
+            },
+            {
+                fr: "Si ce sondage était une expérience sociale, tu te sentirais :",
+                tr: "Bu anket bir sosyal deney olsaydı, nasıl hissederdiniz:",
+                type: "radio",
+                options: { fr: ["Trahi", "Surpris", "Apaisé", "Flageolet"], tr: ["İhanete uğramış", "Şaşırmış", "Sakinleşmiş", "Fasulye"] }
+            },
+            {
+                fr: "Si tu pouvais répondre à cette question, quelle serait ta réponse ?",
+                tr: "Bu soruyu cevaplayabilseydiniz, cevabınız ne olurdu?",
+                type: "radio",
+                options: { fr: ["c'est bien vrai", "il y en a marre !", "Softlock"], tr: ["bu çok doğru", "yeter artık!", "Softlock"] }
+            },
+            {
+                fr: "Sur une échelle de A à triangle, combien pèse une bonne décision ?",
+                tr: "A'dan üçgene kadar bir ölçekte, iyi bir karar ne kadar ağırdır?",
+                type: "radio",
+                options: { fr: ["1", "2", "l'illusoire précarité de nos amours"], tr: ["1", "2", "aşklarımızın yanıltıcı güvencesizliği"] }
+            },
+            {
+                fr: "Le mot \"banane\" te rend-il nerveux ?",
+                tr: "\"Muz\" kelimesi sizi geriyor mu?",
+                type: "radio",
+                options: { fr: ["oui", "j'en ai peur", "je crois bien", "ce n'est pas impossible"], tr: ["evet", "korkarım", "sanırım evet", "imkansız değil"] }
+            }
+        ];
+        
+        const annoyingNotifications = {
+            fr: [
+                "Un voleur est en bas de chez vous !",
+                "Marine habite à 4m de chez vous !",
+                "vous avez gagné un Iphone 17 !",
+                "Achetez le nouveau déodorant !",
+                "Installez des panneaux solaires pour 1€ !",
+                "On a besoin d'argent :("
+            ],
+            tr: [
+                "Evde hırsız var!",
+                "Marine evinizin 4 metre uzağında yaşıyor!",
+                "Bir iPhone 17 kazandınız!",
+                "Yeni deodorantı alın!",
+                "1€ karşılığında güneş paneli kurun!",
+                "Paraya ihtiyacımız var :("
+            ]
+        };
+
+        const adMessages = {
+            fr: [
+                "Cliquez ici pour gagner de l'argent facile et rapide!",
+                "TÉLÉCHARGEZ LE DERNIER VIRUS MAINTENANT !",
+                "FELICITATIONS ! VOUS ÊTES LE 1 000 000ème VISITEUR !",
+                "VOUS AVEZ GAGNÉ UN NOUVEL ORDINATEUR ! (cliquez pour récupérer)",
+                "Ce site est optimisé pour votre sécurité. (cliquez ici pour nous croire)",
+                "ACHETEZ DE LA CRYPTO MAINTENANT ! TOUT VA BIEN SE PASSER !"
+            ],
+            tr: [
+                "Kolay ve hızlı para kazanmak için buraya tıklayın!",
+                "ŞİMDİ EN SON VİRÜSÜ İNDİRİN!",
+                "TEBRİKLER! 1.000.000. ZİYARETÇİSİNİZ!",
+                "YENİ BİR BİLGİSAYAR KAZANDINIZ! (almak için tıklayın)",
+                "Bu site güvenliğiniz için optimize edilmiştir. (inanmak için buraya tıklayın)",
+                "ŞİMDİ KRİPTO SATIN ALIN! HER ŞEY YOLUNDA GİDECEK!"
+            ],
+        };
+
+        const originalTexts = new Map();
+
+        let currentQuestionIndex = 0;
+        let volumeTimeout;
+        let genderOptionsInterval;
+        const mainSound = document.getElementById('annoying-sound');
+        const popup = document.getElementById('annoying-popup');
+        const agePopup = document.getElementById('agePopup');
+        let canSwap = true;
+        let clicksToClose = 0;
+        let clickCount = 0;
+        let activityTimeout;
+        let currentLanguage = 'fr';
+        let translateButtonX = 0;
+        let translateButtonY = 0;
+        let translateButtonDX = 2;
+        let translateButtonDY = 2;
+        
+        const pub = document.getElementById('pub');
+        const fermerPub = document.getElementById('fermer-pub');
+        let pubClicCount = 0;
+        
+        const translations = {
+            fr: {
+                'BIENVENUE SUR LA PAGE ÉNERVANTE !': 'BIENVENUE SUR LA PAGE ÉNERVANTE !',
+                'Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...': 'Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...',
+                'POMPER': 'POMPER',
+                "Bienvenue sur sondages.xyz.com.onion !": 'Bienvenue sur sondages.xyz.com.onion !',
+                "Avez-vous plus de 18 ans ?": "Avez-vous plus de 18 ans ?",
+                "J'ai plus de 18 ans": "J'ai plus de 18 ans",
+                "J'ai moins de 18 ans": "J'ai moins de 18 ans",
+                'Sondage de satisfaction (obligatoire)': 'Sondage de satisfaction (obligatoire)',
+                'Votre nom complet (incluant tous les prénoms) :': 'Votre nom complet (incluant tous les prénoms) :',
+                "NON, CE N'EST PAS VOTRE NOM": "NON, CE N'EST PAS VOTRE NOM",
+                'Ville de naissance de votre grand-mère maternelle :': 'Ville de naissance de votre grand-mère maternelle :',
+                'Pourquoi le ciel est-il bleu ?': 'Pourquoi le ciel est-il bleu ?',
+                'À cause du lait.': 'À cause du lait.',
+                'À cause du soleil.': 'À cause du soleil.',
+                "C'est un arc-en-ciel géant.": "C'est un arc-en-ciel géant.",
+                'Valider': 'Valider',
+                'Suivant': 'Suivant',
+                'Activez Windows': 'Activez Windows',
+                'Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.': 'Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.',
+                'Sauvegarde en cours...': 'Sauvegarde en cours...',
+                'Clics :': 'Clics :',
+                'ARGENT GRATUIT': 'ARGENT GRATUIT',
+                'Traduire en turc': 'Traduire en turc',
+                'Terminer': 'Terminer',
+                'Essayez de taper quelque chose...': 'Essayez de taper quelque chose...',
+                'Veuillez répondre à la question pour continuer.': 'Veuillez répondre à la question pour continuer.',
+            },
+            tr: {
+                'BIENVENUE SUR LA PAGE ÉNERVANTE !': 'HOŞ GELDİNİZ, RAHATSIZ EDİCİ SAYFAYA !',
+                'Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...': 'Bu site, en büyük rahatsızlığınız için tasarlanmıştır. Kaçmaya çalışın...',
+                'POMPER': 'POMPA',
+                "Bienvenue sur sondages.xyz.com.onion !": 'sondages.xyz.com.onion\'a Hoş Geldiniz !',
+                "Avez-vous plus de 18 ans ?": "18 yaşından büyük müsünüz?",
+                "J'ai plus de 18 ans": "18 yaşından büyüğüm",
+                "J'ai moins de 18 ans": "18 yaşından küçüğüm",
+                'Sondage de satisfaction (obligatoire)': 'Memnuniyet anketi (zorunlu)',
+                'Votre nom complet (incluant tous les prénoms) :': 'Tam adınız (tüm ön adlar dahil) :',
+                "NON, CE N'EST PAS VOTRE NOM": "HAYIR, BU SİZİN ADINIZ DEĞİL",
+                'Ville de naissance de votre grand-mère maternelle :': 'Anneannenizin doğum şehri :',
+                'Pourquoi le ciel est-il bleu ?': 'Gökyüzü neden mavi?',
+                'À cause du lait.': 'Süt yüzünden.',
+                'À cause du soleil.': 'Güneş yüzünden.',
+                "C'est un arc-en-ciel géant.": "Dev bir gökkuşağı.",
+                'Valider': 'Doğrula',
+                'Suivant': 'Sonraki',
+                'Activez Windows': 'Windows\'u etkinleştirin',
+                'Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.': 'Bu, müdahaleci bir reklam banner\'ı! Daha fazla reklam için ortağımızı ziyaret edin! Bu site dikkatinize ihtiyaç duyuyor. Ayrılmayın. Başka bir yere tıklamayın. Mutluluk burada.',
+                'Sauvegarde en cours...': 'Kaydediliyor...',
+                'Clics :': 'Tıklama :',
+                'ARGENT GRATUIT': 'BEDAVA PARA',
+                'Traduire en turc': 'Fransızcaya çevir',
+                'Terminer': 'Bitir',
+                'Essayez de taper quelque chose...': 'Bir şeyler yazmayı deneyin...',
+                'Veuillez répondre à la question pour continuer.': 'Devam etmek için lütfen soruyu yanıtlayın.',
+            }
+        };
+
+        function isMobile() {
+            return window.innerWidth <= 768; // Détecte si l'écran est de taille mobile
+        }
+
+        function playRandomSound() {
+            const randomIndex = Math.floor(Math.random() * soundUrls.length);
+            const randomSoundUrl = soundUrls[randomIndex];
+            const audio = new Audio(randomSoundUrl);
+            audio.play();
+        }
+
+        function playErrorSound() {
+            document.getElementById('errorSoundSource').play();
+        }
+        
+        function playNotificationSound() {
+            document.getElementById('notificationSound').play();
+        }
+
+        function handlePopupClose(event) {
+            playRandomSound();
+            event.target.style.opacity = '0';
+            event.target.style.cursor = 'default';
+            event.target.onclick = null;
+            clicksToClose++;
+            if (clicksToClose >= 4) {
+                popup.style.display = 'none';
+            }
+        }
+
+        function updateVolumeBar(volume) {
+            const volumeFill = document.getElementById('volumeFill');
+            const heightPercentage = volume * 100;
+            volumeFill.style.height = `${heightPercentage}%`;
+        }
+
+        function pumpSound() {
+            playRandomSound();
+            if (mainSound.volume < 1) {
+                mainSound.volume = Math.min(mainSound.volume + 0.005, 1);
+            }
+            updateVolumeBar(mainSound.volume);
+            clearTimeout(volumeTimeout);
+            volumeTimeout = setTimeout(decreaseVolume, 500);
+        }
+
+        function decreaseVolume() {
+            if (mainSound.volume > 0.5) {
+                mainSound.volume = Math.max(mainSound.volume - 0.01, 0.5);
+                updateVolumeBar(mainSound.volume);
+                volumeTimeout = setTimeout(decreaseVolume, 100);
+            }
+        }
+
+        function swapButtons() {
+            const container = document.getElementById('ageButtonsContainer');
+            const over18 = document.getElementById('over18');
+            const under18 = document.getElementById('under18');
+
+            const temp = over18.outerHTML;
+            over18.outerHTML = under18.outerHTML;
+            under18.outerHTML = temp;
+
+            document.getElementById('over18').onmouseover = checkAndSwapButtons;
+            document.getElementById('under18').onmouseover = checkAndSwapButtons;
+            document.getElementById('over18').onclick = function() {
+                playRandomSound();
+                agePopup.style.display = 'none';
+            };
+            document.getElementById('under18').onclick = function() {
+                playRandomSound();
+                downloadLoserFile();
+                agePopup.style.display = 'none';
+            };
+        }
+
+        function checkAndSwapButtons() {
+            if (canSwap) {
+                swapButtons();
+                canSwap = false;
+                setTimeout(() => { canSwap = true; }, 4000);
+            }
+        }
+
+        function downloadLoserFile() {
+            const content = 'Bien essayé, mais tu n\'as pas l\'âge requis. Tu es un loser.';
+            const filename = 'loser.txt';
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function annoyTyping(event) {
+            const input = event.target;
+            const text = input.value;
+            if (text.length > 0 && text.length % 3 === 0) {
+                const randomChar = String.fromCharCode(97 + Math.floor(Math.random() * 26));
+                input.value = text.slice(0, -1) + randomChar;
+            }
+        }
+
+        function showErrorMessage() {
+            const errorPopup = document.getElementById('errorMessagePopup');
+            const errorMessageText = document.getElementById('errorMessageText');
+            const randomMessage = errorMessages[currentLanguage][Math.floor(Math.random() * errorMessages[currentLanguage].length)];
+            
+            errorPopup.style.top = `${Math.random() * 80 + 10}%`;
+            errorPopup.style.left = `${Math.random() * 80 + 10}%`;
+            errorMessageText.innerText = randomMessage;
+            errorPopup.style.display = 'block';
+            playErrorSound();
+            
+            setTimeout(() => {
+                errorPopup.style.display = 'none';
+            }, 3000);
+        }
+
+        function showAnnoyingNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            
+            const randomIndex = Math.floor(Math.random() * annoyingNotifications[currentLanguage].length);
+            notification.innerText = annoyingNotifications[currentLanguage][randomIndex];
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                playNotificationSound();
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 4000);
+            
+            const randomDelay = Math.floor(Math.random() * (8000 - 5000 + 1) + 5000);
+            setTimeout(showAnnoyingNotification, randomDelay);
+        }
+
+        function startSurvey() {
+            currentQuestionIndex = 0;
+            const annoyingForm = document.getElementById('annoying-form');
+            annoyingForm.style.display = 'none';
+            const surveyContainer = document.getElementById('surveyPopupContainer');
+            surveyContainer.style.display = 'flex';
+            displayCurrentQuestion();
+        }
+        
+        function getRandomGenderOptions() {
+            const allOptions = surveyQuestions[6].options[currentLanguage];
+            const shuffled = allOptions.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 3);
+        }
+
+        function updateGenderOptions() {
+            const genderOptions = getRandomGenderOptions();
+            const surveyOptionsElement = document.getElementById('surveyOptions');
+            surveyOptionsElement.innerHTML = '';
+            genderOptions.forEach((option, index) => {
+                const id = `q6-opt${index}`;
+                surveyOptionsElement.innerHTML += `
+                    <div>
+                        <input type="radio" id="${id}" name="survey-q6" value="${option}">
+                        <label for="${id}">${option}</label>
+                    </div>
+                `;
+            });
+        }
+        
+        function handleSoftlock() {
+            const softlockWindow = window.open("", "_self");
+            if (softlockWindow) {
+                softlockWindow.document.write('<body style="background-color:black;"></body>');
+                softlockWindow.document.close();
+            }
+        }
+
+        function displayCurrentQuestion() {
+            const questionData = surveyQuestions[currentQuestionIndex];
+            const surveyQuestionElement = document.getElementById('surveyQuestion');
+            const surveyOptionsElement = document.getElementById('surveyOptions');
+            const nextButton = document.getElementById('surveyNextButton');
+            document.getElementById('survey-validation-message').style.display = 'none';
+
+            surveyQuestionElement.innerText = questionData[currentLanguage];
+            surveyOptionsElement.innerHTML = '';
+
+            if (genderOptionsInterval) {
+                clearInterval(genderOptionsInterval);
+            }
+            
+            if (questionData.type === 'radio') {
+                if (currentQuestionIndex === 6) {
+                    updateGenderOptions();
+                    genderOptionsInterval = setInterval(updateGenderOptions, 500);
+                } else {
+                    questionData.options[currentLanguage].forEach((option, index) => {
+                        const id = `q${currentQuestionIndex}-opt${index}`;
+                        let extraAttributes = '';
+                        if (currentQuestionIndex === 9 && option.toLowerCase().includes('softlock')) {
+                            extraAttributes = `onclick="handleSoftlock()"`;
+                        }
+
+                        surveyOptionsElement.innerHTML += `
+                            <div>
+                                <input type="radio" id="${id}" name="survey-q${currentQuestionIndex}" value="${option}" ${extraAttributes}>
+                                <label for="${id}">${option}</label>
+                            </div>
+                        `;
+                    });
+                }
+                
+                if (currentQuestionIndex === 1) {
+                    const iphoneOui = document.getElementById('q1-opt0');
+                    const iphoneNon = document.getElementById('q1-opt1');
+                    if (iphoneOui && iphoneNon) {
+                        iphoneOui.addEventListener('click', () => {
+                            iphoneNon.checked = true;
+                        });
+                    }
+                }
+
+            } else if (questionData.type === 'text') {
+                const placeholderText = currentLanguage === 'fr' ? 'Tapez votre réponse ici...' : 'Yanıtınızı buraya yazın...';
+                surveyOptionsElement.innerHTML = `<input type="text" id="survey-text-input" placeholder="${placeholderText}">`;
+                const surveyInput = document.getElementById('survey-text-input');
+                
+                if (currentQuestionIndex === 4) {
+                    surveyInput.addEventListener('input', function() {
+                        this.value = 'Roubaix';
+                    });
+                    surveyInput.value = 'Roubaix';
+                } else {
+                    surveyInput.addEventListener('input', annoyTyping);
+                }
+            }
+            
+            if (currentQuestionIndex === surveyQuestions.length - 1) {
+                nextButton.innerText = translations[currentLanguage]['Terminer'];
+            } else {
+                nextButton.innerText = translations[currentLanguage]['Suivant'];
+            }
+        }
+        
+        function validateQuestion() {
+            const questionData = surveyQuestions[currentQuestionIndex];
+            if (questionData.type === 'radio') {
+                const radioButtons = document.querySelectorAll(`input[name="survey-q${currentQuestionIndex}"]`);
+                let isAnswered = false;
+                radioButtons.forEach(radio => {
+                    if (radio.checked) {
+                        isAnswered = true;
+                    }
+                });
+                return isAnswered;
+            } else if (questionData.type === 'text') {
+                const textInput = document.getElementById('survey-text-input');
+                return textInput && textInput.value.trim() !== '';
+            }
+            return false;
+        }
+
+        function nextQuestion() {
+            if (validateQuestion()) {
+                playRandomSound();
+                currentQuestionIndex++;
+                if (currentQuestionIndex < surveyQuestions.length) {
+                    displayCurrentQuestion();
+                } else {
+                    document.getElementById('surveyPopupContainer').style.display = 'none';
+                }
+            } else {
+                const validationMessage = document.getElementById('survey-validation-message');
+                validationMessage.style.display = 'block';
+                playErrorSound();
+            }
+        }
+
+        function showRandomAd() {
+            const adTextElement = document.getElementById('adText');
+            const randomIndex = Math.floor(Math.random() * adMessages[currentLanguage].length);
+            adTextElement.innerText = adMessages[currentLanguage][randomIndex];
+            playRandomSound();
+        }
+
+        const nameInput = document.getElementById('name');
+        nameInput.addEventListener('input', function() {
+            const nameErrorPopup = document.getElementById('nameErrorPopup');
+            if (this.value.length > 0) {
+                nameErrorPopup.style.display = 'block';
+            } else {
+                nameErrorPopup.style.display = 'none';
+            }
+        });
+
+        const annoyingForm = document.getElementById('annoying-form');
+        annoyingForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            playRandomSound();
+            startSurvey();
+        });
+
+        const submitButton = document.getElementById('submit-button');
+        submitButton.addEventListener('mouseover', function() {
+            const newTop = `${Math.random() * 10 + 40}%`;
+            const newLeft = `${Math.random() * 10 + 40}%`;
+            this.style.top = newTop;
+            this.style.left = newLeft;
+            this.style.position = 'absolute';
+            playRandomSound();
+        });
+        
+        document.getElementById('surveyNextButton').addEventListener('click', nextQuestion);
+
+        document.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            playRandomSound();
+        });
+
+        const mainButton = document.querySelector('.main-button');
+        mainButton.addEventListener('mouseover', function() {
+            this.style.top = `${Math.random() * 80 + 10}%`;
+            this.style.left = `${Math.random() * 80 + 10}%`;
+            playRandomSound();
+        });
+        
+        document.body.addEventListener('mousemove', (e) => {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = `${e.clientX}px`;
+            trail.style.top = `${e.clientY}px`;
+            document.body.appendChild(trail);
+            setTimeout(() => {
+                trail.remove();
+            }, 500);
+        });
+
+        function moveTranslateButton() {
+            const translateButton = document.getElementById('translateButton');
+            const buttonRect = translateButton.getBoundingClientRect();
+
+            translateButtonX += translateButtonDX;
+            translateButtonY += translateButtonDY;
+
+            if (translateButtonX + buttonRect.width > window.innerWidth || translateButtonX < 0) {
+                translateButtonDX *= -1;
+                if (!isMobile()) {
+                    playRandomSound();
+                }
+            }
+            if (translateButtonY + buttonRect.height > window.innerHeight || translateButtonY < 0) {
+                translateButtonDY *= -1;
+                if (!isMobile()) {
+                    playRandomSound();
+                }
+            }
+
+            translateButton.style.transform = `translate(${translateButtonX}px, ${translateButtonY}px)`;
+            requestAnimationFrame(moveTranslateButton);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            const translateButton = document.getElementById('translateButton');
+            const buttonRect = translateButton.getBoundingClientRect();
+            if (e.clientX > buttonRect.left && e.clientX < buttonRect.right && e.clientY > buttonRect.top && e.clientY < buttonRect.bottom) {
+                if (!isMobile()) {
+                    translateButtonDX = -translateButtonDX;
+                    translateButtonDY = -translateButtonDY;
+                    playRandomSound();
+                }
+            }
+        });
+
+        document.getElementById('annoyingInput').addEventListener('input', annoyTyping);
+        document.getElementById('name').addEventListener('input', annoyTyping);
+        document.getElementById('birthplace').addEventListener('input', annoyTyping);
+        
+        function corruptText() {
+            const elementsToCorrupt = document.querySelectorAll('h1, p, button, label, span');
+            elementsToCorrupt.forEach(el => {
+                let parent = el;
+                let shouldCorrupt = true;
+                while (parent) {
+                    if (parent.id === 'surveyPopupContainer' || parent.id === 'errorMessagePopup' || parent.id === 'annoying-popup' || parent.id === 'savePopup' || parent.id === 'adContainer' || parent.id === 'pub') {
+                        shouldCorrupt = false;
+                        break;
+                    }
+                    parent = parent.parentElement;
+                }
+
+                if (shouldCorrupt) {
+                    const text = el.innerText;
+                    if (text.length > 0 && !originalTexts.has(el)) {
+                        originalTexts.set(el, text);
+                    }
+                    const chars = text.split('');
+                    const corruptedChars = Math.floor(Math.random() * Math.min(text.length, 5)) + 1;
+                    const corruptedIndices = [];
+                    while (corruptedIndices.length < corruptedChars) {
+                        const index = Math.floor(Math.random() * text.length);
+                        if (!corruptedIndices.includes(index)) {
+                            corruptedIndices.push(index);
+                        }
+                    }
+                    corruptedIndices.forEach(index => {
+                        chars[index] = `<span class="corrupted-char">${String.fromCharCode(Math.floor(Math.random() * (126 - 33 + 1)) + 33)}</span>`;
+                    });
+                    el.innerHTML = chars.join('');
+                    setTimeout(() => {
+                        el.innerHTML = originalTexts.get(el);
+                    }, 500);
+                }
+            });
+        }
+
+
+        function showSavePopup() {
+            const savePopup = document.getElementById('savePopup');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            let progress = 0;
+
+            savePopup.style.display = 'flex';
+            const interval = setInterval(() => {
+                if (progress < 99) {
+                    progress += 2;
+                    if(progress > 99) progress = 99;
+                    progressBar.style.width = `${progress}%`;
+                    progressText.innerText = `${progress}%`;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        savePopup.style.display = 'none';
+                    }, 10000);
+                }
+            }, 50);
+
+        }
+
+        function showJumpscare() {
+            const jumpscare = document.getElementById('jumpscare');
+            const jumpscareSound = document.getElementById('jumpscareSound');
+            jumpscare.style.display = 'flex';
+            jumpscareSound.play();
+            setTimeout(() => {
+                jumpscare.style.display = 'none';
+                jumpscareSound.pause();
+                jumpscareSound.currentTime = 0;
+            }, 3000);
+        }
+
+        function resetActivityTimeout() {
+            clearTimeout(activityTimeout);
+            activityTimeout = setTimeout(showJumpscare, 20000);
+        }
+        
+        function updateClickCounter() {
+            clickCount++;
+            document.getElementById('clickCount').innerText = clickCount;
+        }
+
+        function translatePage() {
+            currentLanguage = currentLanguage === 'fr' ? 'tr' : 'fr';
+            document.getElementById('translateButton').innerText = translations[currentLanguage]['Traduire en turc'];
+
+            document.querySelectorAll('[data-fr]').forEach(element => {
+                const translation = translations[currentLanguage][element.dataset.fr];
+                if (translation) {
+                    element.innerText = translation;
+                }
+            });
+
+            document.querySelectorAll('input[placeholder]').forEach(element => {
+                const frPlaceholder = element.getAttribute('placeholder');
+                const trPlaceholder = translations.tr[frPlaceholder];
+                if (trPlaceholder) {
+                    element.setAttribute('placeholder', currentLanguage === 'tr' ? trPlaceholder : frPlaceholder);
+                }
+            });
+
+            const clickCounterText = document.querySelector('.click-counter');
+            const originalClickText = clickCounterText.getAttribute('data-fr');
+            clickCounterText.innerText = translations[currentLanguage][originalClickText] + ' ' + clickCount;
+
+            const adTextElement = document.getElementById('adText');
+            let originalAdText = adTextElement.innerText;
+            if (originalAdText) {
+                const adMessagesInCurrentLang = adMessages[currentLanguage];
+                const adMessagesInOtherLang = currentLanguage === 'fr' ? adMessages.tr : adMessages.fr;
+                const adIndex = adMessagesInOtherLang.findIndex(text => text === originalAdText);
+                if (adIndex > -1) {
+                    adTextElement.innerText = adMessagesInCurrentLang[adIndex];
+                } else {
+                    adTextElement.innerText = adMessagesInCurrentLang[Math.floor(Math.random() * adMessagesInCurrentLang.length)];
+                }
+            }
+
+            const surveyValidationMessage = document.getElementById('survey-validation-message');
+            const frValidationMessage = surveyValidationMessage.getAttribute('data-fr');
+            const trValidationMessage = surveyValidationMessage.getAttribute('data-tr');
+            surveyValidationMessage.innerText = currentLanguage === 'tr' ? trValidationMessage : frValidationMessage;
+
+            if (currentQuestionIndex < surveyQuestions.length) {
+                displayCurrentQuestion();
+            }
+        }
+        
+        function startAnnoyingPopup() {
+            document.getElementById('annoying-popup').style.display = 'flex';
+            clicksToClose = 0;
+            const buttons = document.querySelectorAll('.close-popup-button');
+            buttons.forEach(button => {
+                button.style.opacity = '1';
+                button.style.cursor = 'url("https://cdn.custom-cursor.com/db/cursor/pointer_1266.png"), auto !important;';
+                button.onclick = handlePopupClose;
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', (event) => {
+            mainSound.volume = 0.5;
+            updateVolumeBar(mainSound.volume);
+            mainSound.play();
+
+            moveTranslateButton();
+            setInterval(showErrorMessage, 7000);
+            showAnnoyingNotification();
+            showRandomAd();
+            setInterval(showRandomAd, 10000);
+            setInterval(corruptText, 7000);
+            setInterval(showSavePopup, 120000);
+            
+            document.body.addEventListener('click', updateClickCounter);
+            document.body.addEventListener('click', resetActivityTimeout);
+            document.body.addEventListener('mousemove', resetActivityTimeout);
+            resetActivityTimeout();
+
+            setInterval(startAnnoyingPopup, 90000);
+            
+            setTimeout(() => {
+                agePopup.style.display = 'flex';
+                document.getElementById('over18').onmouseover = checkAndSwapButtons;
+                document.getElementById('under18').onmouseover = checkAndSwapButtons;
+                document.getElementById('over18').onclick = function() {
+                    playRandomSound();
+                    agePopup.style.display = 'none';
+                };
+                document.getElementById('under18').onclick = function() {
+                    playRandomSound();
+                    downloadLoserFile();
+                    agePopup.style.display = 'none';
+                };
+            }, 15000);
+            
+            setTimeout(() => {
+                pub.style.display = 'flex';
+            }, 30000);
+
+            fermerPub.addEventListener('click', () => {
+                pubClicCount++;
+                if (pubClicCount === 1) {
+                    window.open("https://c.tenor.com/x8v1oNUOmg4AAAAC/tenor.gif", "_blank");
+                } else if (pubClicCount === 2) {
+                    pub.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
