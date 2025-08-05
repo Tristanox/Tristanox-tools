@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checklist</title>
+    <title id="page-title">Checklist</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body {
@@ -196,22 +196,54 @@
         #add-item-button:hover {
             background-color: #72da72; /* Vert pâle au survol du bouton "+" */
         }
+        
+        #language-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+            z-index: 10008;
+            pointer-events: all;
+            transition: none;
+            animation: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #language-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
-    <div class="container" id="checklist-container"> <div class="io-buttons">
-            <button id="import-json-button">Importer JSON</button>
-            <button id="export-json-button">Exporter JSON</button>
-            <button id="export-png-button">Exporter en PNG</button>
+    <button id="language-button" onclick="translatePage()">
+        <img id="flag-icon" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" alt="Traduire en Français">
+    </button>
+    <div class="container" id="checklist-container">
+        <div class="io-buttons">
+            <button id="import-json-button" data-fr="Importer JSON" data-en="Import JSON">Importer JSON</button>
+            <button id="export-json-button" data-fr="Exporter JSON" data-en="Export JSON">Exporter JSON</button>
+            <button id="export-png-button" data-fr="Exporter en PNG" data-en="Export to PNG">Exporter en PNG</button>
             <input type="file" id="json-file-input" accept=".json" style="display: none;">
         </div>
 
-        <h1>Checklist</h1>
-        <p>Cliquez sur une case pour ajouter ou modifier un élément.</p>
+        <h1 data-fr="Checklist" data-en="Checklist">Checklist</h1>
+        <p data-fr="Cliquez sur une case pour ajouter ou modifier un élément." data-en="Click a box to add or edit an item.">Cliquez sur une case pour ajouter ou modifier un élément.</p>
         <div id="grid-container" class="grid-container">
             </div>
         <div class="button-group">
-            <button id="clear-grid">Effacer la grille</button>
+            <button id="clear-grid" data-fr="Effacer la grille" data-en="Clear grid">Effacer la grille</button>
             <button id="add-item-button">+</button>
         </div>
     </div>
@@ -224,10 +256,74 @@
         const importJsonButton = document.getElementById('import-json-button');
         const exportJsonButton = document.getElementById('export-json-button');
         const jsonFileInput = document.getElementById('json-file-input');
-        // NOUVEAU: Bouton d'exportation PNG et le conteneur principal à capturer
         const exportPngButton = document.getElementById('export-png-button');
         const checklistContainer = document.getElementById('checklist-container');
 
+        let currentLanguage = 'en';
+
+        const translations = {
+            fr: {
+                'page-title': 'Checklist',
+                'Import JSON': 'Importer JSON',
+                'Export JSON': 'Exporter JSON',
+                'Export to PNG': 'Exporter en PNG',
+                'Checklist': 'Checklist',
+                'Click a box to add or edit an item.': 'Cliquez sur une case pour ajouter ou modifier un élément.',
+                'Clear grid': 'Effacer la grille',
+                'Click to write...': 'Cliquez pour écrire...',
+                'Importing a JSON file will replace the current checklist. Do you want to continue?': 'Importer un fichier JSON remplacera la checklist actuelle. Voulez-vous continuer ?',
+                'Checklist imported successfully!': 'Checklist importée avec succès !',
+                "Error importing file. Make sure it's a valid JSON.": "Erreur lors de l'importation du fichier. Assurez-vous qu'il s'agit d'un JSON valide.",
+                'Are you sure you want to clear the entire checklist? This action is irreversible.': 'Voulez-vous vraiment effacer toute la checklist ? Cette action est irréversible.',
+                'Unable to export to PNG. An error occurred.': "Impossible d'exporter en PNG. Une erreur est survenue."
+            },
+            en: {
+                'page-title': 'Checklist',
+                'Importer JSON': 'Import JSON',
+                'Exporter JSON': 'Export JSON',
+                'Exporter en PNG': 'Export to PNG',
+                'Checklist': 'Checklist',
+                'Cliquez sur une case pour ajouter ou modifier un élément.': 'Click a box to add or edit an item.',
+                'Effacer la grille': 'Clear grid',
+                'Cliquez pour écrire...': 'Click to write...',
+                'Importer un fichier JSON remplacera la checklist actuelle. Voulez-vous continuer ?': 'Importing a JSON file will replace the current checklist. Do you want to continue?',
+                'Checklist importée avec succès !': 'Checklist imported successfully!',
+                "Erreur lors de l'importation du fichier. Assurez-vous qu'il s'agit d'un JSON valide.": "Error importing file. Make sure it's a valid JSON.",
+                'Voulez-vous vraiment effacer toute la checklist ? Cette action est irréversible.': 'Are you sure you want to clear the entire checklist? This action is irreversible.',
+                "Impossible d'exporter en PNG. Une erreur est survenue.": 'Unable to export to PNG. An error occurred.'
+            }
+        };
+
+        function translatePage() {
+            currentLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+            const flagIcon = document.getElementById('flag-icon');
+            
+            if (currentLanguage === 'fr') {
+                flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+                flagIcon.alt = 'Translate to English';
+                document.documentElement.lang = 'fr';
+            } else {
+                flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+                flagIcon.alt = 'Traduire en Français';
+                document.documentElement.lang = 'en';
+            }
+
+            document.querySelectorAll('[data-fr]').forEach(element => {
+                const textKey = element.dataset[currentLanguage];
+                if (textKey) {
+                    element.innerText = textKey;
+                }
+            });
+            
+            document.querySelectorAll('.grid-item textarea').forEach(textarea => {
+                const placeholder = translations[currentLanguage]['Click to write...'];
+                textarea.setAttribute('placeholder', placeholder);
+                updateTextareaPlaceholder(textarea);
+            });
+            
+            const pageTitle = document.getElementById('page-title');
+            pageTitle.innerText = translations[currentLanguage]['page-title'];
+        }
 
         // Fonction pour sauvegarder le contenu de la grille
         function saveGridContent() {
@@ -293,22 +389,25 @@
             textarea.value = content.text;
             textarea.setAttribute('rows', '3');
             textarea.setAttribute('maxlength', '200');
+            textarea.setAttribute('placeholder', translations[currentLanguage]['Click to write...']);
 
             const placeholderSpan = document.createElement('span');
             placeholderSpan.classList.add('placeholder');
-            placeholderSpan.textContent = "Cliquez pour écrire...";
+            placeholderSpan.textContent = translations[currentLanguage]['Click to write...'];
 
-            const updateTextareaPlaceholder = () => {
-                if (textarea.value.trim() === '') {
-                    placeholderSpan.style.display = 'block';
+            const updateTextareaPlaceholder = (element) => {
+                const text = element.value;
+                const placeholder = element.nextElementSibling;
+                if (text.trim() === '') {
+                    placeholder.style.display = 'block';
                 } else {
-                    placeholderSpan.style.display = 'none';
+                    placeholder.style.display = 'none';
                 }
             };
-
+            
             textarea.addEventListener('input', () => {
                 saveGridContent();
-                updateTextareaPlaceholder();
+                updateTextareaPlaceholder(textarea);
             });
 
             textarea.addEventListener('focus', () => {
@@ -319,7 +418,7 @@
             textarea.addEventListener('blur', () => {
                 itemDiv.classList.remove('active');
                 saveGridContent();
-                updateTextareaPlaceholder();
+                updateTextareaPlaceholder(textarea);
             });
 
             itemDiv.addEventListener('click', (event) => {
@@ -330,13 +429,23 @@
             
             itemDiv.appendChild(textarea);
             itemDiv.appendChild(placeholderSpan);
-            updateTextareaPlaceholder();
+            updateTextareaPlaceholder(textarea);
 
             return itemDiv;
         }
+        
+        function updateTextareaPlaceholder(textarea) {
+            const placeholderSpan = textarea.nextElementSibling;
+            if (textarea.value.trim() === '') {
+                placeholderSpan.style.display = 'block';
+            } else {
+                placeholderSpan.style.display = 'none';
+            }
+        }
 
         clearGridButton.addEventListener('click', () => {
-            if (confirm("Voulez-vous vraiment effacer toute la checklist ? Cette action est irréversible.")) {
+            const confirmationText = translations[currentLanguage]['Are you sure you want to clear the entire checklist? This action is irreversible.'];
+            if (confirm(confirmationText)) {
                 localStorage.removeItem('checklistGrid');
                 initializeGrid();
             }
@@ -405,8 +514,9 @@
             if (!file) {
                 return;
             }
-
-            if (!confirm("Importer un fichier JSON remplacera la checklist actuelle. Voulez-vous continuer ?")) {
+            
+            const confirmationText = translations[currentLanguage]['Importing a JSON file will replace the current checklist. Do you want to continue?'];
+            if (!confirm(confirmationText)) {
                 jsonFileInput.value = ''; 
                 return;
             }
@@ -419,11 +529,11 @@
                     localStorage.setItem('checklistGrid', JSON.stringify(importedItems));
                     
                     initializeGrid();
-                    alert("Checklist importée avec succès !");
+                    alert(translations[currentLanguage]['Checklist imported successfully!']);
 
                 } catch (error) {
                     console.error("Erreur lors de l'importation du JSON:", error);
-                    alert("Erreur lors de l'importation du fichier. Assurez-vous qu'il s'agit d'un JSON valide.");
+                    alert(translations[currentLanguage]["Error importing file. Make sure it's a valid JSON."]);
                 } finally {
                     jsonFileInput.value = ''; 
                 }
@@ -433,7 +543,6 @@
 
         // NOUVEAU: Logique d'exportation PNG
         exportPngButton.addEventListener('click', () => {
-            // Désactive temporairement le curseur "pointer" sur les items pour une meilleure capture visuelle
             document.querySelectorAll('.grid-item').forEach(item => {
                 item.style.cursor = 'default';
             });
@@ -443,26 +552,24 @@
 
 
             html2canvas(checklistContainer, { 
-                scale: 2, // Augmente la résolution pour une meilleure qualité d'image
-                useCORS: true, // Important si des images externes sont utilisées (pas le cas ici, mais bonne pratique)
-                backgroundColor: null // Pour que le fond transparent reste transparent si le body a un fond
+                scale: 2,
+                useCORS: true,
+                backgroundColor: null
             }).then(canvas => {
-                // Rétablit le curseur "pointer" après la capture
                 document.querySelectorAll('.grid-item').forEach(item => {
                     item.style.cursor = 'pointer';
                 });
                 document.querySelectorAll('textarea').forEach(textarea => {
-                    textarea.style.cursor = 'text'; /* ou auto, selon votre préférence */
+                    textarea.style.cursor = 'text';
                 });
 
                 const link = document.createElement('a');
                 link.download = 'checklist.png';
-                link.href = canvas.toDataURL('image/png'); // Convertit le canvas en URL de données PNG
+                link.href = canvas.toDataURL('image/png');
                 link.click();
             }).catch(error => {
                 console.error("Erreur lors de l'exportation en PNG:", error);
-                alert("Impossible d'exporter en PNG. Une erreur est survenue.");
-                // Assurez-vous de rétablir le curseur même en cas d'erreur
+                alert(translations[currentLanguage]['Unable to export to PNG. An error occurred.']);
                  document.querySelectorAll('.grid-item').forEach(item => {
                     item.style.cursor = 'pointer';
                 });
@@ -473,7 +580,31 @@
         });
 
 
-        document.addEventListener('DOMContentLoaded', initializeGrid);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGrid();
+            translatePage(); // Initial call to set default language to English
+            currentLanguage = 'en';
+            
+            // Initial setup for the button
+            const flagIcon = document.getElementById('flag-icon');
+            flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+            flagIcon.alt = 'Traduire en Français';
+            document.documentElement.lang = 'en';
+
+            document.getElementById('page-title').innerText = translations.en['page-title'];
+
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.dataset.en;
+                if (text) {
+                    element.innerText = text;
+                }
+            });
+
+            document.querySelectorAll('.grid-item textarea').forEach(textarea => {
+                textarea.setAttribute('placeholder', translations.en['Click to write...']);
+                updateTextareaPlaceholder(textarea);
+            });
+        });
     </script>
 </body>
 </html>
