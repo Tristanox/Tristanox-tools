@@ -1,42 +1,42 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Color Palette Maker</title>
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/logo-NoBG.png">
     <style>
-        /* Votre palette de couleurs pour le style de l'interface */
+        /* Your color palette for the interface style */
         :root {
-            --color-primary-dark: #1e2124; /* Noir très foncé pour header, boutons principaux */
-            --color-secondary-dark: #282b30; /* Gris très foncé pour arrière-plan général */
-            --color-medium-dark: #36393e; /* Gris foncé moyen pour fonds d'éléments, bordures internes des blocs */
-            --color-light-dark: #424549; /* Gris foncé clair pour texte secondaire, bordures externes des blocs */
-            --color-accent-green: #55ff75; /* Vert vif pour actions positives */
-            --color-soft-green: #72da72; /* Vert plus doux pour hover */
-            --color-text-light: #ffffff; /* Texte clair sur fonds sombres */
+            --color-primary-dark: #1e2124;
+            --color-secondary-dark: #282b30;
+            --color-medium-dark: #36393e;
+            --color-light-dark: #424549;
+            --color-accent-green: #55ff75;
+            --color-soft-green: #72da72;
+            --color-text-light: #ffffff;
         }
 
-        /* Styles CSS */
+        /* CSS Styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            background-color: var(--color-secondary-dark); /* Fond général du body */
+            background-color: var(--color-secondary-dark);
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 30px 20px;
-            color: var(--color-light-dark); /* Texte général par défaut */
+            color: var(--color-light-dark);
         }
 
         header {
-            background-color: var(--color-primary-dark); /* Header avec le noir très foncé */
-            color: var(--color-text-light); /* Texte blanc dans le header */
+            background-color: var(--color-primary-dark);
+            color: var(--color-text-light);
             padding: 20px 0;
             width: 100%;
             text-align: center;
             margin-bottom: 40px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Ombre plus prononcée */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         h1 {
@@ -48,7 +48,7 @@
         main {
             max-width: 1200px;
             width: 100%;
-            background-color: var(--color-secondary-dark); /* Assure que le main n'est pas blanc */
+            background-color: var(--color-secondary-dark);
         }
 
         #palette {
@@ -57,24 +57,24 @@
             gap: 25px;
             justify-content: center;
             margin-bottom: 40px;
-            background-color: var(--color-secondary-dark); /* S'assurer que le conteneur de la palette n'est pas blanc */
-            padding: 10px; /* Petit padding pour espacement si besoin */
-            border-radius: 10px; /* Coins arrondis pour le conteneur de palette */
+            background-color: var(--color-secondary-dark);
+            padding: 10px;
+            border-radius: 10px;
         }
 
         .color-block {
             position: relative;
             width: 220px;
             height: 300px;
-            border: 1px solid var(--color-light-dark); /* Bordure externe du bloc */
+            border: 1px solid var(--color-light-dark);
             border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
             padding: 20px;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.25); /* Ombre plus visible */
-            background-color: var(--color-medium-dark); /* Fond du bloc (là où étaient les inputs) */
+            box-shadow: 0 6px 12px rgba(0,0,0,0.25);
+            background-color: var(--color-medium-dark);
             transition: transform 0.2s ease-in-out;
         }
 
@@ -87,8 +87,8 @@
             height: 120px;
             border-radius: 6px;
             margin-bottom: 20px;
-            border: 1px solid var(--color-light-dark); /* Bordure de la zone de couleur */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.15); /* Ombre interne */
+            border: 1px solid var(--color-light-dark);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
         }
 
         .color-input-group {
@@ -101,7 +101,7 @@
 
         .color-input-group label {
             font-size: 0.95em;
-            color: var(--color-text-light); /* Texte des labels clair pour lisibilité */
+            color: var(--color-text-light);
             font-weight: 600;
         }
 
@@ -109,12 +109,12 @@
         .color-input-group input[type="color"] {
             width: calc(100% - 20px);
             padding: 10px;
-            border: 1px solid var(--color-light-dark); /* Bordure des inputs */
+            border: 1px solid var(--color-light-dark);
             border-radius: 5px;
             font-size: 1em;
             box-sizing: border-box;
-            background-color: var(--color-secondary-dark); /* Fond des inputs */
-            color: var(--color-text-light); /* Texte des inputs blanc */
+            background-color: var(--color-secondary-dark);
+            color: var(--color-text-light);
         }
 
         .color-input-group input[type="color"] {
@@ -130,12 +130,12 @@
         }
         .color-input-group input[type="color"]::-webkit-color-swatch {
             border-radius: 5px;
-            border: 1px solid var(--color-light-dark); /* Bordure du swatch de couleur */
+            border: 1px solid var(--color-light-dark);
         }
 
         .hex-code-display {
             font-size: 0.9em;
-            color: var(--color-text-light); /* Texte du code hex clair pour lisibilité */
+            color: var(--color-text-light);
             text-align: center;
             margin-top: -10px;
             font-weight: bold;
@@ -147,12 +147,12 @@
             margin-top: 20px;
             justify-content: center;
             width: 100%;
-            flex-wrap: wrap; /* Permet aux boutons de s'enrouler si l'écran est petit */
+            flex-wrap: wrap;
         }
 
         .action-button {
-            background-color: var(--color-medium-dark); /* Boutons d'action par défaut */
-            color: var(--color-text-light); /* Texte blanc sur les boutons d'action */
+            background-color: var(--color-medium-dark);
+            color: var(--color-text-light);
             padding: 15px 30px;
             border: none;
             border-radius: 50px;
@@ -174,28 +174,28 @@
         }
 
         #add-color-btn {
-            background-color: var(--color-accent-green); /* Vert vif pour Ajouter */
-            color: var(--color-primary-dark); /* Texte foncé sur vert vif */
+            background-color: var(--color-accent-green);
+            color: var(--color-primary-dark);
             font-weight: bold;
         }
         #add-color-btn:hover {
-            background-color: var(--color-soft-green); /* Vert plus doux au hover */
+            background-color: var(--color-soft-green);
         }
 
         #export-png-btn {
-            background-color: var(--color-primary-dark); /* Noir très foncé pour Exporter */
+            background-color: var(--color-primary-dark);
         }
         #export-png-btn:hover {
-            background-color: var(--color-light-dark); /* Gris foncé clair au hover */
+            background-color: var(--color-light-dark);
         }
 
-        /* Styles pour le nouveau champ d'importation en masse */
+        /* Styles for the new mass import field */
         .mass-import-container {
             width: 100%;
-            max-width: 800px; /* Limite la largeur pour une meilleure lisibilité */
+            max-width: 800px;
             margin: 40px auto;
             padding: 25px;
-            background-color: var(--color-medium-dark); /* Fond du conteneur d'importation */
+            background-color: var(--color-medium-dark);
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             text-align: center;
@@ -208,21 +208,21 @@
         }
 
         .mass-import-container textarea {
-            width: calc(100% - 40px); /* Ajuste la largeur */
+            width: calc(100% - 40px);
             height: 100px;
             padding: 15px;
             border: 1px solid var(--color-light-dark);
             border-radius: 8px;
             font-size: 1em;
-            background-color: var(--color-secondary-dark); /* Fond du textarea */
-            color: var(--color-text-light); /* Texte du textarea */
-            resize: vertical; /* Permet le redimensionnement vertical */
+            background-color: var(--color-secondary-dark);
+            color: var(--color-text-light);
+            resize: vertical;
             margin-bottom: 15px;
             box-sizing: border-box;
         }
 
         #import-mass-btn {
-            background-color: var(--color-accent-green); /* Même vert que le bouton "Ajouter" */
+            background-color: var(--color-accent-green);
             color: var(--color-primary-dark);
             font-weight: bold;
         }
@@ -230,12 +230,11 @@
             background-color: var(--color-soft-green);
         }
 
-
         .delete-color-btn {
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #dc3545; /* Reste rouge pour la clarté visuelle */
+            background-color: #dc3545;
             color: white;
             border: none;
             border-radius: 50%;
@@ -260,7 +259,7 @@
             transform: scale(0.95);
         }
 
-        /* Classes pour masquer/afficher lors de l'exportation */
+        /* Classes to hide/show during export */
         .hide-for-export {
             display: none !important;
         }
@@ -268,17 +267,17 @@
             display: block !important;
         }
 
-        /* Ajustements pour les blocs de couleur lors de l'exportation */
+        /* Adjustments for color blocks during export */
         #palette.exporting {
-            background-color: var(--color-secondary-dark); /* Fond de la palette exportée */
+            background-color: var(--color-secondary-dark);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
         #palette.exporting .color-block {
             gap: 0;
-            background-color: transparent; /* Pas de fond pour les blocs eux-mêmes lors de l'export */
-            border: none; /* Pas de bordure visible */
+            background-color: transparent;
+            border: none;
         }
 
         .color-block.export-mode {
@@ -303,8 +302,8 @@
         .color-block.export-mode .hex-code-display {
             margin-top: 5px;
             font-size: 1em;
-            color: var(--color-text-light); /* Texte blanc pour le code hex en mode export */
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Ajoute une ombre au texte pour la lisibilité sur toutes les couleurs */
+            color: var(--color-text-light);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -318,14 +317,14 @@
             </section>
 
         <div class="actions-container">
-            <button id="add-color-btn" class="action-button">Ajouter une couleur</button>
-            <button id="export-png-btn" class="action-button">Exporter en PNG</button>
+            <button id="add-color-btn" class="action-button">Add Color</button>
+            <button id="export-png-btn" class="action-button">Export to PNG</button>
         </div>
 
         <section class="mass-import-container">
-            <h2>Importer des couleurs en masse</h2>
-            <textarea id="mass-hex-input" placeholder="Entrez des codes HEX séparés par des virgules, des espaces ou des sauts de ligne : #XXXXXX, #YYYYYY, #ZZZZZZ..."></textarea>
-            <button id="import-mass-btn" class="action-button">Importer les couleurs</button>
+            <h2>Import Colors in Bulk</h2>
+            <textarea id="mass-hex-input" placeholder="Enter HEX codes separated by commas, spaces or new lines: #XXXXXX, #YYYYYY, #ZZZZZZ..."></textarea>
+            <button id="import-mass-btn" class="action-button">Import Colors</button>
         </section>
     </main>
 
@@ -338,8 +337,20 @@
             const exportPngBtn = document.getElementById('export-png-btn');
             const massHexInput = document.getElementById('mass-hex-input');
             const importMassBtn = document.getElementById('import-mass-btn');
+            
+            const translations = {
+                en: {
+                    'delete-title': 'Delete this color',
+                    'delete-confirm': 'Are you sure you want to delete this color?',
+                    'invalid-color-warn': 'Invalid HEX color ignored:',
+                    'import-success-alert': 'color(s) imported successfully!',
+                    'import-no-valid-alert': 'No valid color found for import. Check the format (e.g. #XXXXXX, #YYYYYY).',
+                    'export-error': 'An error occurred during export. Please try again.',
+                    'hex-code-label': 'Hex Code:'
+                }
+            };
 
-            // Fonction pour générer une couleur hexadécimale aléatoire
+            // Function to generate a random hexadecimal color
             function getRandomHexColor() {
                 const letters = '0123456789ABCDEF';
                 let color = '#';
@@ -349,12 +360,12 @@
                 return color;
             }
 
-            // Fonction pour valider un code hexadécimal (simple vérification)
+            // Function to validate a hexadecimal code (simple check)
             function isValidHex(hex) {
                 return /^#?([0-9A-F]{3}){1,2}$/i.test(hex);
             }
 
-            // Fonction pour créer un bloc de couleur
+            // Function to create a color block
             function createColorBlock(initialColor) {
                 const colorBlock = document.createElement('div');
                 colorBlock.classList.add('color-block');
@@ -369,7 +380,7 @@
                 const hexInputGroup = document.createElement('div');
                 hexInputGroup.classList.add('color-input-group');
                 const hexLabel = document.createElement('label');
-                hexLabel.textContent = 'Code Hex:';
+                hexLabel.textContent = 'Hex Code:';
                 const hexInput = document.createElement('input');
                 hexInput.type = 'text';
                 hexInput.value = initialColor;
@@ -379,7 +390,7 @@
                 const colorWheelInputGroup = document.createElement('div');
                 colorWheelInputGroup.classList.add('color-input-group');
                 const colorWheelLabel = document.createElement('label');
-                colorWheelLabel.textContent = 'Roue Chromatique:';
+                colorWheelLabel.textContent = 'Hex Code:';
                 const colorWheelInput = document.createElement('input');
                 colorWheelInput.type = 'color';
                 colorWheelInput.value = initialColor;
@@ -397,10 +408,12 @@
                 const deleteButton = document.createElement('button');
                 deleteButton.classList.add('delete-color-btn');
                 deleteButton.textContent = '×';
-                deleteButton.title = 'Supprimer cette couleur';
+                deleteButton.title = translations.en['delete-title'];
 
                 deleteButton.addEventListener('click', () => {
-                    colorBlock.remove();
+                    if (confirm(translations.en['delete-confirm'])) {
+                        colorBlock.remove();
+                    }
                 });
 
                 hexInput.addEventListener('input', (event) => {
@@ -431,17 +444,17 @@
                 paletteContainer.appendChild(colorBlock);
             }
 
-            // MODIFICATION ICI: Initialiser avec 1 couleur - blanc pur
-            // Supprimez la boucle for (let i = 0; i < 5; i++) { createColorBlock(getRandomHexColor()); }
-            // Et remplacez-la par :
-            createColorBlock("#FFFFFF"); // Démarre avec une seule couleur blanche pure
+            // MODIFICATION HERE: Initialize with 1 color - pure white
+            // Remove the loop for (let i = 0; i < 5; i++) { createColorBlock(getRandomHexColor()); }
+            // And replace it with:
+            createColorBlock("#FFFFFF"); // Starts with a single pure white color
 
-            // Ajouter une nouvelle couleur au clic sur le bouton (aléatoire par défaut)
+            // Add a new color when clicking the button (random by default)
             addColorBtn.addEventListener('click', () => {
                 createColorBlock(getRandomHexColor());
             });
 
-            // Gérer l'importation de couleurs en masse
+            // Handle bulk color import
             importMassBtn.addEventListener('click', () => {
                 const rawInput = massHexInput.value;
                 const colorsToImport = rawInput.split(/[, \n]+/).map(color => color.trim()).filter(color => color !== '');
@@ -455,19 +468,19 @@
                         createColorBlock(color);
                         importedCount++;
                     } else {
-                        console.warn(`Couleur HEX invalide ignorée: ${color}`);
+                        console.warn(`${translations.en['invalid-color-warn']} ${color}`);
                     }
                 });
 
                 if (importedCount > 0) {
                     massHexInput.value = '';
-                    alert(`${importedCount} couleur(s) importée(s) avec succès !`);
+                    alert(`${importedCount} ${translations.en['import-success-alert']}`);
                 } else {
-                    alert('Aucune couleur valide n\'a été trouvée pour l\'importation. Vérifiez le format (ex: #XXXXXX, #YYYYYY).');
+                    alert(translations.en['import-no-valid-alert']);
                 }
             });
 
-            // Exporter la palette en PNG
+            // Export the palette to PNG
             exportPngBtn.addEventListener('click', () => {
                 const actionButtonsContainer = document.querySelector('.actions-container');
                 actionButtonsContainer.classList.add('hide-for-export');
@@ -501,7 +514,7 @@
                     document.body.removeChild(link);
                 }).catch(error => {
                     console.error('Erreur lors de l\'exportation en PNG:', error);
-                    alert('Une erreur est survenue lors de l\'exportation. Veuillez réessayer.');
+                    alert(translations.en['export-error']);
                 }).finally(() => {
                     actionButtonsContainer.classList.remove('hide-for-export');
                     massImportSection.classList.remove('hide-for-export');
