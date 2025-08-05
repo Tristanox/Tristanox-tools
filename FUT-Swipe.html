@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FUT Swipe - Le Tinder des Joueurs</title>
+    <title>FUT Swipe - The Player Tinder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg" href="https://www.logo.wine/a/logo/Tinder_(app)/Tinder_(app)-Flame-Logo.wine.svg">
 
     <style>
-        /* --- Styles CSS --- */
+        /* --- CSS Styles --- */
         :root {
             --primary-pink: #EB106A;
             --secondary-red: #F05550;
@@ -63,10 +63,10 @@
             z-index: 5;
         }
 
-        /* Styles pour l'affichage du niveau */
+        /* Styles for level display */
         #levelDisplay {
             text-align: center; 
-            margin-bottom: 20px; /* Réduit l'espace pour rapprocher le tout */
+            margin-bottom: 20px; /* Reduce space to bring everything closer */
             font-weight: bold; 
             color: white;
             z-index: 5;
@@ -130,7 +130,7 @@
             flex-shrink: 0; 
         }
 
-        /* Styles de la carte principale */
+        /* Main card styles */
         .card {
             position: absolute;
             width: 100%;
@@ -267,7 +267,7 @@
             transform: scale(0.95);
         }
 
-        /* Menu Burger et nouveaux boutons d'action */
+        /* Burger Menu and new action buttons */
         .menu-action-button {
             position: absolute;
             width: 50px;
@@ -304,21 +304,54 @@
             top: 20px; 
             right: 20px;
             left: auto;
-            font-size: 1.5em; /* Ajustement de la taille de l'icône */
+            font-size: 1.5em; /* Icon size adjustment */
         }
 
         #importStatsBtn {
             top: 80px; 
             right: 20px;
             left: auto;
-            font-size: 1.5em; /* Ajustement de la taille de l'icône */
+            font-size: 1.5em; /* Icon size adjustment */
         }
 
-        #refreshSeriesBtn { /* Nouveau bouton */
+        #refreshSeriesBtn { /* New button */
             top: 140px; 
             right: 20px;
             left: auto;
-            font-size: 1.5em; /* Ajustement de la taille de l'icône */
+            font-size: 1.5em; /* Icon size adjustment */
+        }
+
+        #languageToggleBtn { /* New language toggle button */
+            top: 200px;
+            right: 20px;
+            left: auto;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(128, 128, 128, 0.5);
+            border: none;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            padding: 0; /* Remove padding to fit image */
+            overflow: hidden; /* Hide overflow for image */
+        }
+
+        #languageToggleBtn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        #languageToggleBtn:hover {
+            background-color: rgba(128, 128, 128, 0.7);
+            transform: translateY(-1px);
+        }
+
+        #languageToggleBtn:active {
+            transform: scale(0.95);
         }
 
 
@@ -388,7 +421,7 @@
             color: var(--primary-pink);
         }
 
-        /* Modal de sélection de la série (maintenant pour les réglages) */
+        /* Series selection modal (now for settings) */
         #seriesSelectionModal {
             display: none;
             position: fixed;
@@ -514,7 +547,7 @@
             cursor: pointer;
         }
 
-        /* Modal Preset de Cartes - Styles mis à jour pour sélection multiple */
+        /* Card Preset Modal - Updated styles for multiple selection */
         #presetSelectionModal {
             display: none;
             position: fixed;
@@ -542,7 +575,7 @@
             animation: bounceIn 0.5s ease-out;
             position: relative;
             max-height: 100vh;
-            overflow-y: hidden; /* Maintenir le scroll sur la grille interne */
+            overflow-y: hidden; /* Keep scroll on internal grid */
         }
 
         .preset-modal-content h2 {
@@ -551,14 +584,14 @@
             font-size: 1.8em;
         }
 
-        .preset-options-grid { /* Nouvelle grille pour les options de preset */
+        .preset-options-grid { /* New grid for preset options */
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
             margin-top: 20px;
-            max-height: 400px; /* Limite la hauteur pour le défilement */
+            max-height: 400px; /* Limit height for scrolling */
             overflow-y: auto;
-            padding-right: 5px; /* Pour la barre de défilement */
+            padding-right: 5px; /* For scrollbar */
         }
 
         .preset-option-item {
@@ -576,7 +609,7 @@
             background-color: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
         }
-        .preset-option-item.selected { /* Style pour les éléments sélectionnés */
+        .preset-option-item.selected { /* Style for selected elements */
             background-color: var(--primary-pink);
             border-color: var(--primary-pink);
             box-shadow: 0 0 10px rgba(235, 16, 106, 0.5);
@@ -585,7 +618,7 @@
             margin-right: 10px;
             width: 20px;
             height: 20px;
-            accent-color: var(--secondary-red); /* Style de la case à cocher */
+            accent-color: var(--secondary-red); /* Checkbox style */
             cursor: pointer;
         }
         .preset-option-item label {
@@ -606,7 +639,7 @@
             margin-left: 10px;
         }
 
-        button#applyPresetFilterBtn { /* Nouveau bouton d'application */
+        button#applyPresetFilterBtn { /* New apply button */
             background-color: var(--primary-pink);
             color: white;
             border: none;
@@ -616,7 +649,7 @@
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.1s ease;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            margin-top: 25px; /* Espace au-dessus */
+            margin-top: 25px; /* Space above */
         }
         button#applyPresetFilterBtn:hover {
             background-color: #d10e5d;
@@ -645,7 +678,7 @@
             cursor: pointer;
         }
 
-        /* Modal Sélection OVR */
+        /* OVR Selection Modal */
         #ovrSelectionModal {
             display: none;
             position: fixed;
@@ -776,8 +809,8 @@
             cursor: pointer;
         }
 
-        /* Modal pour l'équipe finale (Collection) */
-        #teamModal, #collectionModal { /* Applique les mêmes styles de base pour les modals plein écran */
+        /* Modal for final team (Collection) */
+        #teamModal, #collectionModal { /* Apply same base styles for full-screen modals */
             display: none;
             position: fixed;
             z-index: 10000;
@@ -824,7 +857,7 @@
             flex-shrink: 0;
         }
 
-        .team-grid, .collection-grid { /* Applique les mêmes styles de grille */
+        .team-grid, .collection-grid { /* Apply same grid styles */
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 15px;
@@ -836,7 +869,7 @@
             justify-items: center;
         }
 
-        .team-player-card { /* Utilisé pour les cartes dans la modal de collection aussi */
+        .team-player-card { /* Used for cards in collection modal too */
             background-color: transparent;
             border-radius: 0;
             padding: 0;
@@ -957,14 +990,17 @@
     <button id="exportStatsBtn" class="menu-action-button">💾</button>
     <button id="importStatsBtn" class="menu-action-button">⬆️</button>
     <button id="refreshSeriesBtn" class="menu-action-button">🔄</button>
+    <button id="languageToggleBtn" class="menu-action-button">
+        <img id="languageFlag" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png" alt="Language Flag">
+    </button>
 
     <div class="swipe-message like" id="likeMessage">LIKE</div>
     <div class="swipe-message nope" id="nopeMessage">NOPE</div>
 
-    <h1>FUT Swipe</h1>
+    <h1 id="mainTitle">FUT Swipe</h1>
     
     <div id="levelDisplay">
-        Niveau: <span id="currentLevel">1</span>
+        <span id="levelText">Level</span>: <span id="currentLevel">1</span>
         <div id="xpBarContainer">
             <div id="xpBar"></div>
         </div>
@@ -985,23 +1021,24 @@
     <div id="sideMenu">
         <span class="close-btn">&times;</span>
         <ul>
-            <li><button id="resetGameMenuBtn">Nouvelle Partie</button></li>
-            <li><button id="viewTeamMenuBtn">Voir l'Équipe</button></li>
-            <li><button id="viewCollectionMenuBtn">Ma Collection</button></li> <li><button id="changeSeriesLengthBtn">Changer Longueur Série</button></li>
-            <li><button id="choosePresetBtn">Choisir un Preset</button></li>
-            <li><button id="filterByOVRBtn">Filtrer par Note (OVR)</button></li>
+            <li><button id="resetGameMenuBtn">New Game</button></li>
+            <li><button id="viewTeamMenuBtn">View Team</button></li>
+            <li><button id="viewCollectionMenuBtn">My Collection</button></li> 
+            <li><button id="changeSeriesLengthBtn">Change Series Length</button></li>
+            <li><button id="choosePresetBtn">Choose Preset</button></li>
+            <li><button id="filterByOVRBtn">Filter by OVR</button></li>
         </ul>
     </div>
 
     <div id="seriesSelectionModal">
         <div class="series-modal-content">
             <span class="close-button series-modal-close-btn">&times;</span>
-            <h2>Ajuster la longueur de la série</h2>
+            <h2 id="adjustSeriesLengthTitle">Adjust Series Length</h2>
             <div class="series-options">
-                <label for="seriesRange">Nombre de swipes :</label>
+                <label for="seriesRange" id="numberOfSwipesLabel">Number of swipes :</label>
                 <input type="range" id="seriesRange" min="10" max="100" step="40" value="50">
                 <span id="sliderValue">50</span>
-                <button id="applySeriesLengthBtn">Appliquer & Recommencer</button>
+                <button id="applySeriesLengthBtn">Apply & Restart</button>
             </div>
         </div>
     </div>
@@ -1009,26 +1046,26 @@
     <div id="presetSelectionModal">
         <div class="preset-modal-content">
             <span class="close-button preset-modal-close-btn">&times;</span>
-            <h2>Choisir un ou plusieurs types de carte</h2>
+            <h2 id="chooseCardTypeTitle">Choose one or more card types</h2>
             <div id="presetOptions" class="preset-options-grid"> 
                 </div>
-            <button id="applyPresetFilterBtn">Appliquer la sélection</button>
+            <button id="applyPresetFilterBtn">Apply Selection</button>
         </div>
     </div>
 
     <div id="ovrSelectionModal">
         <div class="ovr-modal-content">
             <span class="close-button ovr-modal-close-btn">&times;</span>
-            <h2>Filtrer par Note (OVR)</h2>
+            <h2 id="filterByOVRTitle">Filter by OVR</h2>
             <div class="ovr-options">
-                <label for="ovrMinRange">Note Minimale :</label>
+                <label for="ovrMinRange" id="minRatingLabel">Minimum Rating :</label>
                 <div class="slider-group">
                     <input type="range" id="ovrMinRange" min="64" max="99" value="64">
-                    <label for="ovrMaxRange">Note Maximale :</label>
+                    <label for="ovrMaxRange" id="maxRatingLabel">Maximum Rating :</label>
                     <input type="range" id="ovrMaxRange" min="64" max="99" value="99">
                 </div>
                 <span id="ovrRangeValue">64 - 99</span>
-                <button id="applyOvrFilterBtn">Appliquer & Recommencer</button>
+                <button id="applyOvrFilterBtn">Apply & Restart</button>
             </div>
         </div>
     </div>
@@ -1037,12 +1074,12 @@
     <div id="teamModal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h2>Votre Équipe de Rêve ! ⚽</h2>
-            <div id="teamOverallRating">Note Générale de l'Équipe: -</div>
+            <h2 id="dreamTeamTitle">Your Dream Team! ⚽</h2>
+            <div id="teamOverallRating">Team Overall Rating: -</div>
             <div id="teamGrid" class="team-grid">
                 </div>
-            <p style="margin-top: auto; font-size: 0.9em; color: #aaa; padding-top: 10px;">
-                Cliquez sur un joueur pour voir plus de détails (fonctionnalité à venir).
+            <p style="margin-top: auto; font-size: 0.9em; color: #aaa; padding-top: 10px;" id="teamModalFooter">
+                Click on a player to see more details (feature coming soon).
             </p>
         </div>
     </div>
@@ -1050,8 +1087,8 @@
     <div id="collectionModal">
         <div class="modal-content">
             <span class="close-button" id="closeCollectionModalBtn">&times;</span>
-            <h2>Ma Collection 🏆</h2>
-            <div id="collectionCount">Total de cartes dans la collection : 0</div>
+            <h2 id="myCollectionTitle">My Collection 🏆</h2>
+            <div id="collectionCount">Total cards in collection: 0</div>
             <div id="collectionGrid" class="collection-grid">
                 </div>
         </div>
@@ -1066,7 +1103,7 @@
         const likeMessage = document.getElementById('likeMessage');
         const nopeMessage = document.getElementById('nopeMessage');
 
-        // Modals existants
+        // Existing Modals
         const teamModal = document.getElementById('teamModal');
         const teamGrid = document.getElementById('teamGrid');
         const teamOverallRating = document.getElementById('teamOverallRating');
@@ -1079,8 +1116,8 @@
         const closeSeriesModalBtn = seriesSelectionModal.querySelector('.series-modal-close-btn');
 
         const presetSelectionModal = document.getElementById('presetSelectionModal');
-        const presetOptionsDiv = document.getElementById('presetOptions'); // Nouveau conteneur pour les options de preset
-        const applyPresetFilterBtn = document.getElementById('applyPresetFilterBtn'); // Nouveau bouton d'application
+        const presetOptionsDiv = document.getElementById('presetOptions'); // New container for preset options
+        const applyPresetFilterBtn = document.getElementById('applyPresetFilterBtn'); // New apply button
         const closePresetModalBtn = presetSelectionModal.querySelector('.preset-modal-close-btn');
 
         const ovrSelectionModal = document.getElementById('ovrSelectionModal');
@@ -1090,14 +1127,14 @@
         const applyOvrFilterBtn = document.getElementById('applyOvrFilterBtn');
         const closeOvrModalBtn = ovrSelectionModal.querySelector('.ovr-modal-close-btn');
 
-        // Nouveaux éléments pour la collection
+        // New elements for collection
         const collectionModal = document.getElementById('collectionModal');
         const collectionGrid = document.getElementById('collectionGrid');
         const collectionCountDisplay = document.getElementById('collectionCount');
         const closeCollectionModalBtn = document.getElementById('closeCollectionModalBtn');
 
 
-        // Éléments du menu Burger
+        // Burger Menu Elements
         const burgerMenuBtn = document.getElementById('burgerMenuBtn');
         const sideMenu = document.getElementById('sideMenu');
         const closeSideMenuBtn = sideMenu.querySelector('.close-btn');
@@ -1108,10 +1145,14 @@
         const choosePresetBtn = document.getElementById('choosePresetBtn');
         const filterByOVRBtn = document.getElementById('filterByOVRBtn');
 
-        // Nouveaux boutons d'export/import/refresh
+        // New export/import/refresh buttons
         const exportStatsBtn = document.getElementById('exportStatsBtn');
         const importStatsBtn = document.getElementById('importStatsBtn');
         const refreshSeriesBtn = document.getElementById('refreshSeriesBtn');
+
+        // Language toggle button
+        const languageToggleBtn = document.getElementById('languageToggleBtn');
+        const languageFlag = document.getElementById('languageFlag');
 
         let allPlayersData = [];
         let cardTypesCount = {};
@@ -1122,42 +1163,42 @@
         let swipeCounter = 0;
         let MAX_SWIPES_PER_SESSION = 50;
         let availableCardTypes = [];
-        let selectedCardPresets = ['all']; // Changé en tableau pour sélection multiple
+        let selectedCardPresets = ['all']; // Changed to array for multiple selection
         let ovrFilterMin = 64;
         let ovrFilterMax = 99;
         let maxOVRFound = 99;
 
-        // --- Variables et Fonctions pour le Système de Niveaux ---
+        // --- Variables and Functions for Level System ---
         let userLevel = 1;
         let currentXP = 0;
         const MAX_LEVEL = 100;
 
-        // Fonction pour calculer l'XP nécessaire pour le prochain niveau
+        // Function to calculate XP needed for next level
         function getXPForNextLevel(level) {
             if (level >= MAX_LEVEL) {
-                return Infinity; // Pas d'XP nécessaire au-delà du niveau max
+                return Infinity; // No XP needed beyond max level
             }
-            // Formule ajustée pour une progression plus rapide
+            // Adjusted formula for faster progression
             return Math.floor(50 + (level * level * 0.8));
         }
 
-        // Référencez les éléments DOM pour l'affichage du niveau
+        // Reference DOM elements for level display
         const currentLevelSpan = document.getElementById('currentLevel');
         const xpBar = document.getElementById('xpBar');
         const xpProgressSpan = document.getElementById('xpProgress');
 
-        // Fonction pour ajouter de l'XP et vérifier le passage de niveau
+        // Function to add XP and check for level up
         function addXP(amount) {
             currentXP += amount;
-            console.log(`XP gagnés: +${amount}. Total XP: ${currentXP}`);
+            console.log(`XP gained: +${amount}. Total XP: ${currentXP}`);
 
             let xpNeeded = getXPForNextLevel(userLevel);
 
             while (currentXP >= xpNeeded && userLevel < MAX_LEVEL) {
                 currentXP -= xpNeeded; 
                 userLevel++; 
-                console.log(`Félicitations ! Vous avez atteint le Niveau ${userLevel} !`);
-                // Vous pouvez ajouter ici des effets visuels ou sonores pour la montée de niveau
+                console.log(`Congratulations! You reached Level ${userLevel}!`);
+                // You can add visual or sound effects for level up here
                 xpNeeded = getXPForNextLevel(userLevel); 
             }
             
@@ -1165,19 +1206,20 @@
                 currentXP = 0; 
             }
             
-            saveUserData(); // Sauvegarde les données après chaque ajout d'XP
-            updateLevelDisplay(); // Met à jour l'affichage de l'XP et du niveau
+            saveUserData(); // Save data after each XP addition
+            updateLevelDisplay(); // Update XP and level display
         }
 
-        // Fonction pour charger les données de l'utilisateur depuis le localStorage
+        // Function to load user data from localStorage
         function loadUserData() {
             const savedLevel = localStorage.getItem('futSwipeUserLevel');
             const savedXP = localStorage.getItem('futSwipeCurrentXP');
             const savedCollection = localStorage.getItem('futSwipePermanentCollection');
             const savedSessionLength = localStorage.getItem('futSwipeMaxSwipesPerSession');
-            const savedCardPresets = localStorage.getItem('futSwipeCurrentCardPreset'); // Lire comme un tableau JSON
+            const savedCardPresets = localStorage.getItem('futSwipeCurrentCardPreset'); // Read as JSON array
             const savedOVRMin = localStorage.getItem('futSwipeOVRMin');
             const savedOVRMax = localStorage.getItem('futSwipeOVRMax');
+            const savedLanguage = localStorage.getItem('futSwipeLanguage');
 
             if (savedLevel !== null) userLevel = parseInt(savedLevel);
             if (savedXP !== null) currentXP = parseInt(savedXP);
@@ -1189,7 +1231,7 @@
                     const parsed = JSON.parse(savedCardPresets);
                     if (Array.isArray(parsed)) {
                         selectedCardPresets = parsed;
-                    } else if (typeof parsed === 'string') { // Ancienne sauvegarde single-string format
+                    } else if (typeof parsed === 'string') { // Old single-string format
                         selectedCardPresets = [parsed];
                     }
                 } catch (e) {
@@ -1201,26 +1243,31 @@
             if (savedOVRMin !== null) ovrFilterMin = parseInt(savedOVRMin);
             if (savedOVRMax !== null) ovrFilterMax = parseInt(savedOVRMax);
 
-            updateLevelDisplay(); // Met à jour l'affichage au chargement
+            // Set language from saved preference, default to English
+            currentLanguage = savedLanguage || 'en';
+            updateLanguage(); // Update language display and content
+
+            updateLevelDisplay(); // Update display on load
         }
 
-        // Fonction pour sauvegarder les données de l'utilisateur dans le localStorage
+        // Function to save user data to localStorage
         function saveUserData() {
             localStorage.setItem('futSwipeUserLevel', userLevel);
             localStorage.setItem('futSwipeCurrentXP', currentXP);
             localStorage.setItem('futSwipePermanentCollection', JSON.stringify(permanentCollection));
             localStorage.setItem('futSwipeMaxSwipesPerSession', MAX_SWIPES_PER_SESSION);
-            localStorage.setItem('futSwipeCurrentCardPreset', JSON.stringify(selectedCardPresets)); // Sauvegarde comme JSON string
+            localStorage.setItem('futSwipeCurrentCardPreset', JSON.stringify(selectedCardPresets)); // Save as JSON string
             localStorage.setItem('futSwipeOVRMin', ovrFilterMin);
             localStorage.setItem('futSwipeOVRMax', ovrFilterMax);
+            localStorage.setItem('futSwipeLanguage', currentLanguage);
         }
         
-        // Fonction pour mettre à jour l'affichage du niveau et de la barre d'XP
+        // Function to update level and XP bar display
         function updateLevelDisplay() {
             currentLevelSpan.textContent = userLevel;
             
             if (userLevel >= MAX_LEVEL) {
-                xpProgressSpan.textContent = `Niveau Max (${MAX_LEVEL})`;
+                xpProgressSpan.textContent = `${translations[currentLanguage].maxLevel} (${MAX_LEVEL})`;
                 xpBar.style.width = '100%';
                 xpBar.style.backgroundColor = 'gold'; 
             } else {
@@ -1231,10 +1278,10 @@
                 xpProgressSpan.textContent = `${currentXP} / ${xpNeeded} XP`;
             }
         }
-        // --- Fin des Fonctions pour le Système de Niveaux ---
+        // --- End of Level System Functions ---
 
 
-        // --- Fonctions utilitaires ---
+        // --- Utility Functions ---
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -1257,7 +1304,7 @@
             if (namePartsArray.length >= 2) {
                 formattedName = `${namePartsArray[0]} ${namePartsArray[1]}`;
             } else {
-                formattedName = namePartsArray[0] || 'Nom Inconnu';
+                formattedName = namePartsArray[0] || 'Unknown Name';
             }
             
             formattedName = decodeURIComponent(formattedName).replace(/_/g, ' ').trim();
@@ -1268,7 +1315,7 @@
             return { name: formattedName, ovr: ovr, rawCardType: rawCardType };
         }
 
-        // Création de la carte pour l'interface de base
+        // Create card for base interface
         function createCard(player) {
             const card = document.createElement('div');
             card.classList.add('card');
@@ -1281,7 +1328,7 @@
                 <div class="card-info">
                     <p class="player-name">${playerInfo.name}</p>
                     <p class="player-ovr">${playerInfo.ovr}</p>
-                    <p class="card-type">Type de carte: ${formatCardType(player.cardType)}</p>
+                    <p class="card-type">${translations[currentLanguage].cardType}: ${formatCardType(player.cardType)}</p>
                 </div>
             `;
             return card;
@@ -1304,7 +1351,7 @@
                 attachSwipeEvents(card);
                 updateSwipeCount();
 
-                // Précharge la prochaine image
+                // Preload next image
                 if (currentPlayerIndex + 1 < currentSessionPlayers.length) {
                     const nextPlayer = currentSessionPlayers[currentPlayerIndex + 1];
                     const img = new Image();
@@ -1335,11 +1382,11 @@
 
                 swipeCard(currentCard, direction);
 
-                // Ajout d'XP pour chaque swipe
-                if (direction === 'right') { // C'est un "Like"
-                    addXP(5); // Gagne 5 XP pour un Like
-                } else { // C'est un "Nope"
-                    addXP(1); // Gagne 1 XP pour un Nope
+                // Add XP for each swipe
+                if (direction === 'right') { // It's a "Like"
+                    addXP(5); // Gain 5 XP for a Like
+                } else { // It's a "Nope"
+                    addXP(1); // Gain 1 XP for a Nope
                 }
 
                 setTimeout(() => {
@@ -1359,10 +1406,10 @@
                 showSwipeMessage('like');
                 const playerToLike = currentSessionPlayers[currentPlayerIndex];
                 likedPlayersInSession.push(playerToLike);
-                // Ajoute à la collection permanente si pas déjà présente
+                // Add to permanent collection if not already present
                 if (!permanentCollection.some(p => p.id === playerToLike.id)) {
                     permanentCollection.push(playerToLike);
-                    saveUserData(); // Sauvegarde la collection après chaque ajout
+                    saveUserData(); // Save collection after each addition
                 }
             }
             card.style.opacity = '0';
@@ -1376,8 +1423,8 @@
         }
 
         function endRound() {
-            console.log("Fin du round ! Joueurs likés dans la session :", likedPlayersInSession);
-            addXP(20); // Gagne 20 XP pour la fin de la série
+            console.log("Round ended! Players liked in session:", likedPlayersInSession);
+            addXP(20); // Gain 20 XP for finishing the series
             displayTeamModal();
         }
 
@@ -1393,26 +1440,26 @@
             gridElement.innerHTML = '';
             
             if (players.length === 0) {
-                gridElement.innerHTML = '<p style="grid-column: 1 / -1; margin-top: 50px;">Aucun joueur trouvé pour l\'instant !</p>';
+                gridElement.innerHTML = `<p style="grid-column: 1 / -1; margin-top: 50px;">${translations[currentLanguage].noPlayersFound}</p>`;
                 if (countElement) {
-                    countElement.textContent = `Total de cartes : 0`;
+                    countElement.textContent = `${translations[currentLanguage].totalCards}: 0`;
                 }
             } else {
-                // Trie les joueurs pour la collection: par type de carte, puis par OVR (décroissant)
+                // Sort players for collection: by card type, then by OVR (descending)
                 const sortedPlayers = [...players].sort((a, b) => {
-                    // Trier par type de carte (ordre alphabétique)
+                    // Sort by card type (alphabetical order)
                     const typeComparison = a.cardType.localeCompare(b.cardType);
                     if (typeComparison !== 0) {
                         return typeComparison;
                     }
-                    // Si le type de carte est le même, trier par OVR (décroissant)
+                    // If card type is the same, sort by OVR (descending)
                     return b.ovr - a.ovr;
                 });
 
                 sortedPlayers.forEach(player => {
                     const playerInfo = formatPlayerNameAndOVR(player.URL);
                     const playerCard = document.createElement('div');
-                    playerCard.classList.add('team-player-card'); // Réutiliser la classe pour le style
+                    playerCard.classList.add('team-player-card'); // Reuse class for styling
                     playerCard.innerHTML = `
                         <img src="${player.URL}" alt="${playerInfo.name}">
                         <div class="player-details">
@@ -1424,28 +1471,28 @@
                     gridElement.appendChild(playerCard);
                 });
                 if (countElement) {
-                    countElement.textContent = `Total de cartes : ${players.length}`;
+                    countElement.textContent = `${translations[currentLanguage].totalCards}: ${players.length}`;
                 }
             }
         }
 
         function displayTeamModal() {
             const overallRating = calculateTeamOverallRating();
-            teamOverallRating.textContent = `Note Générale de l'Équipe: ${overallRating}`;
-            displayPlayersInGrid(likedPlayersInSession, teamGrid); // Utilisez likedPlayersInSession ici
+            teamOverallRating.textContent = `${translations[currentLanguage].teamOverallRating}: ${overallRating}`;
+            displayPlayersInGrid(likedPlayersInSession, teamGrid); // Use likedPlayersInSession here
             teamModal.style.display = 'flex';
         }
 
         function displayCollectionModal() {
-            // Pour la collection, on veut qu'elle soit triée et affichée sans titres de catégorie
+            // For collection, we want it sorted and displayed without category titles
             displayPlayersInGrid(permanentCollection, collectionGrid, collectionCountDisplay);
             collectionModal.style.display = 'flex';
         }
 
-        // Refonte de startGame pour gérer la réinitialisation des joueurs likés de la session
+        // Refactored startGame to handle resetting liked players for the session
         function startGame(resetLikedPlayers = true) {
             if (resetLikedPlayers) {
-                likedPlayersInSession = []; // Réinitialise les joueurs likés de la session seulement si demandé
+                likedPlayersInSession = []; // Reset liked players for the session only if requested
             }
             currentPlayerIndex = 0;
             swipeCounter = 0;
@@ -1460,7 +1507,7 @@
 
             let playersToUse = allPlayersData;
             
-            // Appliquer le filtre de preset (maintenant multiple)
+            // Apply preset filter (now multiple)
             if (!selectedCardPresets.includes('all')) { 
                 playersToUse = playersToUse.filter(player => selectedCardPresets.includes(player.cardType));
             }
@@ -1476,17 +1523,17 @@
             displayNextCard();
         }
 
-        function resetAndStartGame() { // Utilisé pour "Nouvelle Partie" et filtres (réinitialise les joueurs likés)
+        function resetAndStartGame() { // Used for "New Game" and filters (resets liked players)
             startGame(true); 
         }
 
-        function refreshCurrentSeries() { // Nouvelle fonction pour le bouton d'actualisation (conserve les joueurs likés)
+        function refreshCurrentSeries() { // New function for refresh button (keeps liked players)
             startGame(false); 
-            alert('Nouvelle série de cartes générée !');
+            alert(translations[currentLanguage].newSeriesGenerated);
         }
 
 
-        // --- Gestion des événements de swipe (glisser-déposer) ---
+        // --- Swipe event handling (drag and drop) ---
         let startX;
         let currentX;
         let isSwiping = false;
@@ -1535,7 +1582,7 @@
                 }
             });
 
-            // Mobile - Tactile
+            // Mobile - Touch
             card.addEventListener('touchstart', (e) => {
                 isSwiping = true;
                 startX = e.touches[0].clientX;
@@ -1580,10 +1627,10 @@
         }
 
 
-        // --- Chargement des données et initialisation ---
+        // --- Data loading and initialization ---
         async function loadAllPlayers() {
             try {
-                // Utiliser l'URL directe du fichier JSON sur GitHub
+                // Use direct URL of JSON file on GitHub
                 const response = await fetch('https://raw.githubusercontent.com/Tristanox/FUT-25-assets/refs/heads/main/fut_25_images.json');
                 const data = await response.json();
 
@@ -1596,7 +1643,7 @@
                     data[cardType].forEach(player => {
                         const ovr = formatPlayerNameAndOVR(player.URL).ovr;
                         allPlayersData.push({
-                            id: idCounter++, // Utiliser un ID unique pour chaque joueur
+                            id: idCounter++, // Use a unique ID for each player
                             URL: player.URL,
                             cardType: cardType,
                             ovr: ovr
@@ -1616,22 +1663,22 @@
                 availableCardTypes.sort();
                 availableCardTypes.unshift('all');
 
-                loadUserData(); // <-- Charger les données de l'utilisateur ici
+                loadUserData(); // <-- Load user data here
                 startGame();
             } catch (error) {
-                console.error("Erreur lors du chargement des joueurs :", error);
-                document.body.innerHTML = "<p style='color: white; text-align: center; font-size: 1.5em; margin-top: 50px;'>Erreur : Impossible de charger les joueurs. Veuillez vérifier la connexion ou l'URL des assets.</p>";
+                console.error("Error loading players:", error);
+                document.body.innerHTML = `<p style='color: white; text-align: center; font-size: 1.5em; margin-top: 50px;'>${translations[currentLanguage].loadingError}</p>`;
             }
         }
 
-        // --- Écouteurs d'événements pour les boutons Like/Dislike ---
+        // --- Event listeners for Like/Dislike buttons ---
         dislikeBtn.addEventListener('click', () => performSwipe('left'));
         likeBtn.addEventListener('click', () => performSwipe('right'));
 
-        // --- Écouteurs d'événements pour le modal de réglage de série ---
+        // --- Event listeners for series settings modal ---
         seriesRange.addEventListener('input', () => {
             let value = parseInt(seriesRange.value);
-            // Ajustement pour les pas spécifiques (10, 50, 100)
+            // Adjustment for specific steps (10, 50, 100)
             if (value <= 30) {
                 value = 10;
             } else if (value > 30 && value <= 70) {
@@ -1653,17 +1700,17 @@
             seriesSelectionModal.style.display = 'none';
         });
 
-        // Fermer le modal de l'équipe finale
+        // Close final team modal
         closeTeamModalBtn.addEventListener('click', () => {
             teamModal.style.display = 'none';
         });
 
-        // Fermer le modal de la collection
+        // Close collection modal
         closeCollectionModalBtn.addEventListener('click', () => {
             collectionModal.style.display = 'none';
         });
 
-        // Fermer les modals en cliquant en dehors (générique)
+        // Close modals by clicking outside (generic)
         window.addEventListener('click', (event) => {
             if (event.target == teamModal) {
                 teamModal.style.display = 'none';
@@ -1682,7 +1729,7 @@
             }
         });
 
-        // --- Gestion du menu Burger ---
+        // --- Burger Menu Management ---
         burgerMenuBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             sideMenu.classList.add('open');
@@ -1693,7 +1740,7 @@
         });
 
         resetGameMenuBtn.addEventListener('click', () => {
-            selectedCardPresets = ['all']; // Réinitialiser le preset à 'all'
+            selectedCardPresets = ['all']; // Reset preset to 'all'
             ovrFilterMin = 64;
             ovrFilterMax = maxOVRFound;
             permanentCollection = []; 
@@ -1721,8 +1768,8 @@
 
         choosePresetBtn.addEventListener('click', () => {
             sideMenu.classList.remove('open');
-            populatePresetList(); // Popule les options AVANT d'afficher le modal
-            presetSelectionModal.style.display = 'flex'; // Affiche le modal
+            populatePresetList(); // Populate options BEFORE displaying modal
+            presetSelectionModal.style.display = 'flex'; // Display modal
         });
 
         closePresetModalBtn.addEventListener('click', () => {
@@ -1769,9 +1816,9 @@
         });
 
 
-        // Fonction pour populer la liste des presets (maintenant avec checkboxes)
+        // Function to populate preset list (now with checkboxes)
         function populatePresetList() {
-            presetOptionsDiv.innerHTML = ''; // Nettoyer le conteneur
+            presetOptionsDiv.innerHTML = ''; // Clear container
             availableCardTypes.forEach(type => {
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('preset-option-item');
@@ -1779,7 +1826,7 @@
                 const checkboxId = `preset-${type}`;
                 const isChecked = selectedCardPresets.includes(type);
                 
-                // Création explicite des éléments
+                // Explicitly create elements
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = checkboxId;
@@ -1789,7 +1836,7 @@
                 const label = document.createElement('label');
                 label.htmlFor = checkboxId;
                 label.innerHTML = `
-                    <span>${type === 'all' ? 'Toutes les cartes' : formatCardType(type)}</span>
+                    <span>${type === 'all' ? translations[currentLanguage].allCards : formatCardType(type)}</span>
                     <span class="card-count">${cardTypesCount[type] || 0}</span>
                 `;
                 
@@ -1808,7 +1855,7 @@
                     } else {
                         itemDiv.classList.remove('selected');
                     }
-                    // Logique pour gérer la sélection "All cards"
+                    // Logic to handle "All cards" selection
                     if (type === 'all' && checkbox.checked) {
                         presetOptionsDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                             if (cb.value !== 'all') {
@@ -1824,28 +1871,29 @@
                         }
                     }
                 });
-                // Permettre de cliquer sur l'élément div pour basculer la checkbox
+                // Allow clicking on the div element to toggle the checkbox
                 itemDiv.addEventListener('click', (e) => {
-                    if (e.target.tagName !== 'INPUT') { // Évite le double-clic si on clique directement sur la checkbox
+                    if (e.target.tagName !== 'INPUT') { // Avoid double-click if clicking directly on the checkbox
                         checkbox.checked = !checkbox.checked;
-                        checkbox.dispatchEvent(new Event('change')); // Déclenche l'événement change pour mettre à jour le style et la logique
+                        checkbox.dispatchEvent(new Event('change')); // Trigger change event to update style and logic
                     }
                 });
             });
-            // L'écouteur du bouton "applyPresetFilterBtn" est déplacé à l'extérieur pour n'être attaché qu'une fois.
+            // The "applyPresetFilterBtn" listener is moved outside to be attached only once.
         }
 
 
-        // --- Fonctions Export/Import des stats ---
+        // --- Export/Import stats functions ---
         function exportUserData() {
             const dataToExport = {
                 userLevel: userLevel,
                 currentXP: currentXP,
                 permanentCollection: permanentCollection,
                 MAX_SWIPES_PER_SESSION: MAX_SWIPES_PER_SESSION,
-                selectedCardPresets: selectedCardPresets, // Utiliser le nouveau nom de variable
+                selectedCardPresets: selectedCardPresets, // Use new variable name
                 ovrFilterMin: ovrFilterMin,
-                ovrFilterMax: ovrFilterMax
+                ovrFilterMax: ovrFilterMax,
+                language: currentLanguage // Export current language
             };
             const jsonString = JSON.stringify(dataToExport, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
@@ -1857,10 +1905,10 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            alert('Vos stats ont été exportées en fut_swipe_stats.json !');
+            alert(translations[currentLanguage].statsExported);
         }
 
-        // Créer un input de type fichier masqué pour l'importation
+        // Create a hidden file input for import
         const importFileInput = document.createElement('input');
         importFileInput.type = 'file';
         importFileInput.accept = '.json';
@@ -1887,48 +1935,52 @@
                     if (Array.isArray(importedData.permanentCollection)) permanentCollection = importedData.permanentCollection;
                     if (typeof importedData.MAX_SWIPES_PER_SESSION === 'number') MAX_SWIPES_PER_SESSION = importedData.MAX_SWIPES_PER_SESSION;
                     
-                    // Gérer l'importation de l'ancienne ou de la nouvelle structure de presets
+                    // Handle import of old or new preset structure
                     if (Array.isArray(importedData.selectedCardPresets)) {
                         selectedCardPresets = importedData.selectedCardPresets;
-                    } else if (typeof importedData.currentCardPreset === 'string') { // Compatibilité arrière
+                    } else if (typeof importedData.currentCardPreset === 'string') { // Backward compatibility
                         selectedCardPresets = [importedData.currentCardPreset];
                     } else {
-                        selectedCardPresets = ['all']; // Valeur par défaut si inconnu
+                        selectedCardPresets = ['all']; // Default if unknown
                     }
 
                     if (typeof importedData.ovrFilterMin === 'number') ovrFilterMin = importedData.ovrFilterMin;
                     if (typeof importedData.ovrFilterMax === 'number') ovrFilterMax = importedData.ovrFilterMax;
+                    if (typeof importedData.language === 'string') {
+                        currentLanguage = importedData.language; // Import language
+                    }
 
                     saveUserData(); 
                     updateLevelDisplay(); 
+                    updateLanguage(); // Update language after import
                     startGame(); 
-                    alert('Vos stats ont été importées avec succès !');
+                    alert(translations[currentLanguage].statsImportedSuccess);
 
                 } catch (error) {
-                    console.error('Erreur lors de l\'importation des stats:', error);
-                    alert('Erreur lors de l\'importation. Le fichier n\'est pas un JSON valide ou est corrompu.');
+                    console.error('Error importing stats:', error);
+                    alert(translations[currentLanguage].importError);
                 }
             };
             reader.readAsText(file);
             event.target.value = ''; 
         });
 
-        // --- Écouteurs pour les nouveaux boutons d'action ---
+        // --- Event listeners for new action buttons ---
         exportStatsBtn.addEventListener('click', exportUserData);
         importStatsBtn.addEventListener('click', importUserData);
-        refreshSeriesBtn.addEventListener('click', refreshCurrentSeries); // Nouveau bouton d'actualisation
+        refreshSeriesBtn.addEventListener('click', refreshCurrentSeries); // New refresh button
 
-        // L'écouteur pour applyPresetFilterBtn est déplacé ici pour n'être attaché qu'une seule fois.
+        // The listener for applyPresetFilterBtn is moved here to be attached only once.
         applyPresetFilterBtn.addEventListener('click', () => {
             const selectedCheckboxes = presetOptionsDiv.querySelectorAll('input[type="checkbox"]:checked');
             selectedCardPresets = Array.from(selectedCheckboxes).map(cb => cb.value);
 
             if (selectedCardPresets.length === 0) {
-                selectedCardPresets = ['all']; // Par défaut à 'all' si rien n'est sélectionné
-                alert("Aucun type de carte sélectionné. 'Toutes les cartes' sera utilisé par défaut.");
+                selectedCardPresets = ['all']; // Default to 'all' if nothing is selected
+                alert(translations[currentLanguage].noCardTypeSelected);
             } else if (selectedCardPresets.includes('all') && selectedCardPresets.length > 1) {
-                selectedCardPresets = ['all']; // Si 'all' est coché avec d'autres, seul 'all' est conservé
-                alert("'Toutes les cartes' a été sélectionné, les autres sélections ont été ignorées.");
+                selectedCardPresets = ['all']; // If 'all' is checked with others, only 'all' is kept
+                alert(translations[currentLanguage].allCardsSelectedIgnored);
             }
             
             saveUserData();
@@ -1936,14 +1988,14 @@
         });
 
 
-        // Fermer le menu si on clique en dehors
+        // Close menu if clicked outside
         window.addEventListener('click', (event) => {
-            if (!sideMenu.contains(event.target) && event.target !== burgerMenuBtn && !burgerMenuBtn.contains(event.target) && event.target !== exportStatsBtn && !exportStatsBtn.contains(event.target) && event.target !== importStatsBtn && !importStatsBtn.contains(event.target) && event.target !== refreshSeriesBtn && !refreshSeriesBtn.contains(event.target)) {
+            if (!sideMenu.contains(event.target) && event.target !== burgerMenuBtn && !burgerMenuBtn.contains(event.target) && event.target !== exportStatsBtn && !exportStatsBtn.contains(event.target) && event.target !== importStatsBtn && !importStatsBtn.contains(event.target) && event.target !== refreshSeriesBtn && !refreshSeriesBtn.contains(event.target) && event.target !== languageToggleBtn && !languageToggleBtn.contains(event.target)) {
                 sideMenu.classList.remove('open');
             }
         });
 
-        // --- Écouteur d'événements pour les touches du clavier ---
+        // --- Event listener for keyboard keys ---
         document.addEventListener('keydown', (e) => {
             if (teamModal.style.display === 'flex' || collectionModal.style.display === 'flex' || seriesSelectionModal.style.display === 'flex' || presetSelectionModal.style.display === 'flex' || ovrSelectionModal.style.display === 'flex' || sideMenu.classList.contains('open')) {
                 return;
@@ -1956,7 +2008,140 @@
             }
         });
 
-        // Initialisation au chargement de la page
+        // --- Language Management ---
+        const translations = {
+            en: {
+                mainTitle: "FUT Swipe - The Player Tinder",
+                levelText: "Level",
+                maxLevel: "Max Level",
+                cardType: "Card Type",
+                noPlayersFound: "No players found yet!",
+                totalCards: "Total cards",
+                teamOverallRating: "Team Overall Rating",
+                dreamTeamTitle: "Your Dream Team! ⚽",
+                teamModalFooter: "Click on a player to see more details (feature coming soon).",
+                myCollectionTitle: "My Collection 🏆",
+                newGame: "New Game",
+                viewTeam: "View Team",
+                myCollection: "My Collection",
+                changeSeriesLength: "Change Series Length",
+                choosePreset: "Choose Preset",
+                filterByOVR: "Filter by OVR",
+                adjustSeriesLengthTitle: "Adjust Series Length",
+                numberOfSwipesLabel: "Number of swipes :",
+                applyAndRestart: "Apply & Restart",
+                chooseCardTypeTitle: "Choose one or more card types",
+                allCards: "All cards",
+                applySelection: "Apply Selection",
+                filterByOVRTitle: "Filter by OVR",
+                minRatingLabel: "Minimum Rating :",
+                maxRatingLabel: "Maximum Rating :",
+                statsExported: "Your stats have been exported to fut_swipe_stats.json!",
+                newSeriesGenerated: "New card series generated!",
+                noCardTypeSelected: "No card type selected. 'All cards' will be used by default.",
+                allCardsSelectedIgnored: "'All cards' was selected, other selections were ignored.",
+                statsImportedSuccess: "Your stats have been successfully imported!",
+                importError: "Error during import. The file is not a valid JSON or is corrupted.",
+                loadingError: "Error: Unable to load players. Please check connection or assets URL."
+            },
+            fr: {
+                mainTitle: "FUT Swipe - Le Tinder des Joueurs",
+                levelText: "Niveau",
+                maxLevel: "Niveau Max",
+                cardType: "Type de carte",
+                noPlayersFound: "Aucun joueur trouvé pour l'instant !",
+                totalCards: "Total de cartes",
+                teamOverallRating: "Note Générale de l'Équipe",
+                dreamTeamTitle: "Votre Équipe de Rêve ! ⚽",
+                teamModalFooter: "Cliquez sur un joueur pour voir plus de détails (fonctionnalité à venir).",
+                myCollectionTitle: "Ma Collection 🏆",
+                newGame: "Nouvelle Partie",
+                viewTeam: "Voir l'Équipe",
+                myCollection: "Ma Collection",
+                changeSeriesLength: "Changer Longueur Série",
+                choosePreset: "Choisir un Preset",
+                filterByOVR: "Filtrer par Note (OVR)",
+                adjustSeriesLengthTitle: "Ajuster la longueur de la série",
+                numberOfSwipesLabel: "Nombre de swipes :",
+                applyAndRestart: "Appliquer & Recommencer",
+                chooseCardTypeTitle: "Choisir un ou plusieurs types de carte",
+                allCards: "Toutes les cartes",
+                applySelection: "Appliquer la sélection",
+                filterByOVRTitle: "Filtrer par Note (OVR)",
+                minRatingLabel: "Note Minimale :",
+                maxRatingLabel: "Note Maximale :",
+                statsExported: "Vos stats ont été exportées en fut_swipe_stats.json !",
+                newSeriesGenerated: "Nouvelle série de cartes générée !",
+                noCardTypeSelected: "Aucun type de carte sélectionné. 'Toutes les cartes' sera utilisé par défaut.",
+                allCardsSelectedIgnored: "'Toutes les cartes' a été sélectionné, les autres sélections ont été ignorées.",
+                statsImportedSuccess: "Vos stats ont été importées avec succès !",
+                importError: "Erreur lors de l'importation. Le fichier n'est pas un JSON valide ou est corrompu.",
+                loadingError: "Erreur : Impossible de charger les joueurs. Veuillez vérifier la connexion ou l'URL des assets."
+            }
+        };
+
+        let currentLanguage = 'en'; // Default language is English
+
+        function updateLanguage() {
+            // Update main title
+            document.getElementById('mainTitle').textContent = translations[currentLanguage].mainTitle;
+            // Update level display
+            document.getElementById('levelText').textContent = translations[currentLanguage].levelText;
+            // Update side menu buttons
+            document.getElementById('resetGameMenuBtn').textContent = translations[currentLanguage].newGame;
+            document.getElementById('viewTeamMenuBtn').textContent = translations[currentLanguage].viewTeam;
+            document.getElementById('viewCollectionMenuBtn').textContent = translations[currentLanguage].myCollection;
+            document.getElementById('changeSeriesLengthBtn').textContent = translations[currentLanguage].changeSeriesLength;
+            document.getElementById('choosePresetBtn').textContent = translations[currentLanguage].choosePreset;
+            document.getElementById('filterByOVRBtn').textContent = translations[currentLanguage].filterByOVR;
+            // Update series selection modal
+            document.getElementById('adjustSeriesLengthTitle').textContent = translations[currentLanguage].adjustSeriesLengthTitle;
+            document.getElementById('numberOfSwipesLabel').textContent = translations[currentLanguage].numberOfSwipesLabel;
+            document.getElementById('applySeriesLengthBtn').textContent = translations[currentLanguage].applyAndRestart;
+            // Update preset selection modal
+            document.getElementById('chooseCardTypeTitle').textContent = translations[currentLanguage].chooseCardTypeTitle;
+            document.getElementById('applyPresetFilterBtn').textContent = translations[currentLanguage].applySelection;
+            // Update OVR selection modal
+            document.getElementById('filterByOVRTitle').textContent = translations[currentLanguage].filterByOVRTitle;
+            document.getElementById('minRatingLabel').textContent = translations[currentLanguage].minRatingLabel;
+            document.getElementById('maxRatingLabel').textContent = translations[currentLanguage].maxRatingLabel;
+            document.getElementById('applyOvrFilterBtn').textContent = translations[currentLanguage].applyAndRestart;
+            // Update team modal
+            document.getElementById('dreamTeamTitle').textContent = translations[currentLanguage].dreamTeamTitle;
+            document.getElementById('teamModalFooter').textContent = translations[currentLanguage].teamModalFooter;
+            // Update collection modal
+            document.getElementById('myCollectionTitle').textContent = translations[currentLanguage].myCollectionTitle;
+
+            // Update language flag image
+            if (currentLanguage === 'en') {
+                languageFlag.src = "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png";
+                languageFlag.alt = "French Flag";
+                document.documentElement.lang = 'en';
+            } else {
+                languageFlag.src = "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png";
+                languageFlag.alt = "UK Flag";
+                document.documentElement.lang = 'fr';
+            }
+
+            // Re-populate preset list to update "All cards" text
+            if (presetSelectionModal.style.display === 'flex') {
+                populatePresetList();
+            }
+            // Update other dynamic texts that are not directly tied to a button/title
+            updateLevelDisplay(); // To update Max Level text
+            updateSwipeCount(); // To update swipe counter text
+            // Re-display modals if open to update their content
+            if (teamModal.style.display === 'flex') displayTeamModal();
+            if (collectionModal.style.display === 'flex') displayCollectionModal();
+        }
+
+        languageToggleBtn.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+            saveUserData(); // Save language preference
+            updateLanguage();
+        });
+
+        // Initialisation on page load
         loadAllPlayers();
     </script>
 </body>
