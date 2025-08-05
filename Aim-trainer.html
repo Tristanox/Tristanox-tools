@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Aim Trainer Pro</title>
+<title id="page-title" data-en="Aim Trainer Pro" data-fr="Entraînement à la visée">Aim Trainer Pro</title>
 <style>
   body {
     overflow: hidden;
@@ -106,20 +106,51 @@
       opacity: 0;
     }
   }
+  
+  #language-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10008;
+    pointer-events: all;
+    transition: none;
+    animation: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+
+  #language-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 </style>
 </head>
-<body>
+<body lang="en">
+<button id="language-button" onclick="translatePage()">
+    <img id="flag-icon" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" alt="Traduire en Français">
+</button>
 
 <div id="controls">
-  <button id="easyMode">Facile</button>
-  <button id="mediumMode">Normal</button>
-  <button id="hardMode">Difficile</button>
+  <button id="easyMode" data-en="Easy" data-fr="Facile">Easy</button>
+  <button id="mediumMode" data-en="Normal" data-fr="Normal">Normal</button>
+  <button id="hardMode" data-en="Hard" data-fr="Difficile">Hard</button>
 </div>
 
 <div id="stats">
-  <div id="accuracy-display">Précision: 100%</div>
-  <div id="reaction-time-display">Temps de réaction moyen: 0 ms</div>
-  <div id="hit-miss-display">Réussies: 0 / Ratées: 0</div>
+  <div id="accuracy-display" data-en="Accuracy" data-fr="Précision">Accuracy: 100%</div>
+  <div id="reaction-time-display" data-en="Average reaction time" data-fr="Temps de réaction moyen">Average reaction time: 0 ms</div>
+  <div id="hit-miss-display" data-en="Hits/Misses" data-fr="Réussies/Ratées">Hits: 0 / Misses: 0</div>
 </div>
 
 <div id="game-container"></div>
@@ -129,48 +160,83 @@
   const accuracyDisplay = document.getElementById('accuracy-display');
   const reactionTimeDisplay = document.getElementById('reaction-time-display');
   const hitMissDisplay = document.getElementById('hit-miss-display');
+  const pageTitle = document.getElementById('page-title');
 
   const easyModeBtn = document.getElementById('easyMode');
   const mediumModeBtn = document.getElementById('mediumMode');
   const hardModeBtn = document.getElementById('hardMode');
 
-  // Create an Audio object for the gun sound
   const gunSound = new Audio('https://github.com/Tristanox/GUN/raw/refs/heads/main/submachine-gun-79846%20(1).mp3');
-  gunSound.preload = 'auto'; // Preload the sound for faster playback
+  gunSound.preload = 'auto';
 
   let totalClicks = 0;
   let successfulHits = 0;
   let missedClicks = 0;
   let targetSpawnTime = 0;
   let totalReactionTime = 0;
-  let currentTargetSize = 50; // Default medium size
+  let currentTargetSize = 50;
+  let currentLanguage = 'en';
 
-  // --- Functions to update stats ---
+  function translatePage() {
+    currentLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+    const flagIcon = document.getElementById('flag-icon');
+
+    if (currentLanguage === 'fr') {
+        flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+        flagIcon.alt = 'Translate to English';
+        document.body.lang = 'fr';
+    } else {
+        flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+        flagIcon.alt = 'Traduire en Français';
+        document.body.lang = 'en';
+    }
+
+    document.querySelectorAll('[data-en]').forEach(element => {
+        const translation = element.dataset[currentLanguage];
+        if (translation) {
+            if (element.tagName === 'BUTTON') {
+                element.innerText = translation;
+            }
+        }
+    });
+    
+    pageTitle.innerText = pageTitle.dataset[currentLanguage];
+
+    updateAccuracy();
+    updateReactionTime();
+    updateHitMissCount();
+  }
+
   function updateAccuracy() {
+    const accuracyBaseText = accuracyDisplay.dataset[currentLanguage];
     if (totalClicks === 0) {
-      accuracyDisplay.textContent = 'Précision: 100%';
+      accuracyDisplay.textContent = `${accuracyBaseText}: 100%`;
     } else {
       const accuracy = (successfulHits / totalClicks) * 100;
-      accuracyDisplay.textContent = `Précision: ${accuracy.toFixed(2)}%`;
+      accuracyDisplay.textContent = `${accuracyBaseText}: ${accuracy.toFixed(2)}%`;
     }
   }
 
   function updateReactionTime() {
+    const reactionTimeBaseText = reactionTimeDisplay.dataset[currentLanguage];
     if (successfulHits === 0) {
-      reactionTimeDisplay.textContent = 'Temps de réaction moyen: 0 ms';
+      reactionTimeDisplay.textContent = `${reactionTimeBaseText}: 0 ms`;
     } else {
       const averageReactionTime = totalReactionTime / successfulHits;
-      reactionTimeDisplay.textContent = `Temps de réaction moyen: ${averageReactionTime.toFixed(0)} ms`;
+      reactionTimeDisplay.textContent = `${reactionTimeBaseText}: ${averageReactionTime.toFixed(0)} ms`;
     }
   }
 
   function updateHitMissCount() {
-    hitMissDisplay.textContent = `Réussies: ${successfulHits} / Ratées: ${missedClicks}`;
+    const hitMissBaseText = hitMissDisplay.dataset[currentLanguage];
+    if (currentLanguage === 'en') {
+        hitMissDisplay.textContent = `Hits: ${successfulHits} / Misses: ${missedClicks}`;
+    } else {
+        hitMissDisplay.textContent = `Réussies: ${successfulHits} / Ratées: ${missedClicks}`;
+    }
   }
 
-  // --- Target creation and interaction ---
   function createTarget() {
-    // Remove existing target if any, before creating a new one
     const existingTarget = document.querySelector('.target');
     if (existingTarget) {
       existingTarget.remove();
@@ -190,58 +256,54 @@
     target.style.top = `${randomY}px`;
 
     target.addEventListener('click', (event) => {
-      event.stopPropagation(); // Prevent gameContainer click
+      event.stopPropagation();
 
-      // Play the gun sound
-      gunSound.currentTime = 0; // Rewind to the start
-      gunSound.play().catch(e => console.error("Error playing sound:", e)); // Play and catch potential errors
+      gunSound.currentTime = 0;
+      gunSound.play().catch(e => console.error("Error playing sound:", e));
 
       const reactionTime = Date.now() - targetSpawnTime;
       totalReactionTime += reactionTime;
       successfulHits++;
       totalClicks++;
 
-      // Create and display the white explosion on click
       const explosion = document.createElement('div');
       explosion.classList.add('explosion');
       explosion.style.left = `${event.clientX - gameContainer.getBoundingClientRect().left}px`;
       explosion.style.top = `${event.clientY - gameContainer.getBoundingClientRect().top}px`;
       gameContainer.appendChild(explosion);
 
-      // Remove the explosion after its animation
       setTimeout(() => {
         explosion.remove();
-      }, 300); // Must match CSS animation duration
+      }, 300);
 
       target.remove();
-      createTarget(); // Create a new target
+      createTarget();
       updateAccuracy();
       updateReactionTime();
       updateHitMissCount();
     });
 
     gameContainer.appendChild(target);
-    targetSpawnTime = Date.now(); // Record time when target appears
+    targetSpawnTime = Date.now();
   }
 
   function getDifficultyClass(size) {
     if (size === 70) return 'easy';
     if (size === 50) return 'medium';
     if (size === 30) return 'hard';
-    return 'medium'; // Default
+    return 'medium';
   }
 
-  // --- Handle clicks on the game container (misses) ---
   gameContainer.addEventListener('click', () => {
     if (document.querySelector('.target')) {
       totalClicks++;
       missedClicks++;
       updateAccuracy();
+      updateReactionTime();
       updateHitMissCount();
     }
   });
 
-  // --- Difficulty buttons ---
   easyModeBtn.addEventListener('click', () => {
     currentTargetSize = 70;
     resetGame();
@@ -267,10 +329,18 @@
     updateHitMissCount();
     createTarget();
   }
-
-  // Initial setup
-  createTarget();
-  updateHitMissCount();
+  
+  document.addEventListener('DOMContentLoaded', (event) => {
+      currentLanguage = 'en';
+      document.body.lang = 'en';
+      document.getElementById('flag-icon').src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+      document.getElementById('flag-icon').alt = 'Traduire en Français';
+      
+      updateAccuracy();
+      updateReactionTime();
+      updateHitMissCount();
+      createTarget();
+  });
 </script>
 
 </body>
