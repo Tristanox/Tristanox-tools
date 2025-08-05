@@ -120,7 +120,7 @@
             cursor: url('https://cdn.custom-cursor.com/db/cursor/pointer_1266.png'), auto !important;
             background-color: #ff0000;
             padding: 2px 8px;
-            border-radius: 5px;
+            border-radius: 50%;
             transition: opacity 0.3s;
         }
 
@@ -355,19 +355,32 @@
             object-fit: contain;
         }
         
-        .language-button {
+        #language-button {
             position: fixed;
-            top: 0;
-            left: 0;
-            padding: 10px 20px;
-            background-color: #fff;
-            color: #000;
-            border: 2px solid #ff0000;
-            font-weight: bold;
+            top: 10px;
+            left: 10px;
+            padding: 0;
+            background: none;
+            border: none;
             cursor: pointer;
             z-index: 10008;
             pointer-events: all;
             transition: none;
+            animation: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        #language-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         #pub {
@@ -594,14 +607,16 @@
     </style>
 </head>
 <body onclick="playRandomSound()">
-    <h1 class="title-changer" data-fr="BIENVENUE SUR LA PAGE ÉNERVANTE !" data-tr="HOŞ GELDİNİZ, RAHATSIZ EDİCİ SAYFAYA !">BIENVENUE SUR LA PAGE ÉNERVANTE !</h1>
-    <p data-fr="Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper..." data-tr="Bu site, en büyük rahatsızlığınız için tasarlanmıştır. Kaçmaya çalışın...">Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...</p>
+    <h1 class="title-changer" data-fr="BIENVENUE SUR LA PAGE ÉNERVANTE !" data-en="WELCOME TO THE ANNOYING PAGE!">BIENVENUE SUR LA PAGE ÉNERVANTE !</h1>
+    <p data-fr="Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper..." data-en="This site was designed for your greatest displeasure. Try to escape...">Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...</p>
 
     <div class="volume-bar">
         <div class="volume-fill" id="volumeFill"></div>
     </div>
-    <button class="pump-button" id="pumpButton" onclick="pumpSound()" data-fr="POMPER" data-tr="POMPA">POMPER</button>
-    <button class="language-button" id="translateButton" onclick="translatePage()">Traduire en turc</button>
+    <button class="pump-button" id="pumpButton" onclick="pumpSound()" data-fr="POMPER" data-en="PUMP">POMPER</button>
+    <button id="language-button" onclick="translatePage()">
+        <img id="flag-icon" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png" alt="Translate to English">
+    </button>
 
     <input type="text" id="annoyingInput" placeholder="Essayez de taper quelque chose...">
 
@@ -611,16 +626,16 @@
             <span class="close-popup-button" id="closeButton2" onclick="handlePopupClose(event)">X</span>
             <span class="close-popup-button" id="closeButton3" onclick="handlePopupClose(event)">X</span>
             <span class="close-popup-button" id="closeButton4" onclick="handlePopupClose(event)">X</span>
-            <span data-fr="Bienvenue sur sondages.xyz.com.onion !" data-tr="sondages.xyz.com.onion'a Hoş Geldiniz !">Bienvenue sur sondages.xyz.com.onion !</span>
+            <span data-fr="Bienvenue sur sondages.xyz.com.onion !" data-en="Welcome to surveys.xyz.com.onion!">Bienvenue sur sondages.xyz.com.onion !</span>
         </div>
     </div>
 
     <div class="age-popup" id="agePopup">
         <div class="age-popup-content">
-            <p data-fr="Avez-vous plus de 18 ans ?" data-tr="18 yaşından büyük müsünüz?">Avez-vous plus de 18 ans ?</p>
+            <p data-fr="Avez-vous plus de 18 ans ?" data-en="Are you over 18?">Avez-vous plus de 18 ans ?</p>
             <div class="age-buttons-container" id="ageButtonsContainer">
-                <button class="age-button" id="over18" onmouseover="checkAndSwapButtons()" data-fr="J'ai plus de 18 ans" data-tr="18 yaşından büyüğüm">J'ai plus de 18 ans</button>
-                <button class="age-button" id="under18" onmouseover="checkAndSwapButtons()" data-fr="J'ai moins de 18 ans" data-tr="18 yaşından küçüğüm">J'ai moins de 18 ans</button>
+                <button class="age-button" id="over18" onmouseover="checkAndSwapButtons()" data-fr="J'ai plus de 18 ans" data-en="I am over 18">J'ai plus de 18 ans</button>
+                <button class="age-button" id="under18" onmouseover="checkAndSwapButtons()" data-fr="J'ai moins de 18 ans" data-en="I am under 18">J'ai moins de 18 ans</button>
             </div>
         </div>
     </div>
@@ -630,61 +645,61 @@
     </div>
 
     <form id="annoying-form">
-        <h2 data-fr="Sondage de satisfaction (obligatoire)" data-tr="Memnuniyet anketi (zorunlu)">Sondage de satisfaction (obligatoire)</h2>
+        <h2 data-fr="Sondage de satisfaction (obligatoire)" data-en="Satisfaction Survey (mandatory)">Sondage de satisfaction (obligatoire)</h2>
         <div class="form-group">
-            <label for="name" data-fr="Votre nom complet (incluant tous les prénoms) :" data-tr="Tam adınız (tüm ön adlar dahil) :">Votre nom complet (incluant tous les prénoms) :</label>
+            <label for="name" data-fr="Votre nom complet (incluant tous les prénoms) :" data-en="Your full name (including all first names):">Votre nom complet (incluant tous les prénoms) :</label>
             <input type="text" id="name" name="name" required>
-            <div class="name-error-popup" id="nameErrorPopup" data-fr="NON, CE N'EST PAS VOTRE NOM" data-tr="HAYIR, BU SİZİN ADINIZ DEĞİL">NON, CE N'EST PAS VOTRE NOM</div>
+            <div class="name-error-popup" id="nameErrorPopup" data-fr="NON, CE N'EST PAS VOTRE NOM" data-en="NO, THIS IS NOT YOUR NAME">NON, CE N'EST PAS VOTRE NOM</div>
         </div>
         <div class="form-group">
-            <label for="birthplace" data-fr="Ville de naissance de votre grand-mère maternelle :" data-tr="Anneannenizin doğum şehri :">Ville de naissance de votre grand-mère maternelle :</label>
+            <label for="birthplace" data-fr="Ville de naissance de votre grand-mère maternelle :" data-en="Maternal grandmother's city of birth:">Ville de naissance de votre grand-mère maternelle :</label>
             <input type="text" id="birthplace" name="birthplace" required>
         </div>
         <div class="form-group">
-            <label data-fr="Pourquoi le ciel est-il bleu ?" data-tr="Gökyüzü neden mavi?">Pourquoi le ciel est-il bleu ?</label>
+            <label data-fr="Pourquoi le ciel est-il bleu ?" data-en="Why is the sky blue?">Pourquoi le ciel est-il bleu ?</label>
             <div class="radio-group">
                 <input type="radio" id="lait" name="sky" value="lait" required>
-                <label for="lait" data-fr="À cause du lait." data-tr="Süt yüzünden.">À cause du lait.</label>
+                <label for="lait" data-fr="À cause du lait." data-en="Because of milk.">À cause du lait.</label>
                 <input type="radio" id="soleil" name="sky" value="soleil">
-                <label for="soleil" data-fr="À cause du soleil." data-tr="Güneş yüzünden.">À cause du soleil.</label>
+                <label for="soleil" data-fr="À cause du soleil." data-en="Because of the sun.">À cause du soleil.</label>
                 <input type="radio" id="arc_en_ciel" name="sky" value="arc_en_ciel">
-                <label for="arc_en_ciel" data-fr="C'est un arc-en-ciel géant." data-tr="Dev bir gökkuşağı.">C'est un arc-en-ciel géant.</label>
+                <label for="arc_en_ciel" data-fr="C'est un arc-en-ciel géant." data-en="It's a giant rainbow.">C'est un arc-en-ciel géant.</label>
             </div>
         </div>
-        <button type="submit" id="submit-button" class="annoying-submit" data-fr="Valider" data-tr="Doğrula">Valider</button>
+        <button type="submit" id="submit-button" class="annoying-submit" data-fr="Valider" data-en="Validate">Valider</button>
     </form>
 
     <div class="survey-popup-container" id="surveyPopupContainer">
         <div class="survey-popup-content">
             <p class="survey-question" id="surveyQuestion"></p>
             <div class="survey-options" id="surveyOptions"></div>
-            <p class="validation-message" id="survey-validation-message" data-fr="Veuillez répondre à la question pour continuer." data-tr="Devam etmek için lütfen soruyu yanıtlayın."></p>
-            <button class="survey-next-button" id="surveyNextButton" data-fr="Suivant" data-tr="Sonraki">Suivant</button>
+            <p class="validation-message" id="survey-validation-message" data-fr="Veuillez répondre à la question pour continuer." data-en="Please answer the question to continue."></p>
+            <button class="survey-next-button" id="surveyNextButton" data-fr="Suivant" data-en="Next">Suivant</button>
         </div>
     </div>
 
     <div class="windows-notification" id="windowsNotification">
         <img src="https://worldvectorlogo.com/download/windows.svg" width="20" height="20">
-        <span data-fr="Activez Windows" data-tr="Windows'u etkinleştirin">Activez Windows</span>
+        <span data-fr="Activez Windows" data-en="Activate Windows">Activez Windows</span>
     </div>
 
     <div class="ad-container" id="adContainer">
         <span class="ad-text" id="adText"></span>
     </div>
 
-    <div class="footer-text" id="footerText" data-fr="Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici." data-tr="Bu, müdahaleci bir reklam banner'ı! Daha fazla reklam için ortağımızı ziyaret edin! Bu site dikkatinize ihtiyaç duyuyor. Ayrılmayın. Başka bir yere tıklamayın. Mutluluk burada.">
+    <div class="footer-text" id="footerText" data-fr="Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici." data-en="This is an INTRUSIVE banner ad! Visit our partner for more ads! This site needs your attention. Don't leave. Don't click anywhere else. Happiness is here.">
         Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.
     </div>
     
     <div class="save-popup" id="savePopup">
-        <p class="save-text" data-fr="Sauvegarde en cours..." data-tr="Kaydediliyor...">Sauvegarde en cours...</p>
+        <p class="save-text" data-fr="Sauvegarde en cours..." data-en="Saving...">Sauvegarde en cours...</p>
         <div class="progress-bar-container">
             <div class="progress-bar" id="progressBar"></div>
             <span class="progress-text" id="progressText">0%</span>
         </div>
     </div>
     
-    <div class="click-counter" data-fr="Clics :" data-tr="Tıklama :">Clics : <span id="clickCount">0</span></div>
+    <div class="click-counter" data-fr="Clics :" data-en="Clicks:">Clics : <span id="clickCount">0</span></div>
 
     <div class="jumpscare" id="jumpscare">
         <img id="jumpscareImage" class="jumpscare-image" src="https://static.wikia.nocookie.net/freddy-fazbears-pizzeria-simulator/images/e/ec/BabySalvageJumpscare.gif" alt="jumpscare">
@@ -698,7 +713,7 @@
     <audio id="errorSoundSource" src="https://www.myinstants.com/media/sounds/error_CDOxCYm.mp3"></audio>
     <audio id="notificationSound" src="https://www.myinstants.com/media/sounds/notification_2019.mp3"></audio>
 
-    <button class="main-button" onclick="playRandomSound(); window.location.reload();" onmouseover="playRandomSound()" data-fr="ARGENT GRATUIT" data-tr="BEDAVA PARA">ARGENT GRATUIT</button>
+    <button class="main-button" onclick="playRandomSound(); window.location.reload();" onmouseover="playRandomSound()" data-fr="ARGENT GRATUIT" data-en="FREE MONEY">ARGENT GRATUIT</button>
     
     <div id="pub">
         <div id="fermer-pub">X</div>
@@ -739,55 +754,55 @@
                 "Erreur de gravité maximale : Les pixels se rebellent.",
                 "Votre session a expiré parce que vous existez trop fort."
             ],
-            tr: [
-                "Sistem hatası 404: Kahve USB portundan taştı.",
-                "Kritik uyarı: Fareniz çok fazla tıkladı.",
-                "Arıza: Evren yüklenmeyi durdurdu.",
-                "İşlem başarısız: Kedi klavyenin üzerine yürüdü.",
-                "Maksimum ciddiyet hatası: Pikseller isyan ediyor.",
-                "Çok güçlü var olduğunuz için oturumunuzun süresi doldu."
+            en: [
+                "System Error 404: The coffee overflowed from the USB port.",
+                "Critical Warning: Your mouse clicked too much.",
+                "Failure: The universe stopped loading.",
+                "Operation failed: The cat walked on the keyboard.",
+                "Maximum severity error: The pixels are rebelling.",
+                "Your session expired because you exist too hard."
             ]
         };
 
         const surveyQuestions = [
             {
                 fr: "Avez vous déjà gouté a l'alcool ?",
-                tr: "Daha önce hiç alkol tattınız mı?",
+                en: "Have you ever tasted alcohol?",
                 type: "radio",
-                options: { fr: ["oui", "oui"], tr: ["evet", "evet"] }
+                options: { fr: ["oui", "oui"], en: ["yes", "yes"] }
             },
             {
                 fr: "Voulez vous un IPhone 16 pro max ?",
-                tr: "Bir IPhone 16 Pro Max ister misiniz?",
+                en: "Do you want an IPhone 16 pro max?",
                 type: "radio",
-                options: { fr: ["oui, bien sûr !", "non, je veut plutôt un abonnement à sondages.xyz.com.onion"], tr: ["evet, tabii ki!", "hayır, sondages.xyz.com.onion'a abone olmak isterim"] }
+                options: { fr: ["oui, bien sûr !", "non, je veut plutôt un abonnement à sondages.xyz.com.onion"], en: ["yes, of course!", "no, I'd rather have a subscription to surveys.xyz.com.onion"] }
             },
             {
                 fr: "De quelle couleur est le ciel ?",
-                tr: "Gökyüzü ne renk?",
+                en: "What color is the sky?",
                 type: "radio",
-                options: { fr: ["A mi amor", "Fluo", "De quelle couleur est le ciel."], tr: ["A mi amor", "Floresan", "Gökyüzü ne renk."] }
+                options: { fr: ["A mi amor", "Fluo", "De quelle couleur est le ciel."], en: ["To my love", "Fluo", "What color is the sky."] }
             },
             {
                 fr: "Vous êtes-vous déjà chatouillé les tétons ?",
-                tr: "Hiç göğüs uçlarınızı gıdıkladınız mı?",
+                en: "Have you ever tickled your nipples?",
                 type: "radio",
-                options: { fr: ["oui, bien sûr !", "non, jamais."], tr: ["evet, tabii ki!", "hayır, hiç."] }
+                options: { fr: ["oui, bien sûr !", "non, jamais."], en: ["yes, of course!", "no, never."] }
             },
             {
                 fr: "Oû habitez vous ?",
-                tr: "Nerede yaşıyorsunuz?",
+                en: "Where do you live?",
                 type: "text"
             },
             {
                 fr: "Mangez vous des endives au moins 1 fois par mois ?",
-                tr: "Ayda en az bir kez hindiba yer misiniz?",
+                en: "Do you eat endives at least once a month?",
                 type: "radio",
-                options: { fr: ["oui", "non", "peut-être"], tr: ["evet", "hayır", "belki"] }
+                options: { fr: ["oui", "non", "peut-être"], en: ["yes", "no", "maybe"] }
             },
             {
                 fr: "Quel est votre genre ?",
-                tr: "Cinsiyetiniz nedir?",
+                en: "What is your gender?",
                 type: "radio",
                 options: {
                     fr: [
@@ -800,47 +815,47 @@
                         "Fanfiction-sexuel(le)", "Rétrogame-romantique", "hélicoptère BK-28", "escargot",
                         "Lumière LED", "Zèbre", "Lunettes de soleil", "Radiateur"
                     ],
-                    tr: [
-                        "Heteroseksüel", "Eşcinsel", "Biseksüel", "Panseksüel", "Aseksüel",
-                        "Demiseksüel", "Sapiyoseksüel", "Litromantik", "Aromantik", "Skoliyoseksüel",
-                        "Çoklu ilişki", "Grayseksüel", "Queer", "Andromantik", "Ginormantik",
-                        "Teknoseksüel", "Bibliyofilik romantik", "Kaféromantik", "Meme-seksüel", "Pastaseksüel",
-                        "Seriyofilik romantik", "Noktürnseksüel", "Nostaljiromantik", "Suşiseksüel",
-                        "İçedönükseksüel", "Emojiramantik", "Orgazm-duygusal", "Sarkazmo-romantik",
-                        "Fanfiction-seksüel", "Retrogaming-romantik", "BK-28 helikopter", "salyangoz",
-                        "LED ışık", "Zebra", "Güneş gözlüğü", "Radyatör"
+                    en: [
+                        "Heterosexual", "Homosexual", "Bisexual", "Pansexual", "Asexual",
+                        "Demisexual", "Sapiosexual", "Lithromantic", "Aromantic", "Skoliosexual",
+                        "Polyamorous", "Graysexual", "Queer", "Androromantic", "Gynoromantic",
+                        "Technosexual", "Bibliophilic romantic", "Caferomantic", "Meme-sexual", "Pastasexual",
+                        "Seriophilic romantic", "Nocturnosexual", "Nostalgiaromantic", "Sushisexual",
+                        "Introvertisexual", "Emojiromantic", "Orgasme-affectif", "Sarcasmo-romantic",
+                        "Fanfiction-sexual", "Retrogame-romantic", "BK-28 helicopter", "snail",
+                        "LED light", "Zebra", "Sunglasses", "Radiator"
                     ]
                 }
             },
             {
                 fr: "Quel est la couleur du ?",
-                tr: "Ne renktir?",
+                en: "What is the color of?",
                 type: "radio",
-                options: { fr: ["Jaune", "Bleu", "Mauve", "parabolique"], tr: ["Sarı", "Mavi", "Mor", "parabolik"] }
+                options: { fr: ["Jaune", "Bleu", "Mauve", "parabolique"], en: ["Yellow", "Blue", "Purple", "parabolic"] }
             },
             {
                 fr: "Si ce sondage était une expérience sociale, tu te sentirais :",
-                tr: "Bu anket bir sosyal deney olsaydı, nasıl hissederdiniz:",
+                en: "If this survey were a social experiment, you would feel:",
                 type: "radio",
-                options: { fr: ["Trahi", "Surpris", "Apaisé", "Flageolet"], tr: ["İhanete uğramış", "Şaşırmış", "Sakinleşmiş", "Fasulye"] }
+                options: { fr: ["Trahi", "Surpris", "Apaisé", "Flageolet"], en: ["Betrayed", "Surprised", "Appeased", "Flageolet"] }
             },
             {
                 fr: "Si tu pouvais répondre à cette question, quelle serait ta réponse ?",
-                tr: "Bu soruyu cevaplayabilseydiniz, cevabınız ne olurdu?",
+                en: "If you could answer this question, what would be your answer?",
                 type: "radio",
-                options: { fr: ["c'est bien vrai", "il y en a marre !", "Softlock"], tr: ["bu çok doğru", "yeter artık!", "Softlock"] }
+                options: { fr: ["c'est bien vrai", "il y en a marre !", "Softlock"], en: ["that's very true", "enough already!", "Softlock"] }
             },
             {
                 fr: "Sur une échelle de A à triangle, combien pèse une bonne décision ?",
-                tr: "A'dan üçgene kadar bir ölçekte, iyi bir karar ne kadar ağırdır?",
+                en: "On a scale from A to triangle, how much does a good decision weigh?",
                 type: "radio",
-                options: { fr: ["1", "2", "l'illusoire précarité de nos amours"], tr: ["1", "2", "aşklarımızın yanıltıcı güvencesizliği"] }
+                options: { fr: ["1", "2", "l'illusoire précarité de nos amours"], en: ["1", "2", "the illusory precariousness of our loves"] }
             },
             {
                 fr: "Le mot \"banane\" te rend-il nerveux ?",
-                tr: "\"Muz\" kelimesi sizi geriyor mu?",
+                en: "Does the word \"banana\" make you nervous?",
                 type: "radio",
-                options: { fr: ["oui", "j'en ai peur", "je crois bien", "ce n'est pas impossible"], tr: ["evet", "korkarım", "sanırım evet", "imkansız değil"] }
+                options: { fr: ["oui", "j'en ai peur", "je crois bien", "ce n'est pas impossible"], en: ["yes", "I'm afraid so", "I think so", "it's not impossible"] }
             }
         ];
         
@@ -853,13 +868,13 @@
                 "Installez des panneaux solaires pour 1€ !",
                 "On a besoin d'argent :("
             ],
-            tr: [
-                "Evde hırsız var!",
-                "Marine evinizin 4 metre uzağında yaşıyor!",
-                "Bir iPhone 17 kazandınız!",
-                "Yeni deodorantı alın!",
-                "1€ karşılığında güneş paneli kurun!",
-                "Paraya ihtiyacımız var :("
+            en: [
+                "There's a thief downstairs!",
+                "Marine lives 4m from your home!",
+                "You won an Iphone 17!",
+                "Buy the new deodorant!",
+                "Install solar panels for 1€!",
+                "We need money :("
             ]
         };
 
@@ -872,13 +887,13 @@
                 "Ce site est optimisé pour votre sécurité. (cliquez ici pour nous croire)",
                 "ACHETEZ DE LA CRYPTO MAINTENANT ! TOUT VA BIEN SE PASSER !"
             ],
-            tr: [
-                "Kolay ve hızlı para kazanmak için buraya tıklayın!",
-                "ŞİMDİ EN SON VİRÜSÜ İNDİRİN!",
-                "TEBRİKLER! 1.000.000. ZİYARETÇİSİNİZ!",
-                "YENİ BİR BİLGİSAYAR KAZANDINIZ! (almak için tıklayın)",
-                "Bu site güvenliğiniz için optimize edilmiştir. (inanmak için buraya tıklayın)",
-                "ŞİMDİ KRİPTO SATIN ALIN! HER ŞEY YOLUNDA GİDECEK!"
+            en: [
+                "Click here to earn easy and fast money!",
+                "DOWNLOAD THE LATEST VIRUS NOW!",
+                "CONGRATULATIONS! YOU ARE THE 1,000,000th VISITOR!",
+                "YOU HAVE WON A NEW COMPUTER! (click to claim)",
+                "This site is optimized for your security. (click here to believe us)",
+                "BUY CRYPTO NOW! EVERYTHING WILL BE FINE!"
             ],
         };
 
@@ -895,10 +910,6 @@
         let clickCount = 0;
         let activityTimeout;
         let currentLanguage = 'fr';
-        let translateButtonX = 0;
-        let translateButtonY = 0;
-        let translateButtonDX = 2;
-        let translateButtonDY = 2;
         
         const pub = document.getElementById('pub');
         const fermerPub = document.getElementById('fermer-pub');
@@ -928,43 +939,41 @@
                 'Sauvegarde en cours...': 'Sauvegarde en cours...',
                 'Clics :': 'Clics :',
                 'ARGENT GRATUIT': 'ARGENT GRATUIT',
-                'Traduire en turc': 'Traduire en turc',
                 'Terminer': 'Terminer',
                 'Essayez de taper quelque chose...': 'Essayez de taper quelque chose...',
                 'Veuillez répondre à la question pour continuer.': 'Veuillez répondre à la question pour continuer.',
             },
-            tr: {
-                'BIENVENUE SUR LA PAGE ÉNERVANTE !': 'HOŞ GELDİNİZ, RAHATSIZ EDİCİ SAYFAYA !',
-                'Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...': 'Bu site, en büyük rahatsızlığınız için tasarlanmıştır. Kaçmaya çalışın...',
-                'POMPER': 'POMPA',
-                "Bienvenue sur sondages.xyz.com.onion !": 'sondages.xyz.com.onion\'a Hoş Geldiniz !',
-                "Avez-vous plus de 18 ans ?": "18 yaşından büyük müsünüz?",
-                "J'ai plus de 18 ans": "18 yaşından büyüğüm",
-                "J'ai moins de 18 ans": "18 yaşından küçüğüm",
-                'Sondage de satisfaction (obligatoire)': 'Memnuniyet anketi (zorunlu)',
-                'Votre nom complet (incluant tous les prénoms) :': 'Tam adınız (tüm ön adlar dahil) :',
-                "NON, CE N'EST PAS VOTRE NOM": "HAYIR, BU SİZİN ADINIZ DEĞİL",
-                'Ville de naissance de votre grand-mère maternelle :': 'Anneannenizin doğum şehri :',
-                'Pourquoi le ciel est-il bleu ?': 'Gökyüzü neden mavi?',
-                'À cause du lait.': 'Süt yüzünden.',
-                'À cause du soleil.': 'Güneş yüzünden.',
-                "C'est un arc-en-ciel géant.": "Dev bir gökkuşağı.",
-                'Valider': 'Doğrula',
-                'Suivant': 'Sonraki',
-                'Activez Windows': 'Windows\'u etkinleştirin',
-                'Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.': 'Bu, müdahaleci bir reklam banner\'ı! Daha fazla reklam için ortağımızı ziyaret edin! Bu site dikkatinize ihtiyaç duyuyor. Ayrılmayın. Başka bir yere tıklamayın. Mutluluk burada.',
-                'Sauvegarde en cours...': 'Kaydediliyor...',
-                'Clics :': 'Tıklama :',
-                'ARGENT GRATUIT': 'BEDAVA PARA',
-                'Traduire en turc': 'Fransızcaya çevir',
-                'Terminer': 'Bitir',
-                'Essayez de taper quelque chose...': 'Bir şeyler yazmayı deneyin...',
-                'Veuillez répondre à la question pour continuer.': 'Devam etmek için lütfen soruyu yanıtlayın.',
+            en: {
+                'BIENVENUE SUR LA PAGE ÉNERVANTE !': 'WELCOME TO THE ANNOYING PAGE!',
+                'Ce site a été conçu pour votre plus grand déplaisir. Essayez de vous en échapper...': 'This site was designed for your greatest displeasure. Try to escape...',
+                'POMPER': 'PUMP',
+                "Bienvenue sur sondages.xyz.com.onion !": 'Welcome to surveys.xyz.com.onion!',
+                "Avez-vous plus de 18 ans ?": "Are you over 18?",
+                "J'ai plus de 18 ans": "I am over 18",
+                "J'ai moins de 18 ans": "I am under 18",
+                'Sondage de satisfaction (obligatoire)': 'Satisfaction Survey (mandatory)',
+                'Votre nom complet (incluant tous les prénoms) :': 'Your full name (including all first names):',
+                "NON, CE N'EST PAS VOTRE NOM": "NO, THIS IS NOT YOUR NAME",
+                'Ville de naissance de votre grand-mère maternelle :': "Maternal grandmother's city of birth:",
+                'Pourquoi le ciel est-il bleu ?': 'Why is the sky blue?',
+                'À cause du lait.': 'Because of milk.',
+                'À cause du soleil.': 'Because of the sun.',
+                "C'est un arc-en-ciel géant.": "It's a giant rainbow.",
+                'Valider': 'Validate',
+                'Suivant': 'Next',
+                'Activez Windows': 'Activate Windows',
+                'Ceci est une bannière publicitaire ENVAHISSANTE ! Visitez notre partenaire pour plus de pubs ! Ce site a besoin de votre attention. Ne partez pas. Ne cliquez pas ailleurs. Le bonheur est ici.': 'This is an INTRUSIVE banner ad! Visit our partner for more ads! This site needs your attention. Don\'t leave. Don\'t click anywhere else. Happiness is here.',
+                'Sauvegarde en cours...': 'Saving...',
+                'Clics :': 'Clicks:',
+                'ARGENT GRATUIT': 'FREE MONEY',
+                'Terminer': 'Finish',
+                'Essayez de taper quelque chose...': 'Try to type something...',
+                'Veuillez répondre à la question pour continuer.': 'Please answer the question to continue.',
             }
         };
 
         function isMobile() {
-            return window.innerWidth <= 768; // Détecte si l'écran est de taille mobile
+            return window.innerWidth <= 768;
         }
 
         function playRandomSound() {
@@ -1048,7 +1057,7 @@
         }
 
         function downloadLoserFile() {
-            const content = 'Bien essayé, mais tu n\'as pas l\'âge requis. Tu es un loser.';
+            const content = currentLanguage === 'fr' ? 'Bien essayé, mais tu n\'as pas l\'âge requis. Tu es un loser.' : 'Nice try, but you are not old enough. You are a loser.';
             const filename = 'loser.txt';
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -1195,7 +1204,7 @@
                 }
 
             } else if (questionData.type === 'text') {
-                const placeholderText = currentLanguage === 'fr' ? 'Tapez votre réponse ici...' : 'Yanıtınızı buraya yazın...';
+                const placeholderText = currentLanguage === 'fr' ? 'Tapez votre réponse ici...' : 'Type your answer here...';
                 surveyOptionsElement.innerHTML = `<input type="text" id="survey-text-input" placeholder="${placeholderText}">`;
                 const surveyInput = document.getElementById('survey-text-input');
                 
@@ -1309,136 +1318,25 @@
             }, 500);
         });
 
-        function moveTranslateButton() {
-            const translateButton = document.getElementById('translateButton');
-            const buttonRect = translateButton.getBoundingClientRect();
-
-            translateButtonX += translateButtonDX;
-            translateButtonY += translateButtonDY;
-
-            if (translateButtonX + buttonRect.width > window.innerWidth || translateButtonX < 0) {
-                translateButtonDX *= -1;
-                if (!isMobile()) {
-                    playRandomSound();
-                }
-            }
-            if (translateButtonY + buttonRect.height > window.innerHeight || translateButtonY < 0) {
-                translateButtonDY *= -1;
-                if (!isMobile()) {
-                    playRandomSound();
-                }
-            }
-
-            translateButton.style.transform = `translate(${translateButtonX}px, ${translateButtonY}px)`;
-            requestAnimationFrame(moveTranslateButton);
-        }
-
-        document.addEventListener('mousemove', (e) => {
-            const translateButton = document.getElementById('translateButton');
-            const buttonRect = translateButton.getBoundingClientRect();
-            if (e.clientX > buttonRect.left && e.clientX < buttonRect.right && e.clientY > buttonRect.top && e.clientY < buttonRect.bottom) {
-                if (!isMobile()) {
-                    translateButtonDX = -translateButtonDX;
-                    translateButtonDY = -translateButtonDY;
-                    playRandomSound();
-                }
-            }
-        });
-
-        document.getElementById('annoyingInput').addEventListener('input', annoyTyping);
-        document.getElementById('name').addEventListener('input', annoyTyping);
-        document.getElementById('birthplace').addEventListener('input', annoyTyping);
-        
-        function corruptText() {
-            const elementsToCorrupt = document.querySelectorAll('h1, p, button, label, span');
-            elementsToCorrupt.forEach(el => {
-                let parent = el;
-                let shouldCorrupt = true;
-                while (parent) {
-                    if (parent.id === 'surveyPopupContainer' || parent.id === 'errorMessagePopup' || parent.id === 'annoying-popup' || parent.id === 'savePopup' || parent.id === 'adContainer' || parent.id === 'pub') {
-                        shouldCorrupt = false;
-                        break;
-                    }
-                    parent = parent.parentElement;
-                }
-
-                if (shouldCorrupt) {
-                    const text = el.innerText;
-                    if (text.length > 0 && !originalTexts.has(el)) {
-                        originalTexts.set(el, text);
-                    }
-                    const chars = text.split('');
-                    const corruptedChars = Math.floor(Math.random() * Math.min(text.length, 5)) + 1;
-                    const corruptedIndices = [];
-                    while (corruptedIndices.length < corruptedChars) {
-                        const index = Math.floor(Math.random() * text.length);
-                        if (!corruptedIndices.includes(index)) {
-                            corruptedIndices.push(index);
-                        }
-                    }
-                    corruptedIndices.forEach(index => {
-                        chars[index] = `<span class="corrupted-char">${String.fromCharCode(Math.floor(Math.random() * (126 - 33 + 1)) + 33)}</span>`;
-                    });
-                    el.innerHTML = chars.join('');
-                    setTimeout(() => {
-                        el.innerHTML = originalTexts.get(el);
-                    }, 500);
-                }
-            });
-        }
-
-
-        function showSavePopup() {
-            const savePopup = document.getElementById('savePopup');
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            let progress = 0;
-
-            savePopup.style.display = 'flex';
-            const interval = setInterval(() => {
-                if (progress < 99) {
-                    progress += 2;
-                    if(progress > 99) progress = 99;
-                    progressBar.style.width = `${progress}%`;
-                    progressText.innerText = `${progress}%`;
-                } else {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        savePopup.style.display = 'none';
-                    }, 10000);
-                }
-            }, 50);
-
-        }
-
-        function showJumpscare() {
-            const jumpscare = document.getElementById('jumpscare');
-            const jumpscareSound = document.getElementById('jumpscareSound');
-            jumpscare.style.display = 'flex';
-            jumpscareSound.play();
-            setTimeout(() => {
-                jumpscare.style.display = 'none';
-                jumpscareSound.pause();
-                jumpscareSound.currentTime = 0;
-            }, 3000);
-        }
-
-        function resetActivityTimeout() {
-            clearTimeout(activityTimeout);
-            activityTimeout = setTimeout(showJumpscare, 20000);
-        }
-        
-        function updateClickCounter() {
-            clickCount++;
-            document.getElementById('clickCount').innerText = clickCount;
-        }
-
         function translatePage() {
-            currentLanguage = currentLanguage === 'fr' ? 'tr' : 'fr';
-            document.getElementById('translateButton').innerText = translations[currentLanguage]['Traduire en turc'];
+            currentLanguage = currentLanguage === 'fr' ? 'en' : 'fr';
+            const flagIcon = document.getElementById('flag-icon');
+
+            if (currentLanguage === 'fr') {
+                flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+                flagIcon.alt = 'Translate to English';
+                document.documentElement.lang = 'fr';
+                document.title = translations.fr['BIENVENUE SUR LA PAGE ÉNERVANTE !'];
+            } else {
+                flagIcon.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+                flagIcon.alt = 'Traduire en Français';
+                document.documentElement.lang = 'en';
+                document.title = translations.en['BIENVENUE SUR LA PAGE ÉNERVANTE !'];
+            }
 
             document.querySelectorAll('[data-fr]').forEach(element => {
-                const translation = translations[currentLanguage][element.dataset.fr];
+                const translationKey = element.dataset.fr;
+                const translation = translations[currentLanguage][translationKey];
                 if (translation) {
                     element.innerText = translation;
                 }
@@ -1446,9 +1344,9 @@
 
             document.querySelectorAll('input[placeholder]').forEach(element => {
                 const frPlaceholder = element.getAttribute('placeholder');
-                const trPlaceholder = translations.tr[frPlaceholder];
-                if (trPlaceholder) {
-                    element.setAttribute('placeholder', currentLanguage === 'tr' ? trPlaceholder : frPlaceholder);
+                const enPlaceholder = translations.en[frPlaceholder];
+                if (enPlaceholder) {
+                    element.setAttribute('placeholder', currentLanguage === 'en' ? enPlaceholder : frPlaceholder);
                 }
             });
 
@@ -1460,7 +1358,7 @@
             let originalAdText = adTextElement.innerText;
             if (originalAdText) {
                 const adMessagesInCurrentLang = adMessages[currentLanguage];
-                const adMessagesInOtherLang = currentLanguage === 'fr' ? adMessages.tr : adMessages.fr;
+                const adMessagesInOtherLang = currentLanguage === 'fr' ? adMessages.en : adMessages.fr;
                 const adIndex = adMessagesInOtherLang.findIndex(text => text === originalAdText);
                 if (adIndex > -1) {
                     adTextElement.innerText = adMessagesInCurrentLang[adIndex];
@@ -1471,8 +1369,8 @@
 
             const surveyValidationMessage = document.getElementById('survey-validation-message');
             const frValidationMessage = surveyValidationMessage.getAttribute('data-fr');
-            const trValidationMessage = surveyValidationMessage.getAttribute('data-tr');
-            surveyValidationMessage.innerText = currentLanguage === 'tr' ? trValidationMessage : frValidationMessage;
+            const enValidationMessage = surveyValidationMessage.getAttribute('data-en');
+            surveyValidationMessage.innerText = currentLanguage === 'en' ? enValidationMessage : frValidationMessage;
 
             if (currentQuestionIndex < surveyQuestions.length) {
                 displayCurrentQuestion();
@@ -1495,7 +1393,6 @@
             updateVolumeBar(mainSound.volume);
             mainSound.play();
 
-            moveTranslateButton();
             setInterval(showErrorMessage, 7000);
             showAnnoyingNotification();
             showRandomAd();
