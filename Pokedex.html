@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-icons/refs/heads/main/pokedex.png">
     <title>Pokédex</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline';
+        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
         style-src 'self' 'unsafe-inline';
         img-src 'self' data: https://raw.githubusercontent.com https://i.imgur.com https://raw.githubusercontent.com/PokeAPI/;
         connect-src 'self' https://pokeapi.co https://raw.githubusercontent.com;
@@ -15,7 +16,7 @@
     <style>
         :root {
             /* Couleurs du thème sombre (par défaut) */
-            --bg-color: #1e2124;
+            --bg-color: #282B30;
             --container-bg: #282b30;
             --card-bg: #36393e;
             --border-color: #36393e;
@@ -42,14 +43,222 @@
             background-color: var(--bg-color); /* Fallback pour le thème sombre */
         }
 
+        /* Burger Menu */
+        #burger-menu {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 30px;
+            height: 25px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1001;
+            transition: transform 0.3s ease;
+        }
+        
+        #burger-menu:hover {
+            transform: scale(1.1);
+        }
+
+        #burger-menu span {
+            width: 100%;
+            height: 3px;
+            background-color: var(--text-color);
+            border-radius: 10px;
+            transition: all 0.3s linear;
+        }
+
+        /* Side Menu */
+        #side-menu {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1002;
+            top: 0;
+            left: 0;
+            background-color: var(--container-bg);
+            overflow-x: hidden;
+            transition: transform 0.3s ease-in-out;
+            padding-top: 60px;
+            transform: translateX(-100%);
+            box-shadow: 3px 0 10px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-left: 20px;
+            padding-right: 20px;
+            box-sizing: border-box;
+        }
+
+        #side-menu.open {
+            transform: translateX(0);
+        }
+
+        #side-menu .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 36px;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        #side-menu .close-btn:hover {
+            color: var(--red-button);
+            transform: rotate(90deg);
+        }
+
+        #side-menu button {
+            padding: 15px 10px;
+            text-align: left;
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: var(--text-color);
+            display: block;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            background-color: var(--button-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #side-menu button:hover {
+            background-color: var(--button-hover);
+            border-color: var(--green-color);
+            transform: translateX(5px);
+        }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
             background-color: var(--container-bg);
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); */
             position: relative;
+        }
+
+        /* --- Vue Collection Plein Écran --- */
+        #collection-view-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1e2124; /* Fond un peu plus sombre pour se démarquer */
+            z-index: 2000;
+            display: none; /* Caché par défaut */
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #collection-view-container.visible {
+            display: block;
+        }
+
+        #collection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            padding-top: 60px; /* Espace pour le bouton de fermeture */
+        }
+
+        .collection-card {
+            background-color: #282b30;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #424549;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+        }
+
+        .collection-card:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .collection-card img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            image-rendering: pixelated;
+            margin-bottom: 10px;
+            background-color: var(--input-bg);
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .collection-card:hover img {
+            transform: rotate(5deg);
+        }
+
+        .collection-card h3 {
+            font-size: 1.1rem;
+            color: #f0f2f5;
+            margin: 5px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+
+        .collection-card p {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--green-color);
+            margin: 5px 0 0 0;
+        }
+        
+        .collection-card .card-icons {
+            top: 5px;
+            left: 5px;
+            display: flex;
+            flex-direction: column; /* Vertical */
+            gap: 3px;
+            position: absolute;
+        }
+
+        .collection-card .card-icons .icon {
+            width: 16px; /* TAILLE AJUSTÉE ICI */
+            height: 16px; /* TAILLE AJUSTÉE ICI */
+        }
+        
+        .collection-card .card-icons .icon.shiny-text {
+            font-size: 1rem; /* TAILLE AJUSTÉE ICI */
+            color: gold;
+            text-shadow: 0 0 3px rgba(255,255,0,0.8);
+        }
+
+        #close-collection-view {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            font-size: 36px;
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+            z-index: 2001;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        #close-collection-view:hover {
+            color: var(--red-button);
+            transform: rotate(90deg);
         }
 
         h1 {
@@ -115,11 +324,12 @@
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: bold;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
 
         .add-pokemon-form button:hover {
             background-color: #5cb85c;
+            transform: translateY(-2px);
         }
 
         .checkbox-group {
@@ -138,6 +348,7 @@
             gap: 5px;
             color: var(--text-color);
             font-size: 0.95rem;
+            cursor: pointer;
         }
 
         .checkbox-container input[type="checkbox"] {
@@ -171,6 +382,12 @@
             left: 0;
             width: 100%;
             height: 100%;
+            animation: checkmark-fadein 0.3s ease;
+        }
+
+        @keyframes checkmark-fadein {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .checkbox-container label {
@@ -207,15 +424,16 @@
             background-color: var(--button-bg);
             color: var(--text-color);
             border: 1px solid var(--card-border);
-            border-radius: 5px;
+            border-radius: 5s;
             cursor: pointer;
             font-size: 0.95rem;
-            transition: background-color 0.2s ease, border-color 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
         .action-buttons button:hover {
             background-color: var(--button-hover);
             border-color: var(--green-color);
+            transform: translateY(-2px);
         }
 
         .action-buttons .export {
@@ -226,6 +444,7 @@
         .action-buttons .export:hover {
             background-color: #0056b3;
             border-color: #0056b3;
+            transform: translateY(-2px);
         }
 
         .action-buttons .import {
@@ -236,6 +455,7 @@
         .action-buttons .import:hover {
             background-color: #117a8b;
             border-color: #117a8b;
+            transform: translateY(-2px);
         }
 
         .action-buttons .sort {
@@ -246,6 +466,7 @@
         .action-buttons .sort:hover {
             background-color: #5a6268;
             border-color: var(--green-color);
+            transform: translateY(-2px);
         }
 
         /* Styles for the Filter Dropdown */
@@ -267,6 +488,12 @@
             transform: translateX(-50%); /* Ajuste le centrage */
             top: 45px; /* Positionne sous le bouton, ajustez si nécessaire */
             border: 1px solid var(--border-color);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px) translateX(-50%); }
+            to { opacity: 1; transform: translateY(0) translateX(-50%); }
         }
 
         .filter-dropdown.show {
@@ -281,11 +508,11 @@
             cursor: pointer;
             color: var(--text-color);
             transition: background-color 0.2s ease;
+            border-radius: 4px;
         }
 
         .filter-option:hover {
             background-color: var(--card-bg);
-            border-radius: 4px;
         }
 
         .filter-option input[type="checkbox"] {
@@ -322,7 +549,7 @@
         }
 
         .pokemon-card:hover {
-            transform: translateY(-5px);
+            transform: scale(1.05) translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
             cursor: pointer;
         }
@@ -340,7 +567,7 @@
             font-size: 1rem;
             line-height: 1;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.2s ease;
             opacity: 0.7;
             display: flex;
             align-items: center;
@@ -351,6 +578,7 @@
         .pokemon-card .delete-card-button:hover {
             background-color: var(--red-button-hover);
             opacity: 1;
+            transform: scale(1.2) rotate(90deg);
         }
 
         .pokemon-card .card-icons {
@@ -358,7 +586,7 @@
             top: 5px;
             left: 5px;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column; /* Vertical */
             gap: 3px;
         }
 
@@ -382,6 +610,11 @@
             border: 2px solid var(--border-color);
             object-fit: contain;
             image-rendering: pixelated;
+            transition: transform 0.3s ease;
+        }
+        
+        .pokemon-card:hover img {
+            transform: scale(1.1) rotate(-5deg);
         }
 
         .pokemon-card h3 {
@@ -451,13 +684,14 @@
             top: 10px;
             right: 20px;
             cursor: pointer;
-            transition: color 0.2s ease;
+            transition: color 0.2s ease, transform 0.2s ease;
         }
 
         .close-button:hover,
         .close-button:focus {
             color: var(--text-color);
             text-decoration: none;
+            transform: rotate(90deg);
         }
 
         .modal-content img {
@@ -509,6 +743,7 @@
             background-color: var(--input-bg);
             color: var(--text-color);
             font-size: 1rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         .modal-content input[type="text"]:focus,
@@ -543,12 +778,13 @@
             cursor: pointer;
             font-size: 1rem;
             font-weight: bold;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
         }
 
         .modal-content button:hover {
             background-color: var(--button-hover);
             border-color: var(--green-color);
+            transform: translateY(-2px);
         }
 
         .modal-content .delete-button {
@@ -559,6 +795,7 @@
         .modal-content .delete-button:hover {
             background-color: var(--red-button-hover);
             border-color: var(--red-button-hover);
+            transform: translateY(-2px);
         }
 
         /* Responsive Design */
@@ -628,7 +865,21 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div id="burger-menu" onclick="toggleSideMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div id="side-menu">
+        <a href="javascript:void(0)" class="close-btn" onclick="toggleSideMenu()">&times;</a>
+        <button onclick="exportToJson()">Exporter JSON</button>
+        <button onclick="document.getElementById('importFile').click()">Importer JSON</button>
+        <button onclick="exportCollectionToPng()">Exporter en PNG</button>
+        <button onclick="viewCollection()">Voir la collection</button>
+    </div>
+
+    <div class="container" id="main-container">
         <h1>Pokédex</h1>
 
         <div class="add-pokemon-form">
@@ -711,14 +962,13 @@
         <div id="loadingMessage">Chargement des noms de Pokémon...</div>
 
         <div class="action-buttons">
-            <button class="export" onclick="exportToJson()">Exporter JSON</button>
             <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromJson(event)">
-            <button class="import" onclick="document.getElementById('importFile').click()">Importer JSON</button>
             <button class="sort" onclick="setSortCriterion('cp')">Trier par PC</button>
             <button class="sort" onclick="setSortCriterion('name')">Trier par Nom</button>
             <button class="sort" onclick="setSortCriterion('dexNumber')">Trier par Numéro</button>
             <button class="sort" onclick="setSortCriterion('category')">Trier par Catégorie</button>
-            <button class="sort" onclick="setSortCriterion('timestamp')">Trier par Date (Nouv. > Anc.)</button> <div class="filter-dropdown-container">
+            <button class="sort" onclick="setSortCriterion('timestamp')">Trier par Date (Nouv. > Anc.)</button>
+             <div class="filter-dropdown-container">
                 <button class="sort" onclick="toggleFilterDropdown()">Filtrer</button>
                 <div id="filterDropdown" class="filter-dropdown">
                     </div>
@@ -729,6 +979,11 @@
 
         <div id="pokemonDisplayArea">
             </div>
+    </div>
+
+    <div id="collection-view-container">
+        <a id="close-collection-view" onclick="closeCollectionView()">&times;</a>
+        <div id="collection-grid"></div>
     </div>
 
     <div id="pokemonModal" class="modal">
@@ -767,7 +1022,7 @@
                     <input type="checkbox" id="editPokemonXXS">
                     <label for="editPokemonXXS">XXS</label>
                     <img src="https://i.imgur.com/MwcyI1M.png" alt="XXS" class="icon">
-                </div>
+                </p>
                 <div class="checkbox-container">
                     <input type="checkbox" id="editPokemonXXL">
                     <label for="editPokemonXXL">XXL</label>
@@ -824,6 +1079,104 @@
         </div>
     </div>
     <script>
+        function toggleSideMenu() {
+            document.getElementById('side-menu').classList.toggle('open');
+        }
+
+        function viewCollection() {
+            toggleSideMenu(); // Ferme le menu
+            document.getElementById('main-container').style.display = 'none'; // Cache le conteneur principal
+            document.getElementById('collection-view-container').classList.add('visible'); // Affiche le conteneur de la collection
+            renderCollectionGrid(); // Crée la grille de la collection
+        }
+
+        function closeCollectionView() {
+            document.getElementById('collection-view-container').classList.remove('visible'); // Cache le conteneur de la collection
+            document.getElementById('main-container').style.display = 'block'; // Affiche le conteneur principal
+        }
+        
+        function renderCollectionGrid() {
+            const collectionGrid = document.getElementById('collection-grid');
+            collectionGrid.innerHTML = ''; // Nettoie la grille existante
+
+            pokemons.sort((a, b) => parseInt(a.dexNumber) - parseInt(b.dexNumber)); // Trie par numéro de Pokédex par défaut pour la collection
+
+            pokemons.forEach(pokemon => {
+                const card = document.createElement('div');
+                card.className = 'collection-card';
+                card.innerHTML = `
+                    <div class="card-icons">
+                        ${pokemon.isFavorite ? `<img src="${iconUrls.favorite}" alt="Favori" class="icon">` : ''}
+                        ${pokemon.isShiny ? `<span class="icon shiny-text">✨</span>` : ''}
+                        ${pokemon.isXXS ? `<img src="${iconUrls.xxs}" alt="XXS" class="icon">` : ''}
+                        ${pokemon.isXXL ? `<img src="${iconUrls.xxl}" alt="XXL" class="icon">` : ''}
+                        ${pokemon.isMighty ? `<img src="${iconUrls.mighty}" alt="Mighty" class="icon">` : ''}
+                        ${pokemon.isLegendary ? `<img src="${iconUrls.legendary}" alt="Légendaire" class="icon">` : ''}
+                        ${pokemon.isShadow ? `<img src="${iconUrls.shadow}" alt="Obscur" class="icon">` : ''}
+                        ${pokemon.isPurified ? `<img src="${iconUrls.purified}" alt="Purifié" class="icon">` : ''}
+                        ${pokemon.isHundo ? `<img src="${iconUrls.hundo}" alt="Hundo" class="icon">` : ''}
+                        ${pokemon.isDynamax ? `<img src="${iconUrls.dynamax}" alt="Dynamax" class="icon">` : ''}
+                        ${pokemon.isGigamax ? `<img src="${iconUrls.gigamax}" alt="Gigamax" class="icon">` : ''}
+                        ${pokemon.isLevel1 ? `<img src="${iconUrls.level1}" alt="Niveau 1" class="icon">` : ''}
+                        ${pokemon.isMega ? `<img src="${iconUrls.mega}" alt="Méga-évolution" class="icon">` : ''}
+                    </div>
+                    <img src="${pokemon.image}" alt="${pokemon.nameFrench}">
+                    <h3>${pokemon.nickname || pokemon.nameFrench}</h3>
+                    <p>PC: ${pokemon.cp}</p>
+                `;
+                collectionGrid.appendChild(card);
+            });
+        }
+        
+        // Fonction exportCollectionToPng modifiée pour capturer tout le contenu
+        function exportCollectionToPng() {
+            toggleSideMenu(); // Ferme le menu
+            const collectionContainer = document.getElementById('collection-view-container');
+            const mainContainer = document.getElementById('main-container');
+            const body = document.body;
+            const html = document.documentElement;
+
+            // Masquer la vue principale et afficher la collection
+            mainContainer.style.display = 'none';
+            collectionContainer.style.display = 'block';
+            renderCollectionGrid();
+
+            // Enregistrer les styles originaux
+            const originalBodyOverflow = body.style.overflow;
+            const originalHtmlOverflow = html.style.overflow;
+            const originalCollectionHeight = collectionContainer.style.height;
+            const originalCollectionOverflow = collectionContainer.style.overflow;
+
+            // Appliquer des styles temporaires pour capturer tout le contenu
+            body.style.overflow = 'visible';
+            html.style.overflow = 'visible';
+            collectionContainer.style.height = 'auto';
+            collectionContainer.style.overflow = 'visible';
+            
+            // Attendre un court instant pour le rendu avant de capturer
+            setTimeout(() => {
+                html2canvas(collectionContainer, {
+                    scale: 2, // Pour une meilleure qualité
+                    useCORS: true // Nécessaire pour les images externes
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = 'pokedex_collection.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    // Rétablir les styles originaux après la capture
+                    body.style.overflow = originalBodyOverflow;
+                    html.style.overflow = originalHtmlOverflow;
+                    collectionContainer.style.height = originalCollectionHeight;
+                    collectionContainer.style.overflow = originalCollectionOverflow;
+
+                    // Rétablir l'affichage initial
+                    collectionContainer.style.display = 'none';
+                    mainContainer.style.display = 'block';
+                });
+            }, 100);
+        }
+
         let pokemons = JSON.parse(localStorage.getItem('pokemons')) || [];
         let currentPokemonIndex = -1;
         // Map: nom français/anglais -> { englishName: '...', dexNumber: N, normalSpriteUrl: '...', shinySpriteUrl: '...', nameFrench: '...' }
@@ -1169,8 +1522,7 @@
                                 ${pokemon.isMega ? `<img src="${iconUrls.mega}" alt="Méga-évolution" class="icon">` : ''}
                             </div>
                             <img src="${pokemon.image}" alt="${pokemon.nameFrench}">
-                            <h3>${pokemon.nameFrench}</h3>
-                            ${pokemon.nickname ? `<p class="nickname">"${pokemon.nickname}"</p>` : ''}
+                            <h3>${pokemon.nickname || pokemon.nameFrench}</h3>
                             <p class="cp-display">PC: ${pokemon.cp}</p>
                         `;
                         gridContainer.appendChild(card);
