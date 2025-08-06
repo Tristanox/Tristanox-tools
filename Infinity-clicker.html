@@ -21,16 +21,25 @@
 
         .container {
             display: flex;
-            width: 95%;
-            max-width: 1400px;
-            height: 90vh;
-            max-height: 800px;
+            /* Changement pour le plein écran */
+            width: 100vw; 
+            height: 100vh;
+            max-width: none; /* Supprime la largeur maximale */
+            max-height: none; /* Supprime la hauteur maximale */
             background-color: #292b2f; /* Thème sombre: Conteneur principal */
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée pour la visibilité */
-            border: 1px solid #40444b; /* Bordure subtile */
+            border-radius: 0; /* Supprime les coins arrondis pour le plein écran */
+            box-shadow: none; /* Supprime l'ombre pour le plein écran */
+            border: none; /* Supprime la bordure */
             overflow: hidden;
-            position: relative; /* Permet le positionnement absolu des boutons de sauvegarde */
+            position: relative;
+            /* Animations d'ouverture */
+            animation: fadeIn 1s ease-out;
+        }
+
+        /* Animation d'ouverture */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         /* --- Zone de jeu principale (milieu) --- */
@@ -49,7 +58,7 @@
         .game-area h1 {
             font-size: 3em;
             margin-bottom: 5px;
-            color: #3266a8; /* Thème sombre: Titre principal (Clicks) */
+            color: #ffffff; /* Tous les titres en blanc */
         }
 
         .stats-display {
@@ -59,13 +68,9 @@
             line-height: 1.4;
         }
 
-        #clicks-display {
+        #clicks-display, #cps-display, #click-power-display {
             font-weight: bold;
-            color: #28a745; /* Clicks en vert pour la visibilité */
-        }
-        #cps-display, #click-power-display {
-            font-weight: bold;
-            color: #ffc107; /* CPS et puissance de clic en jaune/orange */
+            color: #ffffff; /* Clicks, CPS et puissance de clic en blanc */
         }
 
         #main-button {
@@ -74,11 +79,18 @@
             object-fit: contain;
             cursor: pointer;
             transition: transform 0.1s ease-out;
-            border: none; /* Supprime le contour */
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Ombre plus foncée */
+            border: none;
+            border-radius: 0; /* Pas de bordure arrondie pour l'image */
+            box-shadow: none; /* Pas d'ombre pour l'image */
             margin-top: 15px;
             z-index: 10;
+            /* Animation de hover */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        #main-button:hover {
+            transform: scale(1.05); /* Légèrement plus grand au survol */
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5); /* Ombre plus prononcée */
         }
 
         #main-button:active {
@@ -88,83 +100,132 @@
 
         /* --- Menu d'améliorations (droite) --- */
         .upgrade-menu {
-            width: 300px;
+            width: 350px; /* Augmenté pour mieux accueillir les onglets */
             background-color: #2f3136; /* Thème sombre: Fond du menu d'améliorations */
             padding: 20px;
             border-left: 1px solid #40444b; /* Bordure à gauche du menu */
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px; /* Espace réduit entre les boutons pour en afficher plus */
         }
 
         .upgrade-menu h2 {
-            color: #3266a8; /* Thème sombre: Titre du menu d'améliorations */
+            color: #ffffff; /* Titre du menu d'améliorations en blanc */
             margin-top: 0;
             margin-bottom: 15px;
             font-size: 1.6em;
             text-align: center;
         }
 
-        .upgrade-category-title {
-            color: #3266a8;
-            font-size: 1.1em;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            text-align: left;
+        /* Styles pour les onglets */
+        .tab-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
             border-bottom: 1px solid #40444b;
-            padding-bottom: 5px;
+            padding-bottom: 10px;
+        }
+
+        .tab-buttons button {
+            flex-grow: 1;
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #40444b;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px 8px 0 0; /* Coins arrondis en haut */
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: none; /* Pas d'ombre ici, gérée par le conteneur */
+            margin: 0 2px; /* Petit espace entre les onglets */
+        }
+
+        .tab-buttons button.active {
+            background-color: #3266a8; /* Couleur active pour l'onglet */
+            font-weight: bold;
+            box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.3); /* Ombre au-dessus de l'onglet actif */
+        }
+
+        .tab-buttons button:hover:not(.active) {
+            background-color: #4a4d52;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none; /* Caché par défaut */
+            flex-direction: column;
+            gap: 12px; /* Espace plus grand entre les améliorations */
+            padding-top: 10px;
+        }
+
+        .tab-content.active {
+            display: flex; /* Affiché si actif */
         }
 
         .upgrade-menu button {
             display: block;
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 12px; /* Augmenté le padding pour plus d'espace */
             font-size: 0.9em;
             cursor: pointer;
-            background-color: #40444b; /* Thème sombre: Couleur de fond des boutons */
-            color: #ffffff; /* Texte des boutons en blanc */
-            border: none;
+            background-color: #40444b;
+            color: #ffffff;
+            border: 1px solid #5a5d61; /* Bordure pour distinguer */
             border-radius: 8px;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease, border-color 0.2s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
             text-align: left;
             white-space: normal;
-            line-height: 1.2;
+            line-height: 1.3; /* Augmenté pour une meilleure lisibilité */
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 8px; /* Marge pour distinguer chaque bouton */
         }
 
         .upgrade-menu button:hover {
-            background-color: #3266a8; /* Thème sombre: Couleur au survol (le bleu accent) */
-            transform: translateY(-2px);
+            background-color: #3266a8;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+            border-color: #3266a8; /* Changement de couleur de bordure au survol */
         }
 
         .upgrade-menu button:active {
-            background-color: #2c548a; /* Une nuance plus foncée du bleu accent */
+            background-color: #2c548a;
             transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
         }
 
         .upgrade-menu button:disabled {
-            background-color: #3a3d40; /* Couleur des boutons désactivés */
+            background-color: #3a3d40;
             cursor: not-allowed;
             box-shadow: none;
-            color: #888; /* Texte gris clair pour les boutons désactivés */
+            color: #888;
+            border-color: #3a3d40; /* Bordure désactivée */
         }
         
         .upgrade-button-cost {
             font-size: 0.75em;
             opacity: 0.9;
-            margin-top: 2px;
-            color: rgba(255, 255, 255, 0.8); /* Coût en blanc transparent */
+            color: #ffffff;
+            margin-top: 5px; /* Plus d'espace pour le coût */
+            display: block; /* Assure que le coût est sur une nouvelle ligne */
+        }
+
+        .upgrade-button-level {
+            float: right; /* Aligne le niveau à droite */
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-left: 10px;
         }
 
         /* --- Boutons en haut à gauche (sauvegarde/chargement/image) --- */
         .top-right-buttons {
             position: absolute;
             top: 15px;
-            left: 15px; /* Aligné à gauche, comme demandé */
-            display: flex; /* Utilise Flexbox */
-            gap: 10px; /* Espace entre les boutons */
-            z-index: 10; /* S'assure que les boutons sont au-dessus du reste */
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
         }
 
         .top-right-buttons button {
@@ -175,17 +236,51 @@
             border: 1px solid #5a5d61;
             border-radius: 6px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            /* Animations de hover */
+            transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .top-right-buttons button:hover {
-            background-color: #3266a8; /* Utilisez la couleur d'accent pour le survol */
+            background-color: #3266a8;
             border-color: #3266a8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .top-right-buttons button:active {
             background-color: #2c548a;
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Style pour le bouton de langue */
+        #language-button {
+            padding: 5px;
+            width: 40px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #language-button img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        /* Animation d'amélioration */
+        @keyframes upgrade-pulse {
+            0% { transform: scale(1); background-color: #3266a8; }
+            50% { transform: scale(1.02); background-color: #4CAF50; } /* Vert pour l'effet de succès */
+            100% { transform: scale(1); background-color: #40444b; }
+        }
+
+        .upgrade-menu button.upgraded {
+            animation: upgrade-pulse 0.5s ease-out;
         }
     </style>
 </head>
@@ -195,13 +290,17 @@
             <button id="import-button">Importer</button>
             <button id="export-button">Exporter</button>
             <button id="change-image-button">Changer l'image</button>
+            <button id="language-button">
+                <!-- Le drapeau initial doit être celui de la langue VERS laquelle on peut changer -->
+                <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" alt="Language Flag">
+            </button>
         </div>
 
         <div class="game-area">
-            <h1>Clicks: <span id="clicks-display">0</span></h1>
+            <h1><span id="clicks-title">Clicks:</span> <span id="clicks-display">0</span></h1>
             <div class="stats-display">
-                Clicks par Seconde (CPS): <span id="cps-display">0.00</span><br>
-                Puissance de Clic: <span id="click-power-display">1</span>
+                <span id="cps-text">Clicks par Seconde (CPS):</span> <span id="cps-display">0.00</span><br>
+                <span id="click-power-text">Puissance de Clic:</span> <span id="click-power-display">1</span>
             </div>
             
             <img src="https://images.emojiterra.com/google/android-11/1024px/1f354.png" alt="Bouton Principal" id="main-button" class="clickable">
@@ -210,634 +309,950 @@
         <div class="upgrade-menu">
             <h2>Améliorations</h2>
 
-            <div class="upgrade-category-title">Générateurs de Clics par Seconde (CPS)</div>
-            <button id="buy-auto-clicker">
-                🖱️ Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-auto-clicker">10</span> Clicks</div>
-            </button>
-            <button id="buy-super-auto-clicker">
-                ⚡ Super Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-super-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-super-auto-clicker">100</span> Clicks</div>
-            </button>
-            <button id="buy-mega-auto-clicker">
-                🔥 Mega Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-mega-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-mega-auto-clicker">1000</span> Clicks</div>
-            </button>
-            <button id="buy-gigabit-auto-clicker">
-                📡 Gigabit Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-gigabit-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-gigabit-auto-clicker">10000</span> Clicks</div>
-            </button>
-            <button id="buy-terabit-auto-clicker">
-                🚀 Terabit Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-terabit-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-terabit-auto-clicker">100000</span> Clicks</div>
-            </button>
-            <button id="buy-quantum-auto-clicker">
-                ⚛️ Quantum Auto-Clicker <span class="upgrade-button-level">(Niv. <span id="level-quantum-auto-clicker">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-quantum-auto-clicker">1000000</span> Clicks</div>
-            </button>
-            <button id="buy-infinite-loop">
-                ♾️ Boucle Infinie <span class="upgrade-button-level">(Niv. <span id="level-infinite-loop">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-infinite-loop">10000000</span> Clicks</div>
-            </button>
-            <button id="buy-temporal-manipulator">
-                ⏳ Manipulateur Temporel <span class="upgrade-button-level">(Niv. <span id="level-temporal-manipulator">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-temporal-manipulator">100000000</span> Clicks</div>
-            </button>
-            <button id="buy-reality-bender">
-                🌀 Cintreur de Réalité <span class="upgrade-button-level">(Niv. <span id="level-reality-bender">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-reality-bender">1000000000</span> Clicks</div>
-            </button>
-            <button id="buy-void-nexus">
-                🌌 Nexus du Vide <span class="upgrade-button-level">(Niv. <span id="level-void-nexus">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-void-nexus">10000000000</span> Clicks</div>
-            </button>
-            <button id="buy-cosmic-engine">
-                🌟 Moteur Cosmique <span class="upgrade-button-level">(Niv. <span id="level-cosmic-engine">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-engine">50000000000</span> Clicks</div>
-            </button>
-            <button id="buy-dimensional-fabricator">
-                🏗️ Fabricateur Dimensionnel <span class="upgrade-button-level">(Niv. <span id="level-dimensional-fabricator">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-dimensional-fabricator">250000000000</span> Clicks</div>
-            </button>
-            <button id="buy-celestial-forge">
-                ✨ Forge Céleste <span class="upgrade-button-level">(Niv. <span id="level-celestial-forge">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-celestial-forge">1000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-omni-accelerator">
-                💨 Omni-Accélérateur <span class="upgrade-button-level">(Niv. <span id="level-omni-accelerator">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-omni-accelerator">5000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-galactic-conduit">
-                🛰️ Conduit Galactique <span class="upgrade-button-level">(Niv. <span id="level-galactic-conduit">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-galactic-conduit">25000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-universal-harmonizer">
-                ☯️ Harmoniseur Universel <span class="upgrade-button-level">(Niv. <span id="level-universal-harmonizer">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-universal-harmonizer">100000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-creator-engine">
-                🌟 Moteur du Créateur <span class="upgrade-button-level">(Niv. <span id="level-creator-engine">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-creator-engine">500000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-absolute-genesis">
-                🌠 Genèse Absolue <span class="upgrade-button-level">(Niv. <span id="level-absolute-genesis">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-absolute-genesis">2500000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-cosmic-singularity">
-                ⚫ Singularité Cosmique <span class="upgrade-button-level">(Niv. <span id="level-cosmic-singularity">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-singularity">10000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-infinite-paradigm">
-                ✨ Paradigme Infini <span class="upgrade-button-level">(Niv. <span id="level-infinite-paradigm">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-infinite-paradigm">50000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-divine-ascension">
-                😇 Ascension Divine <span class="upgrade-button-level">(Niv. <span id="level-divine-ascension">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-divine-ascension">250000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-omega-trigger">
-                💥 Déclencheur Oméga <span class="upgrade-button-level">(Niv. <span id="level-omega-trigger">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-omega-trigger">1000000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-primordial-spark">
-                🔥 Étincelle Primordiale <span class="upgrade-button-level">(Niv. <span id="level-primordial-spark">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-primordial-spark">5000000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-void-fabric">
-                🌀 Tissu du Vide <span class="upgrade-button-level">(Niv. <span id="level-void-fabric">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-void-fabric">25000000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-celestial-chrono">
-                ⏳ Chronomètre Céleste <span class="upgrade-button-level">(Niv. <span id="level-celestial-chrono">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-celestial-chrono">100000000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-ethernal-pulsar">
-                 pulsar Éternel <span class="upgrade-button-level">(Niv. <span id="level-ethernal-pulsar">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-ethernal-pulsar">500000000000000000000</span> Clicks</div>
-            </button>
+            <div class="tab-buttons">
+                <button id="cps-tab-button" class="active">⏰ Générateurs de CPS</button>
+                <button id="click-power-tab-button">⚡ Puissance de Clic</button>
+            </div>
 
-            <div class="upgrade-category-title">Boost de Puissance de Clic</div>
-            <button id="buy-click-booster">
-                💪 Booster de Clics <span class="upgrade-button-level">(Niv. <span id="level-click-booster">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-click-booster">50</span> Clicks</div>
-            </button>
-            <button id="buy-power-glove">
-                🥊 Gant de Puissance <span class="upgrade-button-level">(Niv. <span id="level-power-glove">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-power-glove">250</span> Clicks</div>
-            </button>
-            <button id="buy-mechanical-finger">
-                🤖 Doigt Mécanique <span class="upgrade-button-level">(Niv. <span id="level-mechanical-finger">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-mechanical-finger">1000</span> Clicks</div>
-            </button>
-            <button id="buy-cybernetic-hand">
-                🦾 Main Cybernétique <span class="upgrade-button-level">(Niv. <span id="level-cybernetic-hand">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cybernetic-hand">5000</span> Clicks</div>
-            </button>
-            <button id="buy-titan-grip">
-                💢 Poigne de Titan <span class="upgrade-button-level">(Niv. <span id="level-titan-grip">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-titan-grip">25000</span> Clicks</div>
-            </button>
-            <button id="buy-graviton-press">
-                🪨 Presse à Gravitons <span class="upgrade-button-level">(Niv. <span id="level-graviton-press">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-graviton-press">100000</span> Clicks</div>
-            </button>
-            <button id="buy-black-hole-touch">
-                ⚫ Toucher Trou Noir <span class="upgrade-button-level">(Niv. <span id="level-black-hole-touch">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-black-hole-touch">500000</span> Clicks</div>
-            </button>
-            <button id="buy-reality-shatterer">
-                💥 Briseur de Réalité <span class="upgrade-button-level">(Niv. <span id="level-reality-shatterer">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-reality-shatterer">2500000</span> Clicks</div>
-            </button>
-            <button id="buy-cosmic-impact">
-                🌠 Impact Cosmique <span class="upgrade-button-level">(Niv. <span id="level-cosmic-impact">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-impact">10000000</span> Clicks</div>
-            </button>
-            <button id="buy-void-punch">
-                🕳️ Coup du Vide <span class="upgrade-button-level">(Niv. <span id="level-void-punch">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-void-punch">50000000</span> Clicks</div>
-            </button>
-            <button id="buy-stellar-fist">
-                🌟 Poing Stellaire <span class="upgrade-button-level">(Niv. <span id="level-stellar-fist">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-stellar-fist">250000000</span> Clicks</div>
-            </button>
-            <button id="buy-galaxial-strike">
-                💫 Frappe Galactique <span class="upgrade-button-level">(Niv. <span id="level-galaxial-strike">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-galaxial-strike">1000000000</span> Clicks</div>
-            </button>
-            <button id="buy-infinite-power">
-                ⚡ Puissance Infinie <span class="upgrade-button-level">(Niv. <span id="level-infinite-power">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-infinite-power">5000000000</span> Clicks</div>
-            </button>
-            <button id="buy-divine-might">
-                ✨ Puissance Divine <span class="upgrade-button-level">(Niv. <span id="level-divine-might">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-divine-might">25000000000</span> Clicks</div>
-            </button>
-            <button id="buy-cosmic-force">
-                🌌 Force Cosmique <span class="upgrade-button-level">(Niv. <span id="level-cosmic-force">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-force">100000000000</span> Clicks</div>
-            </button>
-            <button id="buy-genesis-touch">
-                🌱 Toucher de la Genèse <span class="upgrade-button-level">(Niv. <span id="level-genesis-touch">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-genesis-touch">500000000000</span> Clicks</div>
-            </button>
-            <button id="buy-creation-fist">
-                ✊ Poing de la Création <span class="upgrade-button-level">(Niv. <span id="level-creation-fist">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-creation-fist">2500000000000</span> Clicks</div>
-            </button>
-            <button id="buy-omega-strike">
-                ☄️ Frappe Oméga <span class="upgrade-button-level">(Niv. <span id="level-omega-trigger">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-omega-strike">10000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-primordial-punch">
-                🌋 Coup Primordial <span class="upgrade-button-level">(Niv. <span id="level-primordial-spark">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-primordial-punch">50000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-ascendant-blow">
-                ✨ Frappe Ascendante <span class="upgrade-button-level">(Niv. <span id="level-ascendant-blow">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-ascendant-blow">250000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-ultimate-force">
-                💪 Force Ultime <span class="upgrade-button-level">(Niv. <span id="level-ultimate-force">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-ultimate-force">1000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-infinite-strike">
-                ♾️ Frappe Infinie <span class="upgrade-button-level">(Niv. <span id="level-infinite-strike">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-infinite-strike">5000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-cosmic-punch">
-                🪐 Coup Cosmique <span class="upgrade-button-level">(Niv. <span id="level-cosmic-punch">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-punch">25000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-ethernal-fist">
-                💫 Poing Éternel <span class="upgrade-button-level">(Niv. <span id="level-ethernal-fist">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-ethernal-fist">100000000000000000</span> Clicks</div>
-            </button>
-            <button id="buy-divine-fury">
-                🔥 Fureur Divine <span class="upgrade-button-level">(Niv. <span id="level-divine-fury">0</span>)</span>
-                <div class="upgrade-button-cost">Coût: <span id="cost-divine-fury">500000000000000000</span> Clicks</div>
-            </button>
+            <div id="cps-tab-content" class="tab-content active">
+                <button id="buy-auto-clicker">
+                    <span class="upgrade-main-text">🖱️ Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-auto-clicker">10</span> Clicks</div>
+                </button>
+                <button id="buy-super-auto-clicker">
+                    <span class="upgrade-main-text">⚡ Super Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-super-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-super-auto-clicker">100</span> Clicks</div>
+                </button>
+                <button id="buy-mega-auto-clicker">
+                    <span class="upgrade-main-text">🔥 Mega Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-mega-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-mega-auto-clicker">1000</span> Clicks</div>
+                </button>
+                <button id="buy-gigabit-auto-clicker">
+                    <span class="upgrade-main-text">📡 Gigabit Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-gigabit-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-gigabit-auto-clicker">10000</span> Clicks</div>
+                </button>
+                <button id="buy-terabit-auto-clicker">
+                    <span class="upgrade-main-text">🚀 Terabit Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-terabit-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-terabit-auto-clicker">100000</span> Clicks</div>
+                </button>
+                <button id="buy-quantum-auto-clicker">
+                    <span class="upgrade-main-text">⚛️ Quantum Auto-Clicker</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-quantum-auto-clicker">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-quantum-auto-clicker">1000000</span> Clicks</div>
+                </button>
+                <button id="buy-infinite-loop">
+                    <span class="upgrade-main-text">♾️ Boucle Infinie</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-infinite-loop">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-infinite-loop">10000000</span> Clicks</div>
+                </button>
+                <button id="buy-temporal-manipulator">
+                    <span class="upgrade-main-text">⏳ Manipulateur Temporel</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-temporal-manipulator">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-temporal-manipulator">100000000</span> Clicks</div>
+                </button>
+                <button id="buy-reality-bender">
+                    <span class="upgrade-main-text">🌀 Cintreur de Réalité</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-reality-bender">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-reality-bender">1000000000</span> Clicks</div>
+                </button>
+                <button id="buy-void-nexus">
+                    <span class="upgrade-main-text">🌌 Nexus du Vide</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-void-nexus">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-void-nexus">10000000000</span> Clicks</div>
+                </button>
+                <button id="buy-cosmic-engine">
+                    <span class="upgrade-main-text">🌟 Moteur Cosmique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cosmic-engine">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-engine">50000000000</span> Clicks</div>
+                </button>
+                <button id="buy-dimensional-fabricator">
+                    <span class="upgrade-main-text">🏗️ Fabricateur Dimensionnel</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-dimensional-fabricator">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-dimensional-fabricator">250000000000</span> Clicks</div>
+                </button>
+                <button id="buy-celestial-forge">
+                    <span class="upgrade-main-text">✨ Forge Céleste</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-celestial-forge">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-celestial-forge">1000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-omni-accelerator">
+                    <span class="upgrade-main-text">💨 Omni-Accélérateur</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-omni-accelerator">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-omni-accelerator">5000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-galactic-conduit">
+                    <span class="upgrade-main-text">🛰️ Conduit Galactique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-galactic-conduit">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-galactic-conduit">25000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-universal-harmonizer">
+                    <span class="upgrade-main-text">☯️ Harmoniseur Universel</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-universal-harmonizer">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-universal-harmonizer">100000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-creator-engine">
+                    <span class="upgrade-main-text">🌟 Moteur du Créateur</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-creator-engine">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-creator-engine">500000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-absolute-genesis">
+                    <span class="upgrade-main-text">🌠 Genèse Absolue</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-absolute-genesis">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-absolute-genesis">2500000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-cosmic-singularity">
+                    <span class="upgrade-main-text">⚫ Singularité Cosmique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cosmic-singularity">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-singularity">10000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-infinite-paradigm">
+                    <span class="upgrade-main-text">✨ Paradigme Infini</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-infinite-paradigm">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-infinite-paradigm">50000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-divine-ascension">
+                    <span class="upgrade-main-text">😇 Ascension Divine</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-divine-ascension">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-divine-ascension">250000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-omega-trigger">
+                    <span class="upgrade-main-text">💥 Déclencheur Oméga</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-omega-trigger">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-omega-trigger">1000000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-primordial-spark">
+                    <span class="upgrade-main-text">🔥 Étincelle Primordiale</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-primordial-spark">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-primordial-spark">5000000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-void-fabric">
+                    <span class="upgrade-main-text">🌀 Tissu du Vide</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-void-fabric">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-void-fabric">25000000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-celestial-chrono">
+                    <span class="upgrade-main-text">⏳ Chronomètre Céleste</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-celestial-chrono">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-celestial-chrono">100000000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-ethernal-pulsar">
+                    <span class="upgrade-main-text">💫 Pulsar Éternel</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-ethernal-pulsar">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-ethernal-pulsar">500000000000000000000</span> Clicks</div>
+                </button>
+            </div>
 
+            <div id="click-power-tab-content" class="tab-content">
+                <button id="buy-click-booster">
+                    <span class="upgrade-main-text">💪 Booster de Clics</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-click-booster">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-click-booster">50</span> Clicks</div>
+                </button>
+                <button id="buy-power-glove">
+                    <span class="upgrade-main-text">🥊 Gant de Puissance</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-power-glove">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-power-glove">250</span> Clicks</div>
+                </button>
+                <button id="buy-mechanical-finger">
+                    <span class="upgrade-main-text">🤖 Doigt Mécanique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-mechanical-finger">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-mechanical-finger">1000</span> Clicks</div>
+                </button>
+                <button id="buy-cybernetic-hand">
+                    <span class="upgrade-main-text">🦾 Main Cybernétique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cybernetic-hand">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cybernetic-hand">5000</span> Clicks</div>
+                </button>
+                <button id="buy-titan-grip">
+                    <span class="upgrade-main-text">💢 Poigne de Titan</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-titan-grip">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-titan-grip">25000</span> Clicks</div>
+                </button>
+                <button id="buy-graviton-press">
+                    <span class="upgrade-main-text">🪨 Presse à Gravitons</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-graviton-press">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-graviton-press">100000</span> Clicks</div>
+                </button>
+                <button id="buy-black-hole-touch">
+                    <span class="upgrade-main-text">⚫ Toucher Trou Noir</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-black-hole-touch">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-black-hole-touch">500000</span> Clicks</div>
+                </button>
+                <button id="buy-reality-shatterer">
+                    <span class="upgrade-main-text">💥 Briseur de Réalité</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-reality-shatterer">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-reality-shatterer">2500000</span> Clicks</div>
+                </button>
+                <button id="buy-cosmic-impact">
+                    <span class="upgrade-main-text">🌠 Impact Cosmique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cosmic-impact">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-impact">10000000</span> Clicks</div>
+                </button>
+                <button id="buy-void-punch">
+                    <span class="upgrade-main-text">🕳️ Coup du Vide</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-void-punch">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-void-punch">50000000</span> Clicks</div>
+                </button>
+                <button id="buy-stellar-fist">
+                    <span class="upgrade-main-text">🌟 Poing Stellaire</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-stellar-fist">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-stellar-fist">250000000</span> Clicks</div>
+                </button>
+                <button id="buy-galaxial-strike">
+                    <span class="upgrade-main-text">💫 Frappe Galactique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-galaxial-strike">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-galaxial-strike">1000000000</span> Clicks</div>
+                </button>
+                <button id="buy-infinite-power">
+                    <span class="upgrade-main-text">⚡ Puissance Infinie</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-infinite-power">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-infinite-power">5000000000</span> Clicks</div>
+                </button>
+                <button id="buy-divine-might">
+                    <span class="upgrade-main-text">✨ Puissance Divine</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-divine-might">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-divine-might">25000000000</span> Clicks</div>
+                </button>
+                <button id="buy-cosmic-force">
+                    <span class="upgrade-main-text">🌌 Force Cosmique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cosmic-force">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-force">100000000000</span> Clicks</div>
+                </button>
+                <button id="buy-genesis-touch">
+                    <span class="upgrade-main-text">🌱 Toucher de la Genèse</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-genesis-touch">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-genesis-touch">500000000000</span> Clicks</div>
+                </button>
+                <button id="buy-creation-fist">
+                    <span class="upgrade-main-text">✊ Poing de la Création</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-creation-fist">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-creation-fist">2500000000000</span> Clicks</div>
+                </button>
+                <button id="buy-omega-strike">
+                    <span class="upgrade-main-text">☄️ Frappe Oméga</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-omega-strike">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-omega-strike">10000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-primordial-punch">
+                    <span class="upgrade-main-text">🌋 Coup Primordial</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-primordial-punch">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-primordial-punch">50000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-ascendant-blow">
+                    <span class="upgrade-main-text">✨ Frappe Ascendante</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-ascendant-blow">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-ascendant-blow">250000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-ultimate-force">
+                    <span class="upgrade-main-text">💪 Force Ultime</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-ultimate-force">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-ultimate-force">1000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-infinite-strike">
+                    <span class="upgrade-main-text">♾️ Frappe Infinie</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-infinite-strike">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-infinite-strike">5000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-cosmic-punch">
+                    <span class="upgrade-main-text">🪐 Coup Cosmique</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-cosmic-punch">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-cosmic-punch">25000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-ethernal-fist">
+                    <span class="upgrade-main-text">💫 Poing Éternel</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-ethernal-fist">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-ethernal-fist">100000000000000000</span> Clicks</div>
+                </button>
+                <button id="buy-divine-fury">
+                    <span class="upgrade-main-text">🔥 Fureur Divine</span>
+                    <span class="upgrade-button-level">(Niv. <span id="level-divine-fury">0</span>)</span>
+                    <div class="upgrade-button-cost">Coût: <span id="cost-divine-fury">500000000000000000</span> Clicks</div>
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
         /* --- Logique JavaScript du jeu --- */
-        // Variables du Jeu
-        let clicks = 0;
-        let baseClickPower = 1; // Puissance de clic de base
-        let totalCps = 0; // Total des clics par seconde générés
-        
-        // --- Améliorations (coût, effet, niveau, etc.) ---
-        const upgrades = {
-            // Générateurs de Clicks par Seconde (CPS) - Effets additionnels
-            'auto-clicker': { 
-                name: "Auto-Clicker", type: 'cps', baseCost: 10, costMultiplier: 1.15, baseEffect: 0.1, level: 0 
-            },
-            'super-auto-clicker': { 
-                name: "Super Auto-Clicker", type: 'cps', baseCost: 100, costMultiplier: 1.15, baseEffect: 1, level: 0 
-            },
-            'mega-auto-clicker': { 
-                name: "Mega Auto-Clicker", type: 'cps', baseCost: 1000, costMultiplier: 1.15, baseEffect: 10, level: 0 
-            },
-            'gigabit-auto-clicker': { 
-                name: "Gigabit Auto-Clicker", type: 'cps', baseCost: 10000, costMultiplier: 1.15, baseEffect: 100, level: 0 
-            },
-            'terabit-auto-clicker': { 
-                name: "Terabit Auto-Clicker", type: 'cps', baseCost: 100000, costMultiplier: 1.15, baseEffect: 1000, level: 0 
-            },
-            'quantum-auto-clicker': { 
-                name: "Quantum Auto-Clicker", type: 'cps', baseCost: 1000000, costMultiplier: 1.15, baseEffect: 10000, level: 0 
-            },
-            'infinite-loop': { 
-                name: "Boucle Infinie", type: 'cps', baseCost: 10000000, costMultiplier: 1.15, baseEffect: 100000, level: 0 
-            },
-            'temporal-manipulator': { 
-                name: "Manipulateur Temporel", type: 'cps', baseCost: 100000000, costMultiplier: 1.15, baseEffect: 1000000, level: 0 
-            },
-            'reality-bender': { 
-                name: "Cintreur de Réalité", type: 'cps', baseCost: 1000000000, costMultiplier: 1.15, baseEffect: 10000000, level: 0 
-            },
-            'void-nexus': { 
-                name: "Nexus du Vide", type: 'cps', baseCost: 10000000000, costMultiplier: 1.15, baseEffect: 100000000, level: 0 
-            },
-            'cosmic-engine': { 
-                name: "Moteur Cosmique", type: 'cps', baseCost: 50000000000, costMultiplier: 1.15, baseEffect: 500000000, level: 0 
-            },
-            'dimensional-fabricator': { 
-                name: "Fabricateur Dimensionnel", type: 'cps', baseCost: 250000000000, costMultiplier: 1.15, baseEffect: 2500000000, level: 0 
-            },
-            'celestial-forge': { 
-                name: "Forge Céleste", type: 'cps', baseCost: 1000000000000, costMultiplier: 1.15, baseEffect: 10000000000, level: 0 
-            },
-            'omni-accelerator': { 
-                name: "Omni-Accélérateur", type: 'cps', baseCost: 5000000000000, costMultiplier: 1.15, baseEffect: 50000000000, level: 0 
-            },
-            'galactic-conduit': { 
-                name: "Conduit Galactique", type: 'cps', baseCost: 25000000000000, costMultiplier: 1.15, baseEffect: 250000000000, level: 0 
-            },
-            'universal-harmonizer': { 
-                name: "Harmoniseur Universel", type: 'cps', baseCost: 100000000000000, costMultiplier: 1.15, baseEffect: 1000000000000, level: 0 
-            },
-            'creator-engine': { 
-                name: "Moteur du Créateur", type: 'cps', baseCost: 500000000000000, costMultiplier: 1.15, baseEffect: 5000000000000, level: 0
-            },
-            'absolute-genesis': { 
-                name: "Genèse Absolue", type: 'cps', baseCost: 2500000000000000, costMultiplier: 1.15, baseEffect: 25000000000000, level: 0 
-            },
-            'cosmic-singularity': { 
-                name: "Singularité Cosmique", type: 'cps', baseCost: 10000000000000000, costMultiplier: 1.15, baseEffect: 100000000000000, level: 0 
-            },
-            'infinite-paradigm': { 
-                name: "Paradigme Infini", type: 'cps', baseCost: 50000000000000000, costMultiplier: 1.15, baseEffect: 500000000000000, level: 0 
-            },
-            'divine-ascension': { 
-                name: "Ascension Divine", type: 'cps', baseCost: 250000000000000000, costMultiplier: 1.15, baseEffect: 2500000000000000, level: 0 
-            },
-            'omega-trigger': { 
-                name: "Déclencheur Oméga", type: 'cps', baseCost: 1000000000000000000, costMultiplier: 1.15, baseEffect: 10000000000000000, level: 0 
-            },
-            'primordial-spark': { 
-                name: "Étincelle Primordiale", type: 'cps', baseCost: 5000000000000000000, costMultiplier: 1.15, baseEffect: 50000000000000000, level: 0 
-            },
-            'void-fabric': { 
-                name: "Tissu du Vide", type: 'cps', baseCost: 25000000000000000000, costMultiplier: 1.15, baseEffect: 250000000000000000, level: 0 
-            },
-            'celestial-chrono': { 
-                name: "Chronomètre Céleste", type: 'cps', baseCost: 100000000000000000000, costMultiplier: 1.15, baseEffect: 1000000000000000000, level: 0 
-            },
-            'ethernal-pulsar': { 
-                name: "Pulsar Éternel", type: 'cps', baseCost: 500000000000000000000, costMultiplier: 1.15, baseEffect: 5000000000000000000, level: 0 
-            },
+        // S'assure que le DOM est entièrement chargé avant d'exécuter le script
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Variables du Jeu
+            let clicks = 0;
+            let baseClickPower = 1; // Puissance de clic de base
+            let totalCps = 0; // Total des clics par seconde générés
+            
+            // --- Améliorations (coût, effet, niveau, etc.) ---
+            const upgrades = {
+                // Générateurs de Clicks par Seconde (CPS) - Effets additionnels
+                'auto-clicker': { 
+                    name: "Auto-Clicker", emoji: "🖱️", type: 'cps', baseCost: 10, costMultiplier: 1.15, baseEffect: 0.1, level: 0 
+                },
+                'super-auto-clicker': { 
+                    name: "Super Auto-Clicker", emoji: "⚡", type: 'cps', baseCost: 100, costMultiplier: 1.15, baseEffect: 1, level: 0 
+                },
+                'mega-auto-clicker': { 
+                    name: "Mega Auto-Clicker", emoji: "🔥", type: 'cps', baseCost: 1000, costMultiplier: 1.15, baseEffect: 10, level: 0 
+                },
+                'gigabit-auto-clicker': { 
+                    name: "Gigabit Auto-Clicker", emoji: "📡", type: 'cps', baseCost: 10000, costMultiplier: 1.15, baseEffect: 100, level: 0 
+                },
+                'terabit-auto-clicker': { 
+                    name: "Terabit Auto-Clicker", emoji: "🚀", type: 'cps', baseCost: 100000, costMultiplier: 1.15, baseEffect: 1000, level: 0 
+                },
+                'quantum-auto-clicker': { 
+                    name: "Quantum Auto-Clicker", emoji: "⚛️", type: 'cps', baseCost: 1000000, costMultiplier: 1.15, baseEffect: 10000, level: 0 
+                },
+                'infinite-loop': { 
+                    name: "Boucle Infinie", emoji: "♾️", type: 'cps', baseCost: 10000000, costMultiplier: 1.15, baseEffect: 100000, level: 0 
+                },
+                'temporal-manipulator': { 
+                    name: "Manipulateur Temporel", emoji: "⏳", type: 'cps', baseCost: 100000000, costMultiplier: 1.15, baseEffect: 1000000, level: 0 
+                },
+                'reality-bender': { 
+                    name: "Cintreur de Réalité", emoji: "🌀", type: 'cps', baseCost: 1000000000, costMultiplier: 1.15, baseEffect: 10000000, level: 0 
+                },
+                'void-nexus': { 
+                    name: "Nexus du Vide", emoji: "🌌", type: 'cps', baseCost: 10000000000, costMultiplier: 1.15, baseEffect: 100000000, level: 0 
+                },
+                'cosmic-engine': { 
+                    name: "Moteur Cosmique", emoji: "🌟", type: 'cps', baseCost: 50000000000, costMultiplier: 1.15, baseEffect: 500000000, level: 0 
+                },
+                'dimensional-fabricator': { 
+                    name: "Fabricateur Dimensionnel", emoji: "🏗️", type: 'cps', baseCost: 250000000000, costMultiplier: 1.15, baseEffect: 2500000000, level: 0 
+                },
+                'celestial-forge': { 
+                    name: "Forge Céleste", emoji: "✨", type: 'cps', baseCost: 1000000000000, costMultiplier: 1.15, baseEffect: 10000000000, level: 0 
+                },
+                'omni-accelerator': { 
+                    name: "Omni-Accélérateur", emoji: "💨", type: 'cps', baseCost: 5000000000000, costMultiplier: 1.15, baseEffect: 50000000000, level: 0 
+                },
+                'galactic-conduit': { 
+                    name: "Conduit Galactique", emoji: "🛰️", type: 'cps', baseCost: 25000000000000, costMultiplier: 1.15, baseEffect: 250000000000, level: 0 
+                },
+                'universal-harmonizer': { 
+                    name: "Harmoniseur Universel", emoji: "☯️", type: 'cps', baseCost: 100000000000000, costMultiplier: 1.15, baseEffect: 1000000000000, level: 0 
+                },
+                'creator-engine': { 
+                    name: "Moteur du Créateur", emoji: "🌟", type: 'cps', baseCost: 500000000000000, costMultiplier: 1.15, baseEffect: 5000000000000, level: 0
+                },
+                'absolute-genesis': { 
+                    name: "Genèse Absolue", emoji: "🌠", type: 'cps', baseCost: 2500000000000000, costMultiplier: 1.15, baseEffect: 25000000000000, level: 0 
+                },
+                'cosmic-singularity': { 
+                    name: "Singularité Cosmique", emoji: "⚫", type: 'cps', baseCost: 10000000000000000, costMultiplier: 1.15, baseEffect: 100000000000000, level: 0 
+                },
+                'infinite-paradigm': { 
+                    name: "Paradigme Infini", emoji: "✨", type: 'cps', baseCost: 50000000000000000, costMultiplier: 1.15, baseEffect: 500000000000000, level: 0 
+                },
+                'divine-ascension': { 
+                    name: "Ascension Divine", emoji: "😇", type: 'cps', baseCost: 250000000000000000, costMultiplier: 1.15, baseEffect: 2500000000000000, level: 0 
+                },
+                'omega-trigger': { 
+                    name: "Déclencheur Oméga", emoji: "💥", type: 'cps', baseCost: 1000000000000000000, costMultiplier: 1.15, baseEffect: 10000000000000000, level: 0 
+                },
+                'primordial-spark': { 
+                    name: "Étincelle Primordiale", emoji: "🔥", type: 'cps', baseCost: 5000000000000000000, costMultiplier: 1.15, baseEffect: 50000000000000000, level: 0 
+                },
+                'void-fabric': { 
+                    name: "Tissu du Vide", emoji: "🌀", type: 'cps', baseCost: 25000000000000000000, costMultiplier: 1.15, baseEffect: 250000000000000000, level: 0 
+                },
+                'celestial-chrono': { 
+                    name: "Chronomètre Céleste", emoji: "⏳", type: 'cps', baseCost: 100000000000000000000, costMultiplier: 1.15, baseEffect: 1000000000000000000, level: 0 
+                },
+                'ethernal-pulsar': { 
+                    name: "Pulsar Éternel", emoji: "💫", type: 'cps', baseCost: 500000000000000000000, costMultiplier: 1.15, baseEffect: 5000000000000000000, level: 0 
+                },
 
 
-            // Puissance de Clic (Effets additionnels)
-            'click-booster': { 
-                name: "Booster de Clics", type: 'click_power', baseCost: 50, costMultiplier: 1.5, baseEffect: 1, level: 0 
-            }, // Ajoute 1 à clickPower
-            'power-glove': { 
-                name: "Gant de Puissance", type: 'click_power', baseCost: 250, costMultiplier: 1.5, baseEffect: 2, level: 0 
-            },
-            'mechanical-finger': { 
-                name: "Doigt Mécanique", type: 'click_power', baseCost: 1000, costMultiplier: 1.5, baseEffect: 5, level: 0 
-            },
-            'cybernetic-hand': { 
-                name: "Main Cybernétique", type: 'click_power', baseCost: 5000, costMultiplier: 1.5, baseEffect: 10, level: 0 
-            },
-            'titan-grip': { 
-                name: "Poigne de Titan", type: 'click_power', baseCost: 25000, costMultiplier: 1.5, baseEffect: 25, level: 0 
-            },
-            'graviton-press': { 
-                name: "Presse à Gravitons", type: 'click_power', baseCost: 100000, costMultiplier: 1.5, baseEffect: 50, level: 0 
-            },
-            'black-hole-touch': { 
-                name: "Toucher Trou Noir", type: 'click_power', baseCost: 500000, costMultiplier: 1.5, baseEffect: 100, level: 0 
-            },
-            'reality-shatterer': { 
-                name: "Briseur de Réalité", type: 'click_power', baseCost: 2500000, costMultiplier: 1.5, baseEffect: 250, level: 0 
-            },
-            'cosmic-impact': { 
-                name: "Impact Cosmique", type: 'click_power', baseCost: 10000000, costMultiplier: 1.5, baseEffect: 500, level: 0 
-            },
-            'void-punch': { 
-                name: "Coup du Vide", type: 'click_power', baseCost: 50000000, costMultiplier: 1.5, baseEffect: 1000, level: 0 
-            },
-            'stellar-fist': { 
-                name: "Poing Stellaire", type: 'click_power', baseCost: 250000000, costMultiplier: 1.5, baseEffect: 2500, level: 0 
-            },
-            'galaxial-strike': { 
-                name: "Frappe Galactique", type: 'click_power', baseCost: 1000000000, costMultiplier: 1.5, baseEffect: 5000, level: 0 
-            },
-            'infinite-power': { 
-                name: "Puissance Infinie", type: 'click_power', baseCost: 5000000000, costMultiplier: 1.5, baseEffect: 10000, level: 0 
-            },
-            'divine-might': { 
-                name: "Puissance Divine", type: 'click_power', baseCost: 25000000000, costMultiplier: 1.5, baseEffect: 25000, level: 0 
-            },
-            'cosmic-force': { 
-                name: "Force Cosmique", type: 'click_power', baseCost: 100000000000, costMultiplier: 1.5, baseEffect: 50000, level: 0 
-            },
-            'genesis-touch': { 
-                name: "Toucher de la Genèse", type: 'click_power', baseCost: 500000000000, costMultiplier: 1.5, baseEffect: 100000, level: 0 
-            },
-            'creation-fist': { 
-                name: "Poing de la Création", type: 'click_power', baseCost: 2500000000000, costMultiplier: 1.5, baseEffect: 250000, level: 0 
-            },
-            'omega-strike': { 
-                name: "Frappe Oméga", type: 'click_power', baseCost: 10000000000000, costMultiplier: 1.5, baseEffect: 500000, level: 0 
-            },
-            'primordial-punch': { 
-                name: "Coup Primordial", type: 'click_power', baseCost: 50000000000000, costMultiplier: 1.5, baseEffect: 1000000, level: 0 
-            },
-            'ascendant-blow': { 
-                name: "Frappe Ascendante", type: 'click_power', baseCost: 250000000000000, costMultiplier: 1.5, baseEffect: 2500000, level: 0 
-            },
-            'ultimate-force': { 
-                name: "Force Ultime", type: 'click_power', baseCost: 1000000000000000, costMultiplier: 1.5, baseEffect: 5000000, level: 0 
-            },
-            'infinite-strike': { 
-                name: "Frappe Infinie", type: 'click_power', baseCost: 5000000000000000, costMultiplier: 1.5, baseEffect: 10000000, level: 0 
-            },
-            'cosmic-punch': { 
-                name: "Coup Cosmique", type: 'click_power', baseCost: 25000000000000000, costMultiplier: 1.5, baseEffect: 25000000, level: 0 
-            },
-            'ethernal-fist': { 
-                name: "Poing Éternel", type: 'click_power', baseCost: 100000000000000000, costMultiplier: 1.5, baseEffect: 50000000, level: 0 
-            },
-            'divine-fury': { 
-                name: "Fureur Divine", type: 'click_power', baseCost: 500000000000000000, costMultiplier: 1.5, baseEffect: 100000000, level: 0 
-            },
-        };
-
-        // Obtenir les éléments HTML
-        const clicksDisplay = document.getElementById('clicks-display');
-        const cpsDisplay = document.getElementById('cps-display');
-        const clickPowerDisplay = document.getElementById('click-power-display');
-        const mainButton = document.getElementById('main-button');
-        const importButton = document.getElementById('import-button');
-        const exportButton = document.getElementById('export-button');
-        const changeImageButton = document.getElementById('change-image-button'); 
-        const upgradeButtons = {}; // Stocke les références des boutons et leurs éléments de coût/niveau
-
-        // Liste d'URLs d'images pour le bouton principal
-        const imageUrls = [
-            "https://images.emojiterra.com/google/android-11/1024px/1f354.png", // Burger
-            "https://images.emojiterra.com/google/android-11/1024px/1f36a.png", // Cookie
-            "https://images.emojiterra.com/google/android-11/1024px/1f35f.png", // Frites
-            "https://images.emojiterra.com/google/android-11/1024px/1f366.png", // Glace
-            "https://images.emojiterra.com/google/android-11/1024px/1f369.png", // Donut
-            "https://images.emojiterra.com/google/android-11/1024px/1f355.png"  // Pizza
-        ];
-        let currentImageIndex = 0; // Index de l'image actuelle
-
-        // Initialisation des boutons et des affichages
-        for (const key in upgrades) {
-            const upgrade = upgrades[key];
-            const buttonElement = document.getElementById(`buy-${key}`);
-            const costDisplayElement = document.getElementById(`cost-${key}`);
-            const levelDisplayElement = document.getElementById(`level-${key}`);
-
-            if (buttonElement && costDisplayElement && levelDisplayElement) {
-                upgradeButtons[key] = {
-                    button: buttonElement,
-                    costDisplay: costDisplayElement,
-                    levelDisplay: levelDisplayElement
-                };
-                // Mettre à jour le texte initial du bouton
-                upgradeButtons[key].costDisplay.textContent = formatNumber(upgrade.baseCost);
-                upgradeButtons[key].levelDisplay.textContent = upgrade.level;
-                // Ajouter l'écouteur d'événement
-                buttonElement.addEventListener('click', () => buyUpgrade(key));
-            } else {
-                console.warn(`Élément HTML ou données manquantes pour l'amélioration: ${key}. Vérifiez les IDs HTML et les données dans 'upgrades'.`);
-            }
-        }
-
-        // --- Fonctions du Jeu ---
-
-        // Fonction pour formater les grands nombres (ex: 1234567 -> 1.23M)
-        function formatNumber(num) {
-            if (num < 1000000) { // Nombres inférieurs à 1 million
-                return Math.floor(num).toString();
-            }
-            if (num >= 1e21) return (num / 1e21).toFixed(2) + ' Sext.'; // Sextillions
-            if (num >= 1e18) return (num / 1e18).toFixed(2) + ' Quint.'; // Quintillions
-            if (num >= 1e15) return (num / 1e15).toFixed(2) + ' Quad.'; // Quadrillions
-            if (num >= 1e12) return (num / 1e12).toFixed(2) + ' T.';   // Trillions
-            if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B.';   // Billions (milliards)
-            if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M.';   // Millions
-            return num.toString(); // Fallback pour les nombres très petits ou inattendus
-        }
-
-
-        // Fonction pour calculer le CPS total
-        function calculateTotalCps() {
-            let currentCps = 0; // Calculer le CPS de base
-            // Ajouter le CPS de chaque générateur
-            for (const key in upgrades) {
-                const upgrade = upgrades[key];
-                if (upgrade.type === 'cps') {
-                    currentCps += upgrade.baseEffect * upgrade.level;
-                }
-            }
-            totalCps = currentCps; // Mettre à jour la variable globale totalCps
-        }
-
-        // Fonction pour recalculer la puissance de clic totale
-        function recalculateClickPower() {
-            let currentPower = baseClickPower; // Commence avec la puissance de clic de base
-            for (const key in upgrades) {
-                const upgrade = upgrades[key];
-                if (upgrade.type === 'click_power') {
-                    // Pour chaque niveau d'amélioration de click_power, on ajoute son effet de base
-                    currentPower += upgrade.baseEffect * upgrade.level; 
-                }
-            }
-            return currentPower; // Renvoie la puissance de clic calculée
-        }
-
-
-        // Fonction pour mettre à jour l'affichage et l'état des boutons
-        function updateDisplay() {
-            clicksDisplay.textContent = formatNumber(clicks);
-            calculateTotalCps(); // Recalcule le CPS avant l'affichage
-            cpsDisplay.textContent = totalCps.toFixed(2); // Affiche le CPS avec 2 décimales
-            clickPowerDisplay.textContent = formatNumber(recalculateClickPower()); // Recalcule et affiche la puissance de clic
-
-            // Mettre à jour les coûts affichés et l'état des boutons
-            for (const key in upgrades) {
-                const upgrade = upgrades[key];
-                // Calcule le coût actuel basé sur le niveau de l'amélioration
-                const currentCost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
-                
-                // Mettre à jour le texte du bouton et le niveau
-                if (upgradeButtons[key]) { // Vérifiez que l'élément HTML existe
-                    upgradeButtons[key].costDisplay.textContent = formatNumber(currentCost);
-                    upgradeButtons[key].levelDisplay.textContent = upgrade.level;
-                    upgradeButtons[key].button.disabled = clicks < currentCost;
-                }
-            }
-        }
-
-        // Fonction quand le bouton principal est cliqué
-        function clickMainButton() {
-            clicks += recalculateClickPower(); // Utilise la puissance de clic actuelle
-            updateDisplay();
-        }
-
-        // Fonction pour ajouter 1000 clics (pour la touche M)
-        function addTestClicks() {
-            clicks += 1000;
-            updateDisplay();
-        }
-
-        // Fonction pour acheter une amélioration générique
-        function buyUpgrade(upgradeKey) {
-            const upgrade = upgrades[upgradeKey];
-            const currentCost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
-
-            if (clicks >= currentCost) {
-                clicks -= currentCost;
-                upgrade.level++; // Augmente le niveau de l'amélioration
-                updateDisplay(); // Met à jour l'affichage après l'achat
-            } else {
-                // Pas besoin d'alerte, le bouton est désactivé si pas assez de clicks
-            }
-        }
-
-        // Logique des clicks automatiques
-        function applyAutoClicks() {
-            clicks += totalCps / 10; // Divisé par 10 car l'intervalle est de 100ms (1 seconde / 100ms = 10)
-            updateDisplay(); // Met à jour l'affichage régulièrement
-        }
-
-        // --- Fonctions de Sauvegarde / Chargement ---
-
-        function exportGame() {
-            const gameData = {
-                clicks: clicks,
-                upgrades: {},
-                currentImageIndex: currentImageIndex 
+                // Puissance de Clic (Effets additionnels)
+                'click-booster': { 
+                    name: "Booster de Clics", emoji: "💪", type: 'click_power', baseCost: 50, costMultiplier: 1.5, baseEffect: 1, level: 0 
+                }, // Ajoute 1 à clickPower
+                'power-glove': { 
+                    name: "Gant de Puissance", emoji: "🥊", type: 'click_power', baseCost: 250, costMultiplier: 1.5, baseEffect: 2, level: 0 
+                },
+                'mechanical-finger': { 
+                    name: "Doigt Mécanique", emoji: "🤖", type: 'click_power', baseCost: 1000, costMultiplier: 1.5, baseEffect: 5, level: 0 
+                },
+                'cybernetic-hand': { 
+                    name: "Main Cybernétique", emoji: "🦾", type: 'click_power', baseCost: 5000, costMultiplier: 1.5, baseEffect: 10, level: 0 
+                },
+                'titan-grip': { 
+                    name: "Poigne de Titan", emoji: "💢", type: 'click_power', baseCost: 25000, costMultiplier: 1.5, baseEffect: 25, level: 0 
+                },
+                'graviton-press': { 
+                    name: "Presse à Gravitons", emoji: "🪨", type: 'click_power', baseCost: 100000, costMultiplier: 1.5, baseEffect: 50, level: 0 
+                },
+                'black-hole-touch': { 
+                    name: "Toucher Trou Noir", emoji: "⚫", type: 'click_power', baseCost: 500000, costMultiplier: 1.5, baseEffect: 100, level: 0 
+                },
+                'reality-shatterer': { 
+                    name: "Briseur de Réalité", emoji: "💥", type: 'click_power', baseCost: 2500000, costMultiplier: 1.5, baseEffect: 250, level: 0 
+                },
+                'cosmic-impact': { 
+                    name: "Impact Cosmique", emoji: "�", type: 'click_power', baseCost: 10000000, costMultiplier: 1.5, baseEffect: 500, level: 0 
+                },
+                'void-punch': { 
+                    name: "Coup du Vide", emoji: "🕳️", type: 'click_power', baseCost: 50000000, costMultiplier: 1.5, baseEffect: 1000, level: 0 
+                },
+                'stellar-fist': { 
+                    name: "Poing Stellaire", emoji: "🌟", type: 'click_power', baseCost: 250000000, costMultiplier: 1.5, baseEffect: 2500, level: 0 
+                },
+                'galaxial-strike': { 
+                    name: "Frappe Galactique", emoji: "💫", type: 'click_power', baseCost: 1000000000, costMultiplier: 1.5, baseEffect: 5000, level: 0 
+                },
+                'infinite-power': { 
+                    name: "Puissance Infinie", emoji: "⚡", type: 'click_power', baseCost: 5000000000, costMultiplier: 1.5, baseEffect: 10000, level: 0 
+                },
+                'divine-might': { 
+                    name: "Puissance Divine", emoji: "✨", type: 'click_power', baseCost: 25000000000, costMultiplier: 1.5, baseEffect: 25000, level: 0 
+                },
+                'cosmic-force': { 
+                    name: "Force Cosmique", emoji: "🌌", type: 'click_power', baseCost: 100000000000, costMultiplier: 1.5, baseEffect: 50000, level: 0 
+                },
+                'genesis-touch': { 
+                    name: "Toucher de la Genèse", emoji: "🌱", type: 'click_power', baseCost: 500000000000, costMultiplier: 1.5, baseEffect: 100000, level: 0 
+                },
+                'creation-fist': { 
+                    name: "Poing de la Création", emoji: "✊", type: 'click_power', baseCost: 2500000000000, costMultiplier: 1.5, baseEffect: 250000, level: 0 
+                },
+                'omega-strike': { 
+                    name: "Frappe Oméga", emoji: "☄️", type: 'click_power', baseCost: 10000000000000, costMultiplier: 1.5, baseEffect: 500000, level: 0 
+                },
+                'primordial-punch': { 
+                    name: "Coup Primordial", emoji: "🌋", type: 'click_power', baseCost: 50000000000000, costMultiplier: 1.5, baseEffect: 1000000, level: 0 
+                },
+                'ascendant-blow': { 
+                    name: "Frappe Ascendante", emoji: "✨", type: 'click_power', baseCost: 250000000000000, costMultiplier: 1.5, baseEffect: 2500000, level: 0 
+                },
+                'ultimate-force': { 
+                    name: "Force Ultime", emoji: "💪", type: 'click_power', baseCost: 1000000000000000, costMultiplier: 1.5, baseEffect: 5000000, level: 0 
+                },
+                'infinite-strike': { 
+                    name: "Frappe Infinie", emoji: "♾️", type: 'click_power', baseCost: 5000000000000000, costMultiplier: 1.5, baseEffect: 10000000, level: 0 
+                },
+                'cosmic-punch': { 
+                    name: "Coup Cosmique", emoji: "🪐", type: 'click_power', baseCost: 25000000000000000, costMultiplier: 1.5, baseEffect: 25000000, level: 0 
+                },
+                'ethernal-fist': { 
+                    name: "Poing Éternel", emoji: "💫", type: 'click_power', baseCost: 100000000000000000, costMultiplier: 1.5, baseEffect: 50000000, level: 0 
+                },
+                'divine-fury': { 
+                    name: "Fureur Divine", emoji: "🔥", type: 'click_power', baseCost: 500000000000000000, costMultiplier: 1.5, baseEffect: 100000000, level: 0 
+                },
             };
 
+            // Obtenir les éléments HTML
+            // Mise à jour pour cibler les nouveaux spans pour les libellés
+            const clicksTitle = document.getElementById('clicks-title');
+            const clicksDisplay = document.getElementById('clicks-display');
+            const cpsText = document.getElementById('cps-text');
+            const cpsDisplay = document.getElementById('cps-display');
+            const clickPowerText = document.getElementById('click-power-text');
+            const clickPowerDisplay = document.getElementById('click-power-display');
+            const mainButton = document.getElementById('main-button');
+            const importButton = document.getElementById('import-button');
+            const exportButton = document.getElementById('export-button');
+            const changeImageButton = document.getElementById('change-image-button'); 
+            const languageButton = document.getElementById('language-button');
+            
+            // Nouveaux éléments pour les onglets
+            const cpsTabButton = document.getElementById('cps-tab-button');
+            const clickPowerTabButton = document.getElementById('click-power-tab-button');
+            const cpsTabContent = document.getElementById('cps-tab-content');
+            const clickPowerTabContent = document.getElementById('click-power-tab-content');
+
+            const upgradeButtons = {};
+
+            // Liste d'URLs d'images pour le bouton principal
+            const imageUrls = [
+                "https://images.emojiterra.com/google/android-11/1024px/1f354.png", // Burger
+                "https://images.emojiterra.com/google/android-11/1024px/1f36a.png", // Cookie
+                "https://images.emojiterra.com/google/android-11/1024px/1f35f.png", // Frites
+                "https://images.emojiterra.com/google/android-11/1024px/1f366.png", // Glace
+                "https://images.emojiterra.com/google/android-11/1024px/1f369.png", // Donut
+                "https://images.emojiterra.com/google/android-11/1024px/1f355.png"  // Pizza
+            ];
+            let currentImageIndex = 0; // Index de l'image actuelle
+
+            // Définition des traductions
+            const translations = {
+                en: {
+                    pageTitle: "My Dark Theme Clicker",
+                    clicksTitle: "Clicks:",
+                    cpsText: "Clicks per Second (CPS):",
+                    clickPowerText: "Click Power:",
+                    importButton: "Import",
+                    exportButton: "Export",
+                    changeImageButton: "Change Image",
+                    upgradesTitle: "Upgrades",
+                    cpsGeneratorsTab: "⏰ CPS Generators",
+                    clickPowerTab: "⚡ Click Power", /* Renommé */
+                    cost: "Cost:",
+                    level: "Level",
+                    autoClicker: "Auto-Clicker",
+                    superAutoClicker: "Super Auto-Clicker",
+                    megaAutoClicker: "Mega Auto-Clicker",
+                    gigabitAutoClicker: "Gigabit Auto-Clicker",
+                    terabitAutoClicker: "Terabit Auto-Clicker",
+                    quantumAutoClicker: "Quantum Auto-Clicker",
+                    infiniteLoop: "Infinite Loop",
+                    temporalManipulator: "Temporal Manipulator",
+                    realityBender: "Reality Bender",
+                    voidNexus: "Void Nexus",
+                    cosmicEngine: "Cosmic Engine",
+                    dimensionalFabricator: "Dimensional Fabricator",
+                    celestialForge: "Celestial Forge",
+                    omniAccelerator: "Omni-Accelerator",
+                    galacticConduit: "Galactic Conduit",
+                    universalHarmonizer: "Universal Harmonizer",
+                    creatorEngine: "Creator Engine",
+                    absoluteGenesis: "Absolute Genesis",
+                    cosmicSingularity: "Cosmic Singularity",
+                    infiniteParadigm: "Infinite Paradigm",
+                    divineAscension: "Divine Ascension",
+                    omegaTrigger: "Omega Trigger",
+                    primordialSpark: "Primordial Spark",
+                    voidFabric: "Void Fabric",
+                    celestialChrono: "Celestial Chrono",
+                    ethernalPulsar: "Eternal Pulsar",
+                    clickBooster: "Click Booster",
+                    powerGlove: "Power Glove",
+                    mechanicalFinger: "Mechanical Finger",
+                    cyberneticHand: "Cybernetic Hand",
+                    titanGrip: "Titan Grip",
+                    gravitonPress: "Graviton Press",
+                    blackHoleTouch: "Black Hole Touch",
+                    realityShatterer: "Reality Shatterer",
+                    cosmicImpact: "Cosmic Impact",
+                    voidPunch: "Void Punch",
+                    stellarFist: "Stellar Fist",
+                    galaxialStrike: "Galaxial Strike",
+                    infinitePower: "Infinite Power",
+                    divineMight: "Divine Might",
+                    cosmicForce: "Cosmic Force",
+                    genesisTouch: "Genesis Touch",
+                    creationFist: "Creation Fist",
+                    omegaStrike: "Omega Strike",
+                    primordialPunch: "Primordial Punch",
+                    ascendantBlow: "Ascendant Blow",
+                    ultimateForce: "Ultimate Force",
+                    infiniteStrike: "Infinite Strike",
+                    cosmicPunch: "Cosmic Punch",
+                    ethernalFist: "Eternal Fist",
+                    divineFury: "Divine Fury",
+                    exportSuccess: "Progress exported! 'clicker_save.json' downloaded.",
+                    importSuccess: "Progress imported successfully!",
+                    importError: "Error importing JSON file. The file might be corrupted or in the wrong format."
+                },
+                fr: {
+                    pageTitle: "Mon Clicker Thème Sombre",
+                    clicksTitle: "Clics:",
+                    cpsText: "Clics par Seconde (CPS):",
+                    clickPowerText: "Puissance de Clic:",
+                    importButton: "Importer",
+                    exportButton: "Exporter",
+                    changeImageButton: "Changer l'image",
+                    upgradesTitle: "Améliorations",
+                    cpsGeneratorsTab: "⏰ Générateurs de CPS",
+                    clickPowerTab: "⚡ Puissance de Clic", /* Renommé */
+                    cost: "Coût:",
+                    level: "Niv.",
+                    autoClicker: "Auto-Clicker",
+                    superAutoClicker: "Super Auto-Clicker",
+                    megaAutoClicker: "Mega Auto-Clicker",
+                    gigabitAutoClicker: "Gigabit Auto-Clicker",
+                    terabitAutoClicker: "Terabit Auto-Clicker",
+                    quantumAutoClicker: "Quantum Auto-Clicker",
+                    infiniteLoop: "Boucle Infinie",
+                    temporalManipulator: "Manipulateur Temporel",
+                    realityBender: "Cintreur de Réalité",
+                    voidNexus: "Nexus du Vide",
+                    cosmicEngine: "Moteur Cosmique",
+                    dimensionalFabricator: "Fabricateur Dimensionnel",
+                    celestialForge: "Forge Céleste",
+                    omniAccelerator: "Omni-Accélérateur",
+                    galacticConduit: "Conduit Galactique",
+                    universalHarmonizer: "Harmoniseur Universel",
+                    creatorEngine: "Moteur du Créateur",
+                    absoluteGenesis: "Genèse Absolue",
+                    cosmicSingularity: "Singularité Cosmique",
+                    infiniteParadigm: "Paradigme Infini",
+                    divineAscension: "Ascension Divine",
+                    omegaTrigger: "Déclencheur Oméga",
+                    primordialSpark: "Étincelle Primordiale",
+                    voidFabric: "Tissu du Vide",
+                    celestialChrono: "Chronomètre Céleste",
+                    ethernalPulsar: "Pulsar Éternel",
+                    clickBooster: "Booster de Clics",
+                    powerGlove: "Gant de Puissance",
+                    mechanicalFinger: "Doigt Mécanique",
+                    cyberneticHand: "Main Cybernétique",
+                    titanGrip: "Poigne de Titan",
+                    gravitonPress: "Presse à Gravitons",
+                    blackHoleTouch: "Toucher Trou Noir",
+                    realityShatterer: "Briseur de Réalité",
+                    cosmicImpact: "Impact Cosmique",
+                    voidPunch: "Coup du Vide",
+                    stellarFist: "Poing Stellaire",
+                    galaxialStrike: "Frappe Galactique",
+                    infinitePower: "Puissance Infinie",
+                    divineMight: "Puissance Divine",
+                    cosmicForce: "Force Cosmique",
+                    genesisTouch: "Toucher de la Genèse",
+                    creationFist: "Poing de la Création",
+                    omegaStrike: "Frappe Oméga",
+                    primordialPunch: "Coup Primordial",
+                    ascendantBlow: "Frappe Ascendante",
+                    ultimateForce: "Force Ultime",
+                    infiniteStrike: "Frappe Infinie",
+                    cosmicPunch: "Coup Cosmique",
+                    ethernalFist: "Poing Éternel",
+                    divineFury: "Fureur Divine",
+                    exportSuccess: "Progression exportée ! Fichier 'clicker_save.json' téléchargé.",
+                    importSuccess: "Progression importée avec succès !",
+                    importError: "Erreur lors de l'importation du fichier JSON. Le fichier est peut-être corrompu ou au mauvais format."
+                }
+            };
+
+            let currentLanguage = 'en'; // Langue par défaut
+
+            // Initialisation des boutons et des affichages
             for (const key in upgrades) {
-                gameData.upgrades[key] = upgrades[key].level;
+                const upgrade = upgrades[key];
+                const buttonElement = document.getElementById(`buy-${key}`);
+                const costDisplayElement = document.getElementById(`cost-${key}`);
+                const levelDisplayElement = document.getElementById(`level-${key}`);
+
+                if (buttonElement && costDisplayElement && levelDisplayElement) {
+                    upgradeButtons[key] = {
+                        button: buttonElement,
+                        costDisplay: costDisplayElement,
+                        levelDisplay: levelDisplayElement
+                    };
+                    // Ajouter l'écouteur d'événement
+                    buttonElement.addEventListener('click', () => buyUpgrade(key));
+                } else {
+                    // Avertissement plus spécifique si un élément HTML est manquant
+                    console.warn(`Élément HTML manquant pour l'amélioration '${key}'. Vérifiez les IDs: buy-${key}, cost-${key}, level-${key}`);
+                }
             }
 
-            const jsonString = JSON.stringify(gameData, null, 2);
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'clicker_save.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert("Progression exportée ! Fichier 'clicker_save.json' téléchargé.");
-        }
+            // --- Fonctions du Jeu ---
 
-        function importGame() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-
-            input.onchange = e => {
-                const file = e.target.files[0];
-                if (!file) {
-                    return;
+            // Fonction pour formater les grands nombres (ex: 1234567 -> 1.23M)
+            function formatNumber(num) {
+                if (num < 1000000) { // Nombres inférieurs à 1 million
+                    return Math.floor(num).toString();
                 }
+                if (num >= 1e21) return (num / 1e21).toFixed(2) + ' Sext.'; // Sextillions
+                if (num >= 1e18) return (num / 1e18).toFixed(2) + ' Quint.'; // Quintillions
+                if (num >= 1e15) return (num / 1e15).toFixed(2) + ' T.';   // Trillions
+                if (num >= 1e9) return (num / 1e9).toFixed(2) + ' B.';   // Billions (milliards)
+                if (num >= 1e6) return (num / 1e6).toFixed(2) + ' M.';   // Millions
+                return num.toString(); // Fallback pour les nombres très petits ou inattendus
+            }
 
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        clicks = importedData.clicks || 0;
-                        
-                        for (const key in upgrades) {
-                            if (importedData.upgrades && importedData.upgrades[key] !== undefined) {
-                                upgrades[key].level = importedData.upgrades[key];
-                            } else {
-                                upgrades[key].level = 0;
-                            }
-                        }
-
-                        // Charge l'index de l'image si présent, sinon utilise la première
-                        if (importedData.currentImageIndex !== undefined) {
-                            currentImageIndex = importedData.currentImageIndex;
-                            mainButton.src = imageUrls[currentImageIndex];
-                        }
-                        
-                        updateDisplay();
-                        alert("Progression importée avec succès !");
-
-                    } catch (e) {
-                        alert("Erreur lors de l'importation du fichier JSON. Le fichier est peut-être corrompu ou au mauvais format.");
-                        console.error("Erreur JSON:", e);
+            // Fonction pour calculer le CPS total
+            function calculateTotalCps() {
+                let currentCps = 0; // Calculer le CPS de base
+                // Ajouter le CPS de chaque générateur
+                for (const key in upgrades) {
+                    const upgrade = upgrades[key];
+                    if (upgrade.type === 'cps') {
+                        currentCps += upgrade.baseEffect * upgrade.level;
                     }
+                }
+                totalCps = currentCps; // Mettre à jour la variable globale totalCps
+            }
+
+            // Fonction pour recalculer la puissance de clic totale
+            function recalculateClickPower() {
+                let currentPower = baseClickPower; // Commence avec la puissance de clic de base
+                for (const key in upgrades) {
+                    const upgrade = upgrades[key];
+                    if (upgrade.type === 'click_power') {
+                        // Pour chaque niveau d'amélioration de click_power, on ajoute son effet de base
+                        currentPower += upgrade.baseEffect * upgrade.level; 
+                    }
+                }
+                return currentPower; // Renvoie la puissance de clic calculée
+            }
+
+            // Fonction pour mettre à jour l'affichage et l'état des boutons
+            function updateDisplay() {
+                clicksDisplay.textContent = formatNumber(clicks);
+                calculateTotalCps(); // Recalcule le CPS avant l'affichage
+                cpsDisplay.textContent = totalCps.toFixed(2); // Affiche le CPS avec 2 décimales
+                clickPowerDisplay.textContent = formatNumber(recalculateClickPower()); // Recalcule et affiche la puissance de clic
+
+                // Mettre à jour les coûts affichés et l'état des boutons
+                for (const key in upgrades) {
+                    const upgrade = upgrades[key];
+                    // Calcule le coût actuel basé sur le niveau de l'amélioration
+                    const currentCost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
+                    
+                    // Mettre à jour le texte du bouton et le niveau
+                    if (upgradeButtons[key]) { // Vérifiez que l'élément HTML existe
+                        upgradeButtons[key].costDisplay.textContent = formatNumber(currentCost);
+                        upgradeButtons[key].levelDisplay.textContent = upgrade.level;
+                        upgradeButtons[key].button.disabled = clicks < currentCost;
+                    }
+                }
+            }
+
+            // Fonction de traduction
+            function updateLanguage(lang) {
+                currentLanguage = lang;
+                const t = translations[lang];
+
+                document.title = t.pageTitle;
+                // Met à jour les libellés de texte sans recréer les spans de valeur
+                clicksTitle.textContent = t.clicksTitle;
+                cpsText.textContent = t.cpsText;
+                clickPowerText.textContent = t.clickPowerText;
+
+                // Assurez-vous que les valeurs numériques sont également mises à jour
+                clicksDisplay.textContent = formatNumber(clicks);
+                cpsDisplay.textContent = totalCps.toFixed(2);
+                clickPowerDisplay.textContent = formatNumber(recalculateClickPower());
+                
+                document.getElementById('import-button').textContent = t.importButton;
+                document.getElementById('export-button').textContent = t.exportButton;
+                document.getElementById('change-image-button').textContent = t.changeImageButton;
+                document.querySelector('.upgrade-menu h2').textContent = t.upgradesTitle;
+                
+                // Mise à jour du texte des boutons d'onglet
+                cpsTabButton.textContent = t.cpsGeneratorsTab;
+                clickPowerTabButton.textContent = t.clickPowerTab;
+
+                // Mise à jour du texte des boutons d'amélioration
+                for (const key in upgrades) {
+                    const upgrade = upgrades[key];
+                    if (upgradeButtons[key]) {
+                        const buttonElement = upgradeButtons[key].button;
+                        // Obtenez la référence au nouveau span pour le texte principal
+                        const mainTextSpan = buttonElement.querySelector('.upgrade-main-text');
+                        const costDisplayElement = upgradeButtons[key].costDisplay; 
+                        const levelDisplayElement = upgradeButtons[key].levelDisplay;
+
+                        const upgradeNameKey = key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+                        const translatedName = t[upgradeNameKey];
+
+                        if (mainTextSpan && translatedName && costDisplayElement && levelDisplayElement) {
+                            // Mettre à jour le texte principal du bouton
+                            mainTextSpan.textContent = `${upgrade.emoji} ${translatedName}`;
+                            // Mettre à jour le niveau et le coût (ces références sont déjà valides)
+                            levelDisplayElement.textContent = upgrade.level;
+                            costDisplayElement.textContent = formatNumber(Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level)));
+                        } else {
+                            console.warn(`Problème de traduction ou élément de bouton manquant pour l'amélioration '${key}' lors de la mise à jour de la langue.`);
+                        }
+                    } else {
+                        console.warn(`L'objet upgradeButtons pour l'amélioration '${key}' est indéfini lors de la mise à jour de la langue.`);
+                    }
+                }
+
+                // Mise à jour du drapeau sur le bouton de langue
+                const langButtonImg = languageButton.querySelector('img');
+                if (lang === 'en') {
+                    // Si la langue actuelle est l'anglais, affiche le drapeau français pour indiquer le changement possible
+                    langButtonImg.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+                } else {
+                    // Si la langue actuelle est le français, affiche le drapeau anglais pour indiquer le changement possible
+                    langButtonImg.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+                }
+            }
+
+            // Fonction pour afficher l'onglet sélectionné
+            function showTab(tabId) {
+                // Cacher tous les contenus d'onglets
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                // Désactiver tous les boutons d'onglets
+                document.querySelectorAll('.tab-buttons button').forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                // Afficher le contenu de l'onglet sélectionné
+                document.getElementById(tabId).classList.add('active');
+                // Activer le bouton de l'onglet sélectionné
+                document.getElementById(tabId.replace('-content', '-button')).classList.add('active');
+            }
+
+            // Fonction quand le bouton principal est cliqué
+            function clickMainButton() {
+                clicks += recalculateClickPower(); // Utilise la puissance de clic actuelle
+                updateDisplay();
+            }
+
+            // Fonction pour ajouter 1000 clics (pour la touche M)
+            function addTestClicks() {
+                clicks += 1000;
+                updateDisplay();
+            }
+
+            // Fonction pour acheter une amélioration générique
+            function buyUpgrade(upgradeKey) {
+                const upgrade = upgrades[upgradeKey];
+                const currentCost = Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, upgrade.level));
+
+                if (clicks >= currentCost) {
+                    clicks -= currentCost;
+                    upgrade.level++; // Augmente le niveau de l'amélioration
+                    updateDisplay(); // Met à jour l'affichage après l'achat
+
+                    // Animation d'amélioration
+                    const buttonElement = upgradeButtons[upgradeKey].button;
+                    buttonElement.classList.add('upgraded');
+                    setTimeout(() => {
+                        buttonElement.classList.remove('upgraded');
+                    }, 500); // La durée de l'animation CSS
+                } else {
+                    // Pas besoin d'alerte, le bouton est désactivé si pas assez de clicks
+                }
+            }
+
+            // Logique des clicks automatiques
+            function applyAutoClicks() {
+                clicks += totalCps / 10; // Divisé par 10 car l'intervalle est de 100ms (1 seconde / 100ms = 10)
+                updateDisplay(); // Met à jour l'affichage régulièrement
+            }
+
+            // --- Fonctions de Sauvegarde / Chargement ---
+
+            function exportGame() {
+                const gameData = {
+                    clicks: clicks,
+                    upgrades: {},
+                    currentImageIndex: currentImageIndex,
+                    currentLanguage: currentLanguage // Sauvegarde la langue actuelle
                 };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
 
-        // --- Fonctions de changement d'image principale ---
-        function changeMainImage() {
-            currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
-            mainButton.src = imageUrls[currentImageIndex];
-        }
+                for (const key in upgrades) {
+                    gameData.upgrades[key] = upgrades[key].level;
+                }
 
-        // Associer les fonctions aux boutons
-        exportButton.addEventListener('click', exportGame);
-        importButton.addEventListener('click', importGame);
-        changeImageButton.addEventListener('click', changeMainImage); 
-
-        // --- Gestion des Clics Souris et Clavier ---
-        mainButton.addEventListener('click', clickMainButton);
-
-        // Écouteur d'événement keyup pour la touche Espace (un clic par appui)
-        document.addEventListener('keyup', (event) => {
-            if (event.code === 'Space') {
-                event.preventDefault(); // Empêche le comportement par défaut (ex: défilement)
-                clickMainButton(); // Déclenche un seul clic
+                const jsonString = JSON.stringify(gameData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'clicker_save.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
             }
-        });
 
-        // NOUVEL Écouteur d'événement keydown pour la touche M (ajouts rapides en maintenant)
-        document.addEventListener('keydown', (event) => {
-            if (event.code === 'KeyM') { // 'KeyM' correspond à la touche 'M'
-                event.preventDefault(); // Empêche le comportement par défaut (ex: défilement si 'M' avait une action)
-                addTestClicks(); // Ajoute 1000 clics
+            function importGame() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        try {
+                            const importedData = JSON.parse(event.target.result);
+                            clicks = importedData.clicks || 0;
+                            
+                            for (const key in upgrades) {
+                                if (importedData.upgrades && importedData.upgrades[key] !== undefined) {
+                                    upgrades[key].level = importedData.upgrades[key];
+                                } else {
+                                    upgrades[key].level = 0;
+                                }
+                            }
+
+                            // Charge l'index de l'image si présent, sinon utilise la première
+                            if (importedData.currentImageIndex !== undefined) {
+                                currentImageIndex = importedData.currentImageIndex;
+                                mainButton.src = imageUrls[currentImageIndex];
+                            }
+
+                            // Charge la langue si présente
+                            if (importedData.currentLanguage !== undefined) {
+                                currentLanguage = importedData.currentLanguage;
+                                updateLanguage(currentLanguage); // Met à jour la langue après le chargement
+                            }
+                            
+                            updateDisplay();
+
+                        } catch (e) {
+                            console.error("Erreur JSON:", e);
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
             }
-        });
 
-        // --- Initialisation du Jeu ---
+            // --- Fonctions de changement d'image principale ---
+            function changeMainImage() {
+                currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
+                mainButton.src = imageUrls[currentImageIndex];
+            }
 
-        // Définit un intervalle pour les auto-clicks (toutes les 100 millisecondes pour des mises à jour fluides)
-        setInterval(applyAutoClicks, 100);
+            // Associer les fonctions aux boutons
+            exportButton.addEventListener('click', exportGame);
+            importButton.addEventListener('click', importGame);
+            changeImageButton.addEventListener('click', changeMainImage); 
+            languageButton.addEventListener('click', () => {
+                if (currentLanguage === 'en') {
+                    updateLanguage('fr');
+                } else {
+                    updateLanguage('en');
+                }
+            });
 
-        // Mise à jour initiale de l'affichage et de l'état des boutons
-        updateDisplay();
+            // Gestion des clics sur les onglets
+            cpsTabButton.addEventListener('click', () => showTab('cps-tab-content'));
+            clickPowerTabButton.addEventListener('click', () => showTab('click-power-tab-content'));
+
+            // --- Gestion des Clics Souris et Clavier ---
+            mainButton.addEventListener('click', clickMainButton);
+
+            // Écouteur d'événement keyup pour la touche Espace (un clic par appui)
+            document.addEventListener('keyup', (event) => {
+                if (event.code === 'Space') {
+                    event.preventDefault(); // Empêche le comportement par défaut (ex: défilement)
+                    clickMainButton(); // Déclenche un seul clic
+                }
+            });
+
+            // NOUVEL Écouteur d'événement keydown pour la touche M (ajouts rapides en maintenant)
+            document.addEventListener('keydown', (event) => {
+                if (event.code === 'KeyM') { // 'KeyM' correspond à la touche 'M'
+                    event.preventDefault(); // Empêche le comportement par défaut (ex: défilement si 'M' avait une action)
+                    addTestClicks(); // Ajoute 1000 clics
+                }
+            });
+
+            // --- Initialisation du Jeu ---
+
+            // Définit un intervalle pour les auto-clicks (toutes les 100 millisecondes pour des mises à jour fluides)
+            setInterval(applyAutoClicks, 100);
+
+            // Mise à jour initiale de l'affichage et de l'état des boutons
+            updateDisplay();
+            // Mettre à jour la langue au démarrage (par défaut en anglais)
+            updateLanguage(currentLanguage);
+            // Afficher le premier onglet par défaut
+            showTab('cps-tab-content');
+        }); // Fin de DOMContentLoaded
     </script>
 </body>
 </html>
+�
