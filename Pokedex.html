@@ -239,7 +239,13 @@
         }
         
         .collection-card .card-icons .icon.shiny-text {
-            font-size: 1rem; /* TAILLE AJUSTÉE ICI */
+            /* TAILLE ET ALIGNEMENT AJUSTÉS ICI */
+            font-size: 16px; /* Taille fixe pour correspondre aux images */
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: gold;
             text-shadow: 0 0 3px rgba(255,255,0,0.8);
         }
@@ -521,7 +527,7 @@
 
         hr {
             border: 0;
-            border-top: 1px solid var(--border-color);
+            border-top: 1.5px solid var(--border-color); /* Ligne plus épaisse */
             margin: 40px 0;
         }
 
@@ -596,7 +602,13 @@
         }
 
         .pokemon-card .card-icons .icon.shiny-text {
-            font-size: 1rem;
+            /* TAILLE ET ALIGNEMENT AJUSTÉS ICI */
+            font-size: 16px; /* Taille fixe pour correspondre aux images */
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: gold;
             text-shadow: 0 0 3px rgba(255,255,0,0.8);
         }
@@ -1106,8 +1118,8 @@
                 card.className = 'collection-card';
                 card.innerHTML = `
                     <div class="card-icons">
-                        ${pokemon.isFavorite ? `<img src="${iconUrls.favorite}" alt="Favori" class="icon">` : ''}
                         ${pokemon.isShiny ? `<span class="icon shiny-text">✨</span>` : ''}
+                        ${pokemon.isFavorite ? `<img src="${iconUrls.favorite}" alt="Favori" class="icon">` : ''}
                         ${pokemon.isXXS ? `<img src="${iconUrls.xxs}" alt="XXS" class="icon">` : ''}
                         ${pokemon.isXXL ? `<img src="${iconUrls.xxl}" alt="XXL" class="icon">` : ''}
                         ${pokemon.isMighty ? `<img src="${iconUrls.mighty}" alt="Mighty" class="icon">` : ''}
@@ -1507,8 +1519,8 @@
                         card.innerHTML = `
                             <button class="delete-card-button" onclick="event.stopPropagation(); deletePokemon(${pokemon.id});">&times;</button>
                             <div class="card-icons">
-                                ${pokemon.isFavorite ? `<img src="${iconUrls.favorite}" alt="Favori" class="icon">` : ''}
                                 ${pokemon.isShiny ? `<span class="icon shiny-text">✨</span>` : ''}
+                                ${pokemon.isFavorite ? `<img src="${iconUrls.favorite}" alt="Favori" class="icon">` : ''}
                                 ${pokemon.isXXS ? `<img src="${iconUrls.xxs}" alt="XXS" class="icon">` : ''}
                                 ${pokemon.isXXL ? `<img src="${iconUrls.xxl}" alt="XXL" class="icon">` : ''}
                                 ${pokemon.isMighty ? `<img src="${iconUrls.mighty}" alt="Mighty" class="icon">` : ''}
