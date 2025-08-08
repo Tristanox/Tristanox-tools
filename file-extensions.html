@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Répertoire des Extensions de Fichiers</title>
+    <title>File Extensions Directory</title>
     <style>
         /* --- Palette de Couleurs ---
         #424549 - Gris moyen (pour les descriptions)
@@ -84,6 +84,33 @@
             background-color: #218838; /* Vert plus foncé au survol */
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        /* --- Bouton de langue --- */
+        #lang-switch-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        #lang-switch-btn img {
+            width: 40px; /* Taille du drapeau */
+            height: 40px;
+            border-radius: 50%; /* Pour un bouton rond */
+            border: 2px solid #559fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        #lang-switch-btn img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(85, 159, 255, 0.4);
+        }
+        
+        .top-controls-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         /* --- Conteneur principal des extensions --- */
@@ -318,15 +345,20 @@
 </head>
 <body>
 
-    <h1>Répertoire des Extensions de Fichiers</h1>
+    <h1 id="mainTitle">File Extensions Directory</h1>
 
     <div class="top-controls">
-        <input type="text" id="searchInput" placeholder="Rechercher une extension ou une description..." onkeyup="filterExtensions()">
-        <button class="download-all-button" onclick="showDownloadWarning()">Télécharger tous les fichiers</button>
+        <input type="text" id="searchInput" placeholder="Search for an extension or description..." onkeyup="filterExtensions()">
+        <div class="top-controls-group">
+            <button class="download-all-button" id="downloadAllBtn" onclick="showDownloadWarning()">Download All Files</button>
+            <button id="lang-switch-btn" onclick="switchLanguage()">
+                <img id="lang-flag" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" alt="French Flag">
+            </button>
+        </div>
     </div>
 
     <div class="extensions-grid" id="extensionsGrid">
-        </div>
+    </div>
 
     <div id="softwareModalOverlay" class="modal-overlay">
         <div class="modal-content">
@@ -338,14 +370,14 @@
 
     <div id="downloadWarningModalOverlay" class="modal-overlay warning-modal-overlay">
         <div class="warning-modal-content">
-            <h2>Confirmation de téléchargement</h2>
-            <p>Vous êtes sur le point de télécharger un fichier ZIP contenant un fichier vide pour chaque extension listée sur cette page.</p>
-            <p>Nombre de fichiers : <span id="numExtensions"></span></p>
-            <p>Taille estimée du fichier ZIP : <span id="estimatedSize"></span></p>
-            <p>Confirmez-vous le téléchargement ?</p>
+            <h2 id="downloadWarningTitle">Download Confirmation</h2>
+            <p id="downloadWarningText1">You are about to download a ZIP file containing an empty file for each extension listed on this page.</p>
+            <p><span id="downloadWarningText2">Number of files:</span> <span id="numExtensions"></span></p>
+            <p><span id="downloadWarningText3">Estimated ZIP file size:</span> <span id="estimatedSize"></span></p>
+            <p id="downloadWarningText4">Do you confirm the download?</p>
             <div class="buttons">
-                <button class="confirm-button" onclick="confirmDownload()">Confirmer</button>
-                <button class="cancel-button" onclick="closeDownloadWarning()">Annuler</button>
+                <button class="confirm-button" id="confirmDownloadBtn" onclick="confirmDownload()">Confirm</button>
+                <button class="cancel-button" id="cancelDownloadBtn" onclick="closeDownloadWarning()">Cancel</button>
             </div>
         </div>
     </div>
@@ -353,32 +385,70 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
-        // --- JavaScript pour gérer les données et l'affichage ---
+        let allExtensions = []; // This will hold the raw data as fetched from the JSON
+        let currentLanguage = 'en'; // Default language: English
 
-        let allExtensions = []; // Déclare allExtensions globalement pour être accessible après le fetch
+        const translations = {
+            en: {
+                mainTitle: "File Extensions Directory",
+                searchInputPlaceholder: "Search for an extension or description...",
+                downloadAllBtn: "Download All Files",
+                noResults: "No extensions found.",
+                downloadBtn: "Download",
+                softwareModalTitlePrefix: "Software for ",
+                noCommonSoftware: "No common software listed for this extension.",
+                downloadWarningTitle: "Download Confirmation",
+                downloadWarningText1: "You are about to download a ZIP file containing an empty file for each extension listed on this page.",
+                downloadWarningText2: "Number of files:",
+                downloadWarningText3: "Estimated ZIP file size:",
+                downloadWarningText4: "Do you confirm the download?",
+                confirmDownloadBtn: "Confirm",
+                cancelDownloadBtn: "Cancel",
+                filenamePrefix: "file"
+            },
+            fr: {
+                mainTitle: "Répertoire des Extensions de Fichiers",
+                searchInputPlaceholder: "Rechercher une extension ou une description...",
+                downloadAllBtn: "Télécharger tous les fichiers",
+                noResults: "Aucune extension trouvée.",
+                downloadBtn: "Télécharger",
+                softwareModalTitlePrefix: "Logiciels pour ",
+                noCommonSoftware: "Aucun logiciel commun répertorié pour cette extension.",
+                downloadWarningTitle: "Confirmation de téléchargement",
+                downloadWarningText1: "Vous êtes sur le point de télécharger un fichier ZIP contenant un fichier vide pour chaque extension listée sur cette page.",
+                downloadWarningText2: "Nombre de fichiers:",
+                downloadWarningText3: "Taille estimée du fichier ZIP:",
+                downloadWarningText4: "Confirmez-vous le téléchargement ?",
+                confirmDownloadBtn: "Confirmer",
+                cancelDownloadBtn: "Annuler",
+                filenamePrefix: "fichier"
+            }
+        };
 
-        // Fonction pour générer une couleur saturée aléatoire (HSL)
+        // No need for a separate 'extensionData' object with 'en' and 'fr' sub-properties
+        // 'allExtensions' will hold the raw data, and we'll access language-specific parts directly.
+
         function getRandomSaturatedColor() {
-            const hue = Math.floor(Math.random() * 360); // Teinte (0-359)
-            const saturation = 70 + Math.floor(Math.random() * 30); // Saturation (70-100%)
-            const lightness = 40 + Math.floor(Math.random() * 20); // Luminosité (40-60%)
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = 70 + Math.floor(Math.random() * 30);
+            const lightness = 40 + Math.floor(Math.random() * 20);
             return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
         }
 
-        // Fonction pour afficher les extensions
         function displayExtensions(extensions) {
             const extensionsGrid = document.getElementById('extensionsGrid');
-            extensionsGrid.innerHTML = ''; // Nettoyer la grille existante
+            extensionsGrid.innerHTML = '';
 
+            const lang = currentLanguage;
             if (extensions.length === 0) {
-                extensionsGrid.innerHTML = '<p class="no-results">Aucune extension trouvée.</p>';
+                extensionsGrid.innerHTML = `<p class="no-results">${translations[lang].noResults}</p>`;
                 return;
             }
 
             extensions.forEach(extInfo => {
                 const item = document.createElement('div');
                 item.className = 'extension-item';
-                // Assurez-vous que les clés de extInfo correspondent à votre JSON réel
+                // Pass the whole 'logiciels communs' object, which has 'fr' and 'en' properties
                 item.onclick = () => showSoftwareModal(extInfo['nom d\'extension'], extInfo['logiciels communs']);
 
                 const ribbon = document.createElement('div');
@@ -388,10 +458,13 @@
 
                 const details = document.createElement('div');
                 details.className = 'extension-details';
+                // Access the language-specific description using the 'lang' variable
+                const descriptionText = extInfo.description[lang]; 
+                
                 details.innerHTML = `
                     <h3>${extInfo['nom d\'extension']}</h3>
-                    <p>${extInfo.description}</p>
-                    <a href="#" class="download-button" onclick="event.stopPropagation(); downloadSingleFile('${extInfo['nom d\'extension']}');">Télécharger</a>
+                    <p>${descriptionText}</p>
+                    <a href="#" class="download-button" onclick="event.stopPropagation(); downloadSingleFile('${extInfo['nom d\'extension']}');">${translations[lang].downloadBtn}</a>
                 `;
 
                 item.appendChild(ribbon);
@@ -400,29 +473,35 @@
             });
         }
 
-        // Fonction pour filtrer les extensions
         function filterExtensions() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const lang = currentLanguage;
+            // Filter using the 'allExtensions' array directly
             const filteredExtensions = allExtensions.filter(extInfo => {
-                // Assurez-vous que les clés de extInfo correspondent à votre JSON réel
                 const extName = extInfo['nom d\'extension'].toLowerCase();
-                const description = extInfo.description.toLowerCase();
-                const commonSoftware = extInfo['logiciels communs'] ? extInfo['logiciels communs'].map(s => s.toLowerCase()) : [];
+                // Access language-specific description for filtering, with a fallback for safety
+                const description = extInfo.description[lang] ? extInfo.description[lang].toLowerCase() : ''; 
+                // Access language-specific software list for filtering, with a fallback
+                const commonSoftware = extInfo['logiciels communs'][lang] ? extInfo['logiciels communs'][lang].map(s => s.toLowerCase()) : [];
+                const softwareText = commonSoftware.join(' ');
 
                 return extName.includes(searchTerm) ||
                        description.includes(searchTerm) ||
-                       commonSoftware.some(software => software.includes(searchTerm));
+                       softwareText.includes(searchTerm);
             });
             displayExtensions(filteredExtensions);
         }
 
-        // Fonctions pour le modal des logiciels
         const softwareModalOverlay = document.getElementById('softwareModalOverlay');
         const softwareModalTitle = document.getElementById('softwareModalTitle');
         const softwareList = document.getElementById('softwareList');
 
-        function showSoftwareModal(extensionName, softwareArray) {
-            softwareModalTitle.textContent = `Logiciels pour ${extensionName}`;
+        function showSoftwareModal(extensionName, softwareObj) {
+            const lang = currentLanguage;
+            // Access the correct language array from the passed 'softwareObj'
+            const softwareArray = softwareObj[lang]; 
+
+            softwareModalTitle.textContent = `${translations[lang].softwareModalTitlePrefix}${extensionName}`;
             softwareList.innerHTML = '';
             if (softwareArray && softwareArray.length > 0) {
                 softwareArray.forEach(software => {
@@ -432,24 +511,23 @@
                 });
             } else {
                 const listItem = document.createElement('li');
-                listItem.textContent = "Aucun logiciel commun répertorié pour cette extension.";
+                listItem.textContent = translations[lang].noCommonSoftware;
                 softwareList.appendChild(listItem);
             }
 
             softwareModalOverlay.classList.add('visible');
         }
 
-        // Fonction pour fermer la modale des logiciels
         function closeSoftwareModal() {
             softwareModalOverlay.classList.remove('visible');
         }
 
-        // --- Nouvelle fonction pour télécharger un seul fichier ---
         function downloadSingleFile(extensionName) {
-            const filename = `file${extensionName}`; // Ex: "file.psd"
-            const emptyFileContent = ''; // Contenu vide
+            const lang = currentLanguage;
+            const filename = `${translations[lang].filenamePrefix}${extensionName}`;
+            const emptyFileContent = '';
 
-            const blob = new Blob([emptyFileContent], { type: 'application/octet-stream' }); // Type MIME générique pour un fichier binaire
+            const blob = new Blob([emptyFileContent], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
@@ -458,17 +536,16 @@
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url); // Libérer l'URL objet de la mémoire
+            URL.revokeObjectURL(url);
         }
 
-        // Fonctions pour le modal d'avertissement de téléchargement (pour le bouton "Télécharger tous les fichiers")
         const downloadWarningModalOverlay = document.getElementById('downloadWarningModalOverlay');
 
         function showDownloadWarning() {
-            const numFiles = allExtensions.length;
-            // Estimation simple: environ 150 bytes par fichier vide + overhead du ZIP.
-            // C'est une estimation TRÈS grossière, mais donne un ordre de grandeur.
-            const estimatedSizeKB = (numFiles * 0.15) + (numFiles > 0 ? 50 : 0); // ~150 bytes/file + 50KB overhead
+            const lang = currentLanguage;
+            // 'allExtensions' holds the data for the number of files
+            const numFiles = allExtensions.length; 
+            const estimatedSizeKB = (numFiles * 0.15) + (numFiles > 0 ? 50 : 0);
 
             let sizeText = "";
             if (estimatedSizeKB < 1024) {
@@ -479,6 +556,14 @@
 
             document.getElementById('numExtensions').textContent = numFiles;
             document.getElementById('estimatedSize').textContent = sizeText;
+            document.getElementById('downloadWarningTitle').textContent = translations[lang].downloadWarningTitle;
+            document.getElementById('downloadWarningText1').textContent = translations[lang].downloadWarningText1;
+            document.getElementById('downloadWarningText2').textContent = translations[lang].downloadWarningText2 + " ";
+            document.getElementById('downloadWarningText3').textContent = translations[lang].downloadWarningText3 + " ";
+            document.getElementById('downloadWarningText4').textContent = translations[lang].downloadWarningText4;
+            document.getElementById('confirmDownloadBtn').textContent = translations[lang].confirmDownloadBtn;
+            document.getElementById('cancelDownloadBtn').textContent = translations[lang].cancelDownloadBtn;
+
             downloadWarningModalOverlay.classList.add('visible');
         }
 
@@ -490,19 +575,17 @@
             closeDownloadWarning();
 
             const zip = new JSZip();
+            const lang = currentLanguage;
             const zipFileName = 'extensions.zip';
-            const emptyFileContent = ''; // Contenu vide pour les fichiers
+            const emptyFileContent = '';
 
             allExtensions.forEach(extInfo => {
-                // Utilisez la clé exacte de votre JSON, par ex. "nom d'extension"
-                const filename = `file${extInfo['nom d\'extension']}`; // Ex: file.TXT, file.PDF
+                const filename = `${translations[lang].filenamePrefix}${extInfo['nom d\'extension']}`;
                 zip.file(filename, emptyFileContent);
             });
 
-            // Générer le fichier ZIP
             zip.generateAsync({ type: "blob" })
                 .then(function(content) {
-                    // Créer un lien de téléchargement et le déclencher
                     const url = URL.createObjectURL(content);
                     const a = document.createElement('a');
                     a.href = url;
@@ -510,7 +593,7 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-                    URL.revokeObjectURL(url); // Libérer la mémoire de l'URL objet
+                    URL.revokeObjectURL(url);
 
                     console.log("Fichier ZIP créé et téléchargé avec succès !");
                 })
@@ -519,8 +602,34 @@
                     alert("Une erreur est survenue lors de la création du fichier ZIP. Veuillez réessayer.");
                 });
         }
+        
+        function updateUI() {
+            const lang = currentLanguage;
+            document.getElementById('mainTitle').textContent = translations[lang].mainTitle;
+            document.getElementById('searchInput').placeholder = translations[lang].searchInputPlaceholder;
+            document.getElementById('downloadAllBtn').textContent = translations[lang].downloadAllBtn;
+            document.getElementById('downloadWarningText2').textContent = translations[lang].downloadWarningText2 + " ";
+            document.getElementById('downloadWarningText3').textContent = translations[lang].downloadWarningText3 + " ";
 
-        // Afficher toutes les extensions au chargement de la page
+            const langFlag = document.getElementById('lang-flag');
+            if (lang === 'fr') {
+                langFlag.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png';
+                langFlag.alt = 'English Flag';
+            } else {
+                langFlag.src = 'https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png';
+                langFlag.alt = 'French Flag';
+            }
+
+            // Always display extensions from the main 'allExtensions' array
+            displayExtensions(allExtensions);
+            filterExtensions(); // Re-filter the displayed extensions based on current language and search term
+        }
+
+        function switchLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'fr' : 'en';
+            updateUI();
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             fetch('https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/extension-data.json')
                 .then(response => {
@@ -530,9 +639,14 @@
                     return response.json();
                 })
                 .then(data => {
-                    // Les données sont directement utilisables si elles ont "nom d'extension", "description", "logiciels communs"
-                    allExtensions = data;
-                    displayExtensions(allExtensions);
+                    // Directly store the fetched data into allExtensions.
+                    // This data already has the nested 'description' and 'logiciels communs' objects.
+                    allExtensions = data; 
+                    
+                    // No need to create separate 'extensionData.fr' and 'extensionData.en' arrays that flatten the data.
+                    // We will work directly with 'allExtensions' and 'currentLanguage' to access the nested properties.
+
+                    updateUI(); // Display the UI in the default language (English)
                 })
                 .catch(error => {
                     console.error('There has been a problem with your fetch operation:', error);
