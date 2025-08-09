@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scroll Through a Lifetime</title>
+    <script src="https://unpkg.com/gsap@3.12.2/dist/gsap.min.js"></script>
+    <script src="https://unpkg.com/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        scroll-behavior: smooth;
+        background: linear-gradient(to bottom, #e0f7fa, #fffde7, #ede7f6);
+        scroll-snap-type: y mandatory;
+      }
+      .year-section {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        scroll-snap-align: start;
+        overflow: hidden;
+      }
+      .year-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 110%;
+        background: inherit;
+        background-size: cover;
+        background-position: center;
+        filter: blur(3px);
+        transform: translateY(-5%);
+        z-index: 1;
+      }
+      .year-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(59, 59, 59, 0.3);
+        z-index: 2;
+      }
+      .year-section > * {
+        z-index: 10;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .timeline-container {
+        position: fixed;
+        top: 0;
+        right: 1rem; /* Réduit pour les mobiles */
+        height: 100vh;
+        width: 1rem;
+        display: flex;
+        align-items: center;
+        z-index: 50;
+      }
+      @media (min-width: 768px) {
+        .timeline-container {
+          right: 3rem; /* Augmenté pour les ordinateurs */
+        }
+      }
+      .timeline-bar {
+        width: 6px;
+        height: 80%;
+        background: linear-gradient(to bottom, #6ae1ff, #6aff8b, #facc15, #ff954f);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 9999px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .year-indicator {
+        position: absolute;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        font-size: 0.75rem;
+      }
+      .go-top {
+        position: fixed;
+        bottom: 2rem;
+        right: 1rem; /* Réduit pour les mobiles */
+        background: #1f2937;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        cursor: pointer;
+        z-index: 50;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s;
+      }
+      .go-top:hover {
+        background: #374151;
+      }
+      @media (min-width: 768px) {
+        .go-top {
+          right: 2rem; /* Augmenté pour les ordinateurs */
+        }
+      }
+      audio {
+        display: none;
+      }
+      .quote-text {
+        font-family: 'Playfair Display', serif;
+        font-style: normal;
+        text-align: center;
+        color: white;
+        font-size: 1.5rem;
+        line-height: 2rem;
+        margin-top: 2rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+      .fact-text {
+        font-size: 1rem; /* Taille de base pour mobile */
+        text-align: center;
+        color: white;
+        max-width: 40rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+      .year-title {
+        font-size: 4rem; /* Taille de base pour mobile */
+        font-weight: bold;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+      }
+      .glow-text {
+        text-shadow: 0 0 3px #fff, 0 0 5px #fff;
+        font-size: 1.25rem;
+        margin-top: 1rem;
+      }
+      .life-lesson-bottom {
+        position: absolute;
+        bottom: 5vh;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 40rem;
+        text-align: center;
+      }
+      #welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        z-index: 100;
+        transition: opacity 1s ease-in-out;
+      }
+      #welcome-screen h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 4rem;
+        color: white;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+      #start-button {
+        background-color: #21cbd1;
+        border: none;
+        border-radius: 9999px;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        margin-top: 2rem;
+      }
+      #start-button:hover {
+        background-color: #128b8f;
+        transform: scale(1.1);
+        color: rgb(226, 226, 226);
+      }
+      @media (min-width: 768px) {
+        .year-title {
+            font-size: 2.5rem;
+        }
+        .quote-text {
+            font-size: 2rem;
+        }
+        .fact-text {
+            font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white text-white font-sans">
+    <div id="welcome-screen">
+      <img src="https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/Logo-STAL.png" alt="Logo Scroll Through a Lifetime" class="w-3/4 max-w-xl md:max-w-2xl max-h-1/2 transition-transform duration-300 transform hover:scale-105" />
+      <button id="start-button" onclick="startGame()" class="py-3 px-6 text-lg font-bold text-white md:py-4 md:px-8 md:text-xl">Commencer</button>
+    </div>
+
+    <div class="timeline-container">
+      <div class="timeline-bar"></div>
+      <div id="year-indicator" class="year-indicator">0 ans</div>
+    </div>
+    <div class="go-top" onclick="scrollToTop()">Revivre la vie</div>
+    <audio id="sound-player" loop></audio>
+
+    <div id="container">
+    </div>
+
+    <script>
+      const sounds = {
+        baby: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_41639e622a.mp3?filename=baby-laugh-15258.mp3',
+        school: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_dfae88b514.mp3?filename=children-playing-7075.mp3',
+        teen: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c22778a78c.mp3?filename=ambient-melancholy-6192.mp3',
+        adult: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9a34a8f08e.mp3?filename=calm-day-10878.mp3',
+        elder: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_9041c2f614.mp3?filename=ambient-piano-7558.mp3'
+      };
+
+      const icons = [
+        '🍼', '👶', '🚸', '😶‍🌫️', '🏫', '🧒', '✍️', '🌛', '🦸', '🦜', '🤪', '🤩', '📚', '🤌', '🎧', '🦠', '❤️‍🔥', '🚧', '🎧', '🩷', '🧑‍🎓', '📗', '💼', '💏', '📷', '💪', '🔗', '💥', '🧔‍♂️', '👩‍👧‍👦', '🏚️', '🏕️', '🐮', '😁', '🥸', '💼', '🧐', '🔱', '👻', '😨', '😖', '👩‍👦', '💕', '🥱', '👓', '👀', '🤑', '🪙', '🧱', '🪖', '⌚', '🐘', '🔐', '🧑‍🎨', '📺', '🍋', '🥰', '🧑‍🤝‍🧑', '⌚', '👵', '🕊️', '🐟', '🛖', '🛕', '🚸', '🫛', '🥕', '♠️', '🧬', '😏', '🚛', '😶‍🌫️', '⛱️', '🌘', '🧶', '🎬', '🥐', '🗯️', '🍊', '🏹', '🕊️'
+      ];
+
+      const backgroundImages = [
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2323-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2322-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2321-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2320-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2319-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2317-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2304-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2265-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2271-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2251-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2263-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2183-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2172-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2150-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1955-768x471.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1918-768x472.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2275-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1973-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2005-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1965-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1960-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1937-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1916-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1889-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1876-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1871-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1830-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-114-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-383-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-196-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2198-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2112-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1801-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-654-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-322-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1976-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-334-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-791-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-256-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1134-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1529-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1349-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-2147-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1772-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1803-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1686-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-1676-768x512.jpg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-13-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-115-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-144-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-308-768x512.jpeg",
+        "https://freenaturestock.com/wp-content/uploads/freenaturestock-116-768x512.jpeg",
+        "https://cdn.pixabay.com/photo/2018/12/25/17/11/nature-3894567_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/11/06/22/00/mountain-stream-7575143_640.jpg",
+        "https://cdn.pixabay.com/photo/2017/01/14/11/20/bures-1979307_640.jpg",
+        "https://cdn.pixabay.com/photo/2018/11/05/17/43/autumn-3796552_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/10/17/18/34/lake-7528439_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/09/27/01/20/riviere-5605400_640.jpg",
+        "https://cdn.pixabay.com/photo/2021/02/08/18/51/berges-du-rhone-5996073_640.jpg",
+        "https://cdn.pixabay.com/photo/2021/03/01/18/53/waterfall-6060557_640.jpg",
+        "https://cdn.pixabay.com/photo/2019/10/30/09/31/vigne-4589083_640.jpg",
+        "https://cdn.pixabay.com/photo/2018/12/18/08/44/nature-3881943_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/12/10/11/05/snow-7646952_1280.jpg",
+        "https://cdn.pixabay.com/photo/2024/11/02/05/13/winter-9168141_640.jpg",
+        "https://cdn.pixabay.com/photo/2021/12/03/08/50/nature-6842159_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/11/16/19/19/snowdrift-7596603_640.jpg",
+        "https://cdn.pixabay.com/photo/2021/02/05/07/35/winter-5983671_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/12/10/11/08/trees-7646958_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/12/17/14/17/winter-7661769_640.jpg",
+        "https://cdn.pixabay.com/photo/2019/12/08/01/08/winter-4680354_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/10/11/09/04/peak-5645235_640.jpg",
+        "https://cdn.pixabay.com/photo/2015/04/10/01/41/fox-715588_640.jpg",
+        "https://cdn.pixabay.com/photo/2024/01/21/12/37/chiemsee-lake-8523044_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/06/24/20/41/truebsee-5337646_640.jpg",
+        "https://cdn.pixabay.com/photo/2023/11/01/11/12/hallstatt-8357170_640.jpg",
+        "https://cdn.pixabay.com/photo/2016/11/21/00/47/view-1844110_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/03/19/00/55/sailing-4945855_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/07/08/08/04/sunset-5383043_640.jpg",
+        "https://cdn.pixabay.com/photo/2024/01/18/10/07/sunset-8516639_1280.jpg",
+        "https://cdn.pixabay.com/photo/2021/07/12/19/43/swans-6421355_640.jpg",
+        "https://cdn.pixabay.com/photo/2022/08/06/15/39/city-7368852_640.jpg",
+        "https://cdn.pixabay.com/photo/2018/06/16/16/17/road-3478977_640.jpg",
+        "https://cdn.pixabay.com/photo/2020/01/31/02/42/death-valley-np-4806971_640.jpg"
+      ];
+      const events = [
+        { range: [0, 3], color: "bg-blue-100", sound: sounds.baby },
+        { range: [4, 12], color: "bg-green-100", sound: sounds.school },
+        { range: [13, 18], color: "bg-yellow-100", sound: sounds.teen },
+        { range: [19, 29], color: "bg-red-100", sound: sounds.adult },
+        { range: [30, 59], color: "bg-pink-100", sound: sounds.adult },
+        { range: [60, 80], color: "bg-gray-200", sound: sounds.elder }
+      ];
+
+      const quotes = [
+        "“Chaque enfant commence le monde à nouveau.”",
+        "“Le rire d’un enfant est la lumière de la maison.”",
+        "“L’imagination est plus importante que le savoir.”",
+        "“Les petites choses deviennent les grands souvenirs.”",
+        "“Jouer, c’est le travail de l’enfant.”",
+        "“L’éducation est l’arme la plus puissante pour changer le monde.”",
+        "“Les enfants voient la magie parce qu’ils la cherchent.”",
+        "“La curiosité est le moteur de la découverte.”",
+        "“L’amitié est née au moment où une personne dit à une autre : ‘Toi aussi ?’”",
+        "“Ce que l’on apprend avec plaisir, on ne l’oublie jamais.”",
+        "“L’enfance est le sol sur lequel nous marcherons toute notre vie.”",
+        "“Grandir, c’est découvrir que le monde est plus vaste que soi.”",
+        "“La jeunesse est le temps d’étudier la sagesse ; la vieillesse est le temps de la pratiquer.”",
+        "“Sois toi-même, tous les autres sont déjà pris.”",
+        "“Ce n’est pas ce que tu regardes qui compte, c’est ce que tu vois.”",
+        "“La confiance en soi est le premier secret du succès.”",
+        "“La vie commence là où commence l’amour.”",
+        "“Le courage ne rugit pas toujours. Parfois, c’est la voix calme qui dit : ‘Je recommencerai demain.’”",
+        "“La liberté commence là où finit la peur.”",
+        "“Fais de ta vie un rêve, et d’un rêve une réalité.”",
+        "“La jeunesse n’est pas une période de la vie, c’est un état d’esprit.”",
+        "“Le monde est plein de belles choses, il suffit d’oser les chercher.”",
+        "“Ce n’est pas l’âge qui compte, mais l’intensité avec laquelle on vit.”",
+        "“La vie est une aventure audacieuse ou elle n’est rien.”",
+        "“Le bonheur n’est pas quelque chose de prêt à l’emploi. Il vient de tes propres actions.”",
+        "“Ce que tu fais aujourd’hui peut améliorer tous tes lendemains.”",
+        "“La vie ne se mesure pas en respirations, mais en moments qui nous coupent le souffle.”",
+        "“Ne vis pas la même année 75 fois et appelle ça une vie.”",
+        "“Le changement est douloureux, mais rien n’est plus douloureux que de rester coincé.”",
+        "“La vie est courte, fais que chaque jour compte.”",
+        "“Ce n’est jamais trop tard pour être ce que tu aurais pu être.”",
+        "“La maturité, c’est quand tu arrêtes de te plaindre et que tu commences à faire.”",
+        "“La vie est faite de choix. Choisis avec intention.”",
+        "“La paix vient de l’intérieur. Ne la cherche pas à l’extérieur.”",
+        "“La simplicité est la sophistication suprême.”",
+        "“Le succès n’est pas la clé du bonheur. Le bonheur est la clé du succès.”",
+        "“Ce que tu fais fait une différence. Tu dois décider quel genre de différence tu veux faire.”",
+        "“La sagesse commence dans l’émerveillement.”",
+        "“La vie est une série de milliers de petits miracles.”",
+        "“Le plus grand voyage commence par un pas.”",
+        "“La vie commence à 40 ans.”",
+        "“Le bonheur est réel seulement quand il est partagé.”",
+        "“La beauté de la vie réside dans ses imperfections.”",
+        "“Ce n’est pas l’âge qui rend sage, c’est l’expérience.”",
+        "“La gratitude transforme ce que nous avons en assez.”",
+        "“La vie est un miroir : elle te sourit si tu lui sourit.”",
+        "“Vieillir est obligatoire, grandir est un choix.”",
+        "“La sagesse ne vient pas avec les années, mais avec la capacité d’apprendre.”",
+        "“Le temps est un cadeau, pas une garantie.”",
+        "“La vie est une œuvre d’art, peins-la avec passion.”",
+        "“À cinquante ans, chacun a le visage qu’il mérite.”",
+        "“La vie est courte, mais elle est large.”",
+        "“L’âge est une question d’esprit sur la matière.”",
+        "“La sagesse est de savoir ce qu’il faut ignorer.”",
+        "“Le bonheur est une direction, pas une destination.”",
+        "“Le passé est un lieu de référence, pas de résidence.”",
+        "“La vie est une danse entre ce que tu veux et ce que tu crains.”",
+        "“La paix intérieure est le vrai succès.”",
+        "“Vieillir, c’est découvrir la beauté de la lenteur.”",
+        "“La mémoire est le journal que nous portons tous en nous.”",
+        "“L’âge est le prix de la sagesse.”",
+        "“Les souvenirs sont les trésors du cœur.”",
+        "“La vie est faite de moments, pas de choses.”",
+        "“Le bonheur est de savourer ce que l’on a.”",
+        "“La sagesse est de savoir quand parler et quand écouter.”",
+        "“La retraite est le début d’une nouvelle liberté.”",
+        "“La vie est plus douce quand on ralentit.”",
+        "“L’expérience est une lanterne qu’on porte dans le dos.”",
+        "“Le cœur ne vieillit jamais.”",
+        "“La sagesse est de vivre en paix avec le temps.”",
+        "“Chaque ride raconte une histoire.”",
+        "“La vie est un cadeau, même dans ses silences.”",
+        "“La spiritualité est le souffle de l’âme.”",
+        "“Le calme est une forme de puissance.”",
+        "“Les souvenirs sont les étoiles de notre ciel intérieur.”",
+        "“La mémoire est le miroir de l’âme.”",
+        "“Transmettre, c’est prolonger sa propre vie.”",
+        "“Écrire, c’est revivre.”",
+        "“La joie ne connaît pas d’âge.”",
+        "“Le lien humain est le plus grand héritage.”",
+        "“La vie est un poème, et chaque année est un vers.”"
+      ];
+      const descriptions = [
+        "Un nouveau-né reconnaît la voix de sa mère dès la naissance.",
+        "À 1 an, le cerveau a déjà doublé de taille par rapport à la naissance.",
+        "Les enfants de 2 ans peuvent apprendre jusqu’à 10 nouveaux mots par jour.",
+        "À 3 ans, les connexions neuronales sont à leur pic.",
+        "Le jeu symbolique commence : les enfants imaginent des mondes.",
+        "90% du cerveau adulte est déjà formé.",
+        "L’enfant comprend les règles sociales de base.",
+        "L’âge moyen du début de la lecture autonome.",
+        "Les enfants développent leur sens moral et la notion de justice.",
+        "L’amitié devient plus importante que les jouets.",
+        "Le cerveau commence à se spécialiser dans certaines fonctions.",
+        "Les enfants commencent à comprendre l’ironie.",
+        "Le corps entre dans la puberté : croissance rapide.",
+        "Le cortex préfrontal commence à se remodeler.",
+        "L’adolescent peut ressentir des émotions plus intenses que les adultes.",
+        "Le sommeil devient irrégulier à cause des changements hormonaux.",
+        "L’âge moyen du premier amour ou crush.",
+        "Le cerveau atteint son pic de plasticité sociale.",
+        "L’âge légal de la majorité dans de nombreux pays.",
+        "Le cerveau commence à se stabiliser émotionnellement.",
+        "80% des gens ont déjà eu leur premier emploi.",
+        "L’âge moyen du premier déménagement hors du foyer parental.",
+        "Le cerveau atteint sa vitesse maximale de traitement.",
+        "L’âge moyen du premier diplôme universitaire.",
+        "Le métabolisme commence à ralentir légèrement.",
+        "Le cerveau atteint sa maturité complète.",
+        "L’âge moyen du premier achat immobilier dans certains pays.",
+        "Le risque de burn-out professionnel commence à apparaître.",
+        "La fertilité commence à diminuer lentement chez les femmes.",
+        "L’âge moyen du mariage dans de nombreux pays occidentaux.",
+        "60% des gens sont en couple stable.",
+        "Le corps commence à perdre de la masse musculaire sans exercice.",
+        "L’âge moyen du premier enfant.",
+        "Le cerveau commence à prioriser la stabilité émotionnelle.",
+        "Le sommeil profond diminue progressivement.",
+        "Le pic de productivité professionnelle.",
+        "Le risque de maladies cardiovasculaires commence à augmenter.",
+        "La mémoire à court terme commence à décliner légèrement.",
+        "L’âge moyen du premier doute existentiel sérieux.",
+        "Le stress lié à la carrière atteint souvent son pic.",
+        "Milieu de vie : bilan personnel et professionnel.",
+        "Le cerveau devient plus efficace dans la prise de décision.",
+        "L’âge moyen du premier divorce.",
+        "Le corps commence à perdre de la densité osseuse.",
+        "Les priorités changent : plus de temps pour soi.",
+        "Le risque de burn-out est élevé.",
+        "La vision commence à se détériorer (presbytie).",
+        "Le cerveau devient plus résilient au stress.",
+        "L’âge moyen du premier petit-enfant.",
+        "Le sentiment de sagesse commence à émerger.",
+        "70% des gens ont des enfants adultes.",
+        "Le sommeil devient plus léger.",
+        "Le bonheur augmente selon certaines études.",
+        "Le cerveau compense la perte de mémoire par l’expérience.",
+        "Les relations sociales deviennent plus profondes.",
+        "L’âge moyen de la retraite anticipée.",
+        "Le corps devient plus sensible aux changements alimentaires.",
+        "Le besoin de solitude augmente.",
+        "Le cerveau reste capable d’apprendre de nouvelles compétences.",
+        "La créativité peut atteindre un nouveau pic.",
+        "L’âge légal de la retraite dans plusieurs pays.",
+        "80% des gens ont des petits-enfants.",
+        "Le temps libre devient une richesse précieuse.",
+        "Le cerveau reste actif grâce à la lecture et aux jeux.",
+        "Le bonheur est souvent plus stable qu’à 30 ans.",
+        "L’âge moyen du bénévolat actif.",
+        "Le stress diminue malgré les soucis de santé.",
+        "L’expérience devient un capital social.",
+        "Le cerveau peut encore créer de nouveaux neurones.",
+        "La sagesse émotionnelle atteint son apogée.",
+        "90% des gens ressentent plus de gratitude.",
+        "Le sommeil devient fragmenté mais suffisant.",
+        "La spiritualité ou la philosophie de vie devient centrale.",
+        "Le corps demande plus de soins doux (yoga, marche).",
+        "Les souvenirs deviennent plus précieux que les objets.",
+        "La mémoire autobiographique est très active.",
+        "Le besoin de transmission augmente.",
+        "L’âge moyen des écrivains de mémoires.",
+        "Le cerveau reste capable de ressentir de la joie intense.",
+        "Le lien intergénérationnel devient essentiel.",
+        "Plus de gens vivent jusqu’à 80 ans que jamais auparavant."
+      ];
+      const descriptions2 = [
+        "À la naissance, tu peux respirer et avaler en même temps… mais tu perds cette capacité vers 3 mois.",
+        "Ton cœur bat environ deux fois plus vite que celui d’un adulte.",
+        "À cet âge, ton cerveau est déjà plus actif que celui d’un adulte.",
+        "Tu produis plus de nouvelles connexions neuronales que jamais dans ta vie.",
+        "Les enfants de 4 ans posent en moyenne 300 questions par jour.",
+        "Ton squelette contient encore plus de 300 os (contre 206 à l’âge adulte).",
+        "Ton sens du goût est plus sensible que celui des adultes.",
+        "Beaucoup d’enfants perdent leur première dent de lait autour de cet âge.",
+        "Les enfants de 8 ans peuvent apprendre une langue étrangère presque sans accent.",
+        "Tu a une capacité pulmonaire proportionnellement plus grande que celle d’un adulte.",
+        "Ton cerveau atteint son volume maximal, mais pas encore sa maturité.",
+        "Les enfants courent souvent plus vite que leurs parents sur de courtes distances.",
+        "Les empreintes digitales sont désormais complètement formées.",
+        "C’est l’âge moyen où les adolescents rient le plus dans leur vie.",
+        "Ton sommeil devient naturellement plus tardif (horloge interne décalée).",
+        "Tu peux mémoriser des chansons entières en quelques écoutes.",
+        "Le centre des émotions dans ton cerveau est en pleine hyperactivité.",
+        "Ton temps de réaction est parmi les plus rapides de ta vie.",
+        "Tes cordes vocales sont à leur taille définitive.",
+        "Tes os sont plus durs que le béton… à l’échelle de leur résistance.",
+        "La plupart des athlètes olympiques atteignent leur pic de performance autour de cet âge.",
+        "Tu as environ 10 litres de sang qui circulent chaque minute au repos.",
+        "Ton cœur a déjà battu environ 800 millions de fois.",
+        "Tu peux encore doubler ta force musculaire avec l’entraînement.",
+        "Ton cerveau est à son pic de mémoire à court terme.",
+        "Les astronautes ont souvent entre 25 et 35 ans lors de leur première mission.",
+        "Tu peux avoir déjà parcouru plus de 200 000 km à pied depuis ta naissance (si tu marches beaucoup).",
+        "Tes réflexes visuels sont à leur maximum.",
+        "Ton odorat peut détecter environ 1 000 milliards d’odeurs différentes.",
+        "Ton oreille peut encore percevoir des fréquences très aiguës que les plus âgés ne distinguent plus.",
+        "Tu as cligné des yeux environ 400 millions de fois depuis ta naissance.",
+        "Les souvenirs d’enfance commencent souvent à s’estomper nettement.",
+        "Ton foie s’est déjà régénéré complètement plusieurs fois.",
+        "La peau se renouvelle environ tous les 28 jours.",
+        "Tes os se renouvellent entièrement tous les 10 ans.",
+        "Les neurones que tu as encore peuvent durer toute ta vie.",
+        "Tu as respiré environ 300 millions de fois depuis ta naissance.",
+        "Tes yeux ont vu environ 500 millions d’images distinctes.",
+        "Ton cœur a pompé environ 150 millions de litres de sang depuis ta naissance.",
+        "Ton système immunitaire a combattu des milliers de pathogènes différents.",
+        "Tes cellules se renouvellent plus lentement, mais ton expérience compense.",
+        "Ton cerveau traite les visages familiers plus vite que jamais.",
+        "Les cheveux gris contiennent en réalité des bulles d’air microscopiques.",
+        "Ton corps fabrique encore environ 2 millions de globules rouges chaque seconde.",
+        "Tu as parcouru l’équivalent de plusieurs fois le tour du monde à pied.",
+        "Tes oreilles et ton nez continuent de grandir toute ta vie.",
+        "Ton corps a remplacé entièrement presque toutes ses cellules depuis ta naissance.",
+        "Les fibres nerveuses transmettent l’information à plus de 400 km/h.",
+        "Ton estomac produit 2 à 3 litres d’acide gastrique par jour.",
+        "Ton cerveau contient encore la majorité des souvenirs stockés à 20 ans.",
+        "Ton cœur a battu plus de 2 milliards de fois depuis ta naissance.",
+        "Ton ADN a été copié des milliards de milliards de fois.",
+        "Ta peau a résisté à des millions d’agressions environnementales.",
+        "Tes muscles contiennent encore plus de 600 fibres distinctes.",
+        "Ton corps a produit des litres entiers de larmes depuis ta naissance.",
+        "Tu as probablement ri plus de 500 000 fois.",
+        "Tu as entendu des millions de sons différents.",
+        "Tu as respiré environ 400 millions de litres d’air.",
+        "Ton système nerveux reste un des plus rapides du règne animal.",
+        "Tes yeux ont capté plus de lumière que beaucoup d’animaux.",
+        "Ton cerveau a généré des milliards de pensées uniques.",
+        "Ton squelette a supporté l’équivalent de milliers de tonnes cumulées.",
+        "Tes mains ont exécuté des millions de gestes fins.",
+        "Tes pieds ont touché toutes sortes de sols, des plus chauds aux plus froids.",
+        "Ton cœur a travaillé sans arrêt depuis ta naissance.",
+        "Tu as fabriqué assez de salive pour remplir une piscine.",
+        "Ton corps a combattu des milliards de bactéries.",
+        "Tes os sont toujours plus solides que l’acier à poids égal.",
+        "Tes articulations ont effectué des millions de mouvements.",
+        "Ton cerveau reste capable d’apprendre jusqu’au dernier souffle.",
+        "Tes yeux ont cligné environ un demi-milliard de fois.",
+        "Tes oreilles ont vibré avec des milliards d’ondes sonores.",
+        "Ton système digestif a traité environ 30 tonnes de nourriture.",
+        "Ton cœur a pompé plus de 200 millions de litres de sang.",
+        "Ton squelette s’est renouvelé environ 7 fois depuis ta naissance.",
+        "Ton corps a fabriqué des millions de litres de sang neuf.",
+        "Ton système immunitaire t’a protégé contre des milliards de virus.",
+        "Tes jambes t’ont porté sur des milliers de kilomètres.",
+        "Ton cerveau a stocké l’équivalent de plusieurs millions de gigaoctets d’informations.",
+        "Ton corps a exécuté plus d’un milliard de battements de paupières.",
+        "Ton cœur a battu environ 3,3 milliards de fois, sans jamais prendre de pause."
+      ];
+
+      const lifeLessons = [
+        "Bienvenue dans le monde, petit miracle",
+        "Continue d’explorer, chaque pas est une victoire.",
+        "Ta curiosité est ta super-puissance.",
+        "Tu rends chaque journée plus joyeuse.",
+        "Tu as déjà une imagination incroyable, garde-la précieusement.",
+        "Continue de poser des questions, elles t’ouvriront des portes.",
+        "Ta joie est contagieuse, partage-la souvent.",
+        "Tu es déjà plus courageux que tu ne le crois.",
+        "Garde ce sourire, il illumine ton entourage.",
+        "Tu as déjà tant de potentiel, crois en toi.",
+        "Ton esprit vif est un vrai trésor.",
+        "Tes idées comptent, exprime-les.",
+        "Continue de croire que tout est possible.",
+        "Tes différences sont ta plus grande force.",
+        "Sois fier de qui tu es, même si tu changes encore.",
+        "Tu as un courage que tu ne vois pas encore.",
+        "Tes rêves méritent d’être poursuivis.",
+        "Tu es plus prêt pour l’avenir que tu ne le penses.",
+        "C’est ton moment d’oser, le monde est grand et à toi.",
+        "Garde la curiosité de tes 10 ans et l’audace de tes 20 ans.",
+        "Tu peux tracer ta route, elle n’a pas besoin d’être parfaite.",
+        "Tu es capable de grandes choses, pas besoin de tout prouver.",
+        "Chaque échec est juste une étape vers ta réussite.",
+        "Ta jeunesse est un atout, mais ta maturité commence à briller.",
+        "Continue de t’entourer de gens qui t’élèvent.",
+        "Ton histoire ne fait que commencer.",
+        "Tu peux être à la fois prudent et ambitieux.",
+        "Tu as déjà surmonté tant de choses, bravo.",
+        "Ton expérience est précieuse, partage-la.",
+        "Tu as encore toute la vie pour changer de cap.",
+        "Tu es dans la force de l’âge, savoure-le.",
+        "Tu inspires plus de monde que tu ne le sais.",
+        "Ta stabilité est une base solide pour de grands projets.",
+        "Ton équilibre entre raison et passion est admirable.",
+        "Tu sais déjà ce qui compte vraiment pour toi, reste aligné.",
+        "Tu as la maturité pour dire oui… et pour dire non.",
+        "Tu sais t’adapter, c’est un vrai talent.",
+        "Tes choix inspirent discrètement ceux qui t’entourent.",
+        "Tu es une belle combinaison de force et de douceur.",
+        "Tu as la sagesse de l’expérience et l’énergie d’un jeune.",
+        "Tu es un bel exemple de persévérance.",
+        "Ta vision du monde est plus riche que jamais.",
+        "Tu sais ce que tu veux, et ça se voit.",
+        "Ton calme est une force qui rassure les autres.",
+        "Tu sais trouver la beauté dans les petites choses.",
+        "Tu es plus fort que la somme de toutes tes épreuves.",
+        "Ton authenticité est rafraîchissante.",
+        "Tu as le droit de te réinventer, même maintenant.",
+        "Ta présence apporte de la stabilité aux autres.",
+        "Tu es la preuve qu’on peut vieillir avec grâce.",
+        "Tu portes ta vie comme une œuvre d’art.",
+        "Tu es une source d’inspiration pour ceux qui te suivent.",
+        "Tu sais profiter des bons moments.",
+        "Ta sagesse vaut plus que de l’or.",
+        "Tu rayonnes d’une maturité sereine.",
+        "Tu es une bibliothèque vivante de souvenirs précieux.",
+        "Ton sourire raconte des histoires.",
+        "Tu es un exemple de résilience.",
+        "Tu as appris à faire la paix avec le passé.",
+        "Tu sais mieux que quiconque apprécier le présent.",
+        "Tu es une belle preuve que la joie n’a pas d’âge.",
+        "Tu es une source de conseils précieux.",
+        "Ta bienveillance marque ceux qui te croisent.",
+        "Tu as appris à savourer la vie lentement.",
+        "Ton humour reste une arme redoutable.",
+        "Tu as encore tant à offrir au monde.",
+        "Tu es un pilier pour ceux que tu aimes.",
+        "Tu as cette élégance qui vient avec le temps.",
+        "Ta voix est écoutée et respectée.",
+        "Tu es la preuve que l’âme reste jeune.",
+        "Tu inspires par ton vécu et ta lumière.",
+        "Tu sais transmettre tes valeurs avec douceur.",
+        "Ton regard porte toute une vie d’expériences.",
+        "Tu es un gardien de souvenirs précieux.",
+        "Tu as un charme intemporel.",
+        "Tu es une leçon vivante de courage.",
+        "Tu as encore la capacité d’émerveiller.",
+        "Tu es un repère pour plusieurs générations.",
+        "Tu sais que chaque jour est un cadeau.",
+        "Ta vie est une histoire que beaucoup aimeraient entendre.",
+        "Tu es la preuve vivante que la beauté et la valeur grandissent avec le temps."
+      ];
+
+      const container = document.getElementById('container');
+      const soundPlayer = document.getElementById('sound-player');
+      const yearIndicator = document.getElementById("year-indicator");
+      const welcomeScreen = document.getElementById("welcome-screen");
+      const content = document.body.querySelector('div:not(#welcome-screen)');
+
+      function startGame() {
+        gsap.to(welcomeScreen, {
+          opacity: 0,
+          duration: 1,
+          onComplete: () => {
+            welcomeScreen.style.display = 'none';
+          }
+        });
+      }
+
+      for (let i = 0; i <= 80; i++) {
+        const event = events.find(e => i >= e.range[0] && i <= e.range[1]);
+        const section = document.createElement('section');
+        section.className = `year-section`;
+        section.id = `year-${i}`;
+        section.setAttribute('data-sound', event.sound);
+
+        if (backgroundImages[i]) {
+          section.style.backgroundImage = `url(${backgroundImages[i]})`;
+        }
+
+        section.innerHTML = `
+          <h1 class="year-title text-4xl md:text-6xl font-serif drop-shadow-md">${icons[i]} ${i} ans</h1>
+          <p class="fact-text mt-6 text-sm md:text-base">${descriptions[i]}</p>
+          <p class="fact-text mt-2 text-sm md:text-base">${descriptions2[i]}</p>
+          <p class="quote-text max-w-4xl text-base md:text-xl">${quotes[i]}</p>
+          <p class="quote-text glow-text life-lesson-text life-lesson-bottom max-w-4xl text-base md:text-xl">${lifeLessons[i]}</p>
+          <div class="mt-8 w-24 h-1 bg-white rounded-full animate-pulse"></div>
+        `;
+        container.appendChild(section);
+      }
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.utils.toArray(".year-section").forEach((section) => {
+        const h1 = section.querySelector('.year-title');
+        const pFacts = section.querySelectorAll('.fact-text');
+        const pQuotes = section.querySelector('.quote-text');
+        const pLessons = section.querySelector('.life-lesson-text');
+        const divider = section.querySelector('div');
+
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top center",
+            toggleActions: "play none none reverse",
+            onEnter: () => {
+              const soundSrc = section.getAttribute('data-sound');
+              if (soundPlayer.src !== soundSrc) {
+                soundPlayer.src = soundSrc;
+                soundPlayer.play();
+              }
+            }
+          }
+        })
+        .to([h1, ...pFacts, pQuotes, pLessons, divider], {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power2.out"
+        });
+
+        gsap.to(section, {
+          backgroundPosition: "50% 110%",
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            scrub: true
+          }
+        });
+      });
+
+      let currentIndex = 0;
+
+      function updateUI(index) {
+        yearIndicator.innerText = `${index} ans`;
+        const soundSrc = document.getElementById(`year-${index}`).getAttribute('data-sound');
+        if (soundPlayer.src !== soundSrc) {
+          soundPlayer.src = soundSrc;
+          soundPlayer.play();
+        }
+      }
+
+      function scrollToIndex(index) {
+        const target = document.getElementById(`year-${index}`);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+          currentIndex = index;
+          updateUI(currentIndex);
+        }
+      }
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' && currentIndex < 80) {
+          e.preventDefault();
+          currentIndex++;
+          scrollToIndex(currentIndex);
+        } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+          e.preventDefault();
+          currentIndex--;
+          scrollToIndex(currentIndex);
+        }
+      });
+      
+      const indicator = document.getElementById('year-indicator');
+      const timelineBar = document.querySelector('.timeline-bar');
+
+      gsap.to(indicator, {
+        y: () => timelineBar.clientHeight,
+        ease: "none",
+        scrollTrigger: {
+          trigger: "body",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true,
+          onUpdate: (self) => {
+            const scrollY = self.scroll();
+            const vh = window.innerHeight;
+            const newIndex = Math.floor(scrollY / vh);
+            if (newIndex !== currentIndex) {
+              currentIndex = newIndex;
+              updateUI(currentIndex);
+            }
+          }
+        }
+      });
+
+      function scrollToTop() {
+        currentIndex = 0;
+        scrollToIndex(currentIndex);
+      }
+    </script>
+  </body>
+</html>
