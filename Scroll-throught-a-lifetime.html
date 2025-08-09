@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +7,7 @@
     <script src="https://unpkg.com/gsap@3.12.2/dist/gsap.min.js"></script>
     <script src="https://unpkg.com/gsap@3.12.2/dist/ScrollTrigger.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-icons/refs/heads/main/aretfact-clicker.png">
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
@@ -70,13 +71,13 @@
       }
       @media (min-width: 768px) {
         .timeline-container {
-          right: 3rem; /* Augmenté pour les ordinateurs */
+          right: 2rem; /* Augmenté pour les ordinateurs */
         }
       }
       .timeline-bar {
-        width: 6px;
+        width: 4px;
         height: 80%;
-        background: linear-gradient(to bottom, #6ae1ff, #6aff8b, #facc15, #ff954f);
+        background: linear-gradient(to bottom, #a3d8f4, #facc15, #d1d5db);
         position: absolute;
         top: 50%;
         left: 50%;
@@ -201,25 +202,46 @@
             font-size: 2.5rem;
         }
         .quote-text {
-            font-size: 2rem;
+            font-size: 1.5rem;
         }
         .fact-text {
             font-size: 1.5rem;
         }
       }
+      
+      #language-switch {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        width: 40px;
+        height: 40px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 101;
+      }
+      #language-switch img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
     </style>
   </head>
   <body class="bg-white text-white font-sans">
     <div id="welcome-screen">
-      <img src="https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/Logo-STAL.png" alt="Logo Scroll Through a Lifetime" class="w-3/4 max-w-xl md:max-w-2xl max-h-1/2 transition-transform duration-300 transform hover:scale-105" />
-      <button id="start-button" onclick="startGame()" class="py-3 px-6 text-lg font-bold text-white md:py-4 md:px-8 md:text-xl">Commencer</button>
+      <button id="language-switch" onclick="switchLanguage()">
+        <img id="lang-flag" src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" alt="Switch to French">
+      </button>
+      <img src="https://raw.githubusercontent.com/Tristanox/textures/refs/heads/main/Logo-STAL.png" alt="Scroll Through a Lifetime Logo" class="w-3/4 max-w-xl md:max-w-2xl max-h-1/2 transition-transform duration-300 transform hover:scale-105" />
+      <button id="start-button" onclick="startGame()" class="py-3 px-6 text-lg font-bold text-white md:py-4 md:px-8 md:text-xl">Start</button>
     </div>
 
     <div class="timeline-container">
       <div class="timeline-bar"></div>
-      <div id="year-indicator" class="year-indicator">0 ans</div>
+      <div id="year-indicator" class="year-indicator">0 years</div>
     </div>
-    <div class="go-top" onclick="scrollToTop()">Revivre la vie</div>
+    <div id="relive-button" class="go-top" onclick="scrollToTop()">Relive life</div>
     <audio id="sound-player" loop></audio>
 
     <div id="container">
@@ -235,7 +257,7 @@
       };
 
       const icons = [
-        '🍼', '👶', '🚸', '😶‍🌫️', '🏫', '🧒', '✍️', '🌛', '🦸', '🦜', '🤪', '🤩', '📚', '🤌', '🎧', '🦠', '❤️‍🔥', '🚧', '🎧', '🩷', '🧑‍🎓', '📗', '💼', '💏', '📷', '💪', '🔗', '💥', '🧔‍♂️', '👩‍👧‍👦', '🏚️', '🏕️', '🐮', '😁', '🥸', '💼', '🧐', '🔱', '👻', '😨', '😖', '👩‍👦', '💕', '🥱', '👓', '👀', '🤑', '🪙', '🧱', '🪖', '⌚', '🐘', '🔐', '🧑‍🎨', '📺', '🍋', '🥰', '🧑‍🤝‍🧑', '⌚', '👵', '🕊️', '🐟', '🛖', '🛕', '🚸', '🫛', '🥕', '♠️', '🧬', '😏', '🚛', '😶‍🌫️', '⛱️', '🌘', '🧶', '🎬', '🥐', '🗯️', '🍊', '🏹', '🕊️'
+        '🍼', '👶', '🚸', '👶', '🏫', '🧒', '✍️', '🌛', '🦸', '🦜', '🤪', '🤩', '📚', '🤌', '🎧', '🦠', '❤️‍🔥', '🚧', '🎧', '🩷', '🧑‍🎓', '📗', '💼', '💏', '📷', '💪', '🔗', '💥', '🧔‍♂️', '👩‍👧‍👦', '🏚️', '🏕️', '🐮', '😁', '🥸', '💼', '🧐', '🔱', '👻', '😨', '😖', '👩‍👦', '💕', '🥱', '👓', '👀', '🤑', '🪙', '🧱', '🪖', '⌚', '🐘', '🔐', '🧑‍🎨', '📺', '🍋', '🥰', '🧑‍🤝‍🧑', '⌚', '👵', '🕊️', '🐟', '🛖', '🛕', '🚸', '🫛', '🥕', '♠️', '🧬', '😏', '🚛', '😶‍🌫️', '⛱️', '🌘', '🧶', '🎬', '🥐', '🗯️', '🍊', '🏹', '🕊️'
       ];
 
       const backgroundImages = [
@@ -332,345 +354,939 @@
         { range: [60, 80], color: "bg-gray-200", sound: sounds.elder }
       ];
 
-      const quotes = [
-        "“Chaque enfant commence le monde à nouveau.”",
-        "“Le rire d’un enfant est la lumière de la maison.”",
-        "“L’imagination est plus importante que le savoir.”",
-        "“Les petites choses deviennent les grands souvenirs.”",
-        "“Jouer, c’est le travail de l’enfant.”",
-        "“L’éducation est l’arme la plus puissante pour changer le monde.”",
-        "“Les enfants voient la magie parce qu’ils la cherchent.”",
-        "“La curiosité est le moteur de la découverte.”",
-        "“L’amitié est née au moment où une personne dit à une autre : ‘Toi aussi ?’”",
-        "“Ce que l’on apprend avec plaisir, on ne l’oublie jamais.”",
-        "“L’enfance est le sol sur lequel nous marcherons toute notre vie.”",
-        "“Grandir, c’est découvrir que le monde est plus vaste que soi.”",
-        "“La jeunesse est le temps d’étudier la sagesse ; la vieillesse est le temps de la pratiquer.”",
-        "“Sois toi-même, tous les autres sont déjà pris.”",
-        "“Ce n’est pas ce que tu regardes qui compte, c’est ce que tu vois.”",
-        "“La confiance en soi est le premier secret du succès.”",
-        "“La vie commence là où commence l’amour.”",
-        "“Le courage ne rugit pas toujours. Parfois, c’est la voix calme qui dit : ‘Je recommencerai demain.’”",
-        "“La liberté commence là où finit la peur.”",
-        "“Fais de ta vie un rêve, et d’un rêve une réalité.”",
-        "“La jeunesse n’est pas une période de la vie, c’est un état d’esprit.”",
-        "“Le monde est plein de belles choses, il suffit d’oser les chercher.”",
-        "“Ce n’est pas l’âge qui compte, mais l’intensité avec laquelle on vit.”",
-        "“La vie est une aventure audacieuse ou elle n’est rien.”",
-        "“Le bonheur n’est pas quelque chose de prêt à l’emploi. Il vient de tes propres actions.”",
-        "“Ce que tu fais aujourd’hui peut améliorer tous tes lendemains.”",
-        "“La vie ne se mesure pas en respirations, mais en moments qui nous coupent le souffle.”",
-        "“Ne vis pas la même année 75 fois et appelle ça une vie.”",
-        "“Le changement est douloureux, mais rien n’est plus douloureux que de rester coincé.”",
-        "“La vie est courte, fais que chaque jour compte.”",
-        "“Ce n’est jamais trop tard pour être ce que tu aurais pu être.”",
-        "“La maturité, c’est quand tu arrêtes de te plaindre et que tu commences à faire.”",
-        "“La vie est faite de choix. Choisis avec intention.”",
-        "“La paix vient de l’intérieur. Ne la cherche pas à l’extérieur.”",
-        "“La simplicité est la sophistication suprême.”",
-        "“Le succès n’est pas la clé du bonheur. Le bonheur est la clé du succès.”",
-        "“Ce que tu fais fait une différence. Tu dois décider quel genre de différence tu veux faire.”",
-        "“La sagesse commence dans l’émerveillement.”",
-        "“La vie est une série de milliers de petits miracles.”",
-        "“Le plus grand voyage commence par un pas.”",
-        "“La vie commence à 40 ans.”",
-        "“Le bonheur est réel seulement quand il est partagé.”",
-        "“La beauté de la vie réside dans ses imperfections.”",
-        "“Ce n’est pas l’âge qui rend sage, c’est l’expérience.”",
-        "“La gratitude transforme ce que nous avons en assez.”",
-        "“La vie est un miroir : elle te sourit si tu lui sourit.”",
-        "“Vieillir est obligatoire, grandir est un choix.”",
-        "“La sagesse ne vient pas avec les années, mais avec la capacité d’apprendre.”",
-        "“Le temps est un cadeau, pas une garantie.”",
-        "“La vie est une œuvre d’art, peins-la avec passion.”",
-        "“À cinquante ans, chacun a le visage qu’il mérite.”",
-        "“La vie est courte, mais elle est large.”",
-        "“L’âge est une question d’esprit sur la matière.”",
-        "“La sagesse est de savoir ce qu’il faut ignorer.”",
-        "“Le bonheur est une direction, pas une destination.”",
-        "“Le passé est un lieu de référence, pas de résidence.”",
-        "“La vie est une danse entre ce que tu veux et ce que tu crains.”",
-        "“La paix intérieure est le vrai succès.”",
-        "“Vieillir, c’est découvrir la beauté de la lenteur.”",
-        "“La mémoire est le journal que nous portons tous en nous.”",
-        "“L’âge est le prix de la sagesse.”",
-        "“Les souvenirs sont les trésors du cœur.”",
-        "“La vie est faite de moments, pas de choses.”",
-        "“Le bonheur est de savourer ce que l’on a.”",
-        "“La sagesse est de savoir quand parler et quand écouter.”",
-        "“La retraite est le début d’une nouvelle liberté.”",
-        "“La vie est plus douce quand on ralentit.”",
-        "“L’expérience est une lanterne qu’on porte dans le dos.”",
-        "“Le cœur ne vieillit jamais.”",
-        "“La sagesse est de vivre en paix avec le temps.”",
-        "“Chaque ride raconte une histoire.”",
-        "“La vie est un cadeau, même dans ses silences.”",
-        "“La spiritualité est le souffle de l’âme.”",
-        "“Le calme est une forme de puissance.”",
-        "“Les souvenirs sont les étoiles de notre ciel intérieur.”",
-        "“La mémoire est le miroir de l’âme.”",
-        "“Transmettre, c’est prolonger sa propre vie.”",
-        "“Écrire, c’est revivre.”",
-        "“La joie ne connaît pas d’âge.”",
-        "“Le lien humain est le plus grand héritage.”",
-        "“La vie est un poème, et chaque année est un vers.”"
-      ];
-      const descriptions = [
-        "Un nouveau-né reconnaît la voix de sa mère dès la naissance.",
-        "À 1 an, le cerveau a déjà doublé de taille par rapport à la naissance.",
-        "Les enfants de 2 ans peuvent apprendre jusqu’à 10 nouveaux mots par jour.",
-        "À 3 ans, les connexions neuronales sont à leur pic.",
-        "Le jeu symbolique commence : les enfants imaginent des mondes.",
-        "90% du cerveau adulte est déjà formé.",
-        "L’enfant comprend les règles sociales de base.",
-        "L’âge moyen du début de la lecture autonome.",
-        "Les enfants développent leur sens moral et la notion de justice.",
-        "L’amitié devient plus importante que les jouets.",
-        "Le cerveau commence à se spécialiser dans certaines fonctions.",
-        "Les enfants commencent à comprendre l’ironie.",
-        "Le corps entre dans la puberté : croissance rapide.",
-        "Le cortex préfrontal commence à se remodeler.",
-        "L’adolescent peut ressentir des émotions plus intenses que les adultes.",
-        "Le sommeil devient irrégulier à cause des changements hormonaux.",
-        "L’âge moyen du premier amour ou crush.",
-        "Le cerveau atteint son pic de plasticité sociale.",
-        "L’âge légal de la majorité dans de nombreux pays.",
-        "Le cerveau commence à se stabiliser émotionnellement.",
-        "80% des gens ont déjà eu leur premier emploi.",
-        "L’âge moyen du premier déménagement hors du foyer parental.",
-        "Le cerveau atteint sa vitesse maximale de traitement.",
-        "L’âge moyen du premier diplôme universitaire.",
-        "Le métabolisme commence à ralentir légèrement.",
-        "Le cerveau atteint sa maturité complète.",
-        "L’âge moyen du premier achat immobilier dans certains pays.",
-        "Le risque de burn-out professionnel commence à apparaître.",
-        "La fertilité commence à diminuer lentement chez les femmes.",
-        "L’âge moyen du mariage dans de nombreux pays occidentaux.",
-        "60% des gens sont en couple stable.",
-        "Le corps commence à perdre de la masse musculaire sans exercice.",
-        "L’âge moyen du premier enfant.",
-        "Le cerveau commence à prioriser la stabilité émotionnelle.",
-        "Le sommeil profond diminue progressivement.",
-        "Le pic de productivité professionnelle.",
-        "Le risque de maladies cardiovasculaires commence à augmenter.",
-        "La mémoire à court terme commence à décliner légèrement.",
-        "L’âge moyen du premier doute existentiel sérieux.",
-        "Le stress lié à la carrière atteint souvent son pic.",
-        "Milieu de vie : bilan personnel et professionnel.",
-        "Le cerveau devient plus efficace dans la prise de décision.",
-        "L’âge moyen du premier divorce.",
-        "Le corps commence à perdre de la densité osseuse.",
-        "Les priorités changent : plus de temps pour soi.",
-        "Le risque de burn-out est élevé.",
-        "La vision commence à se détériorer (presbytie).",
-        "Le cerveau devient plus résilient au stress.",
-        "L’âge moyen du premier petit-enfant.",
-        "Le sentiment de sagesse commence à émerger.",
-        "70% des gens ont des enfants adultes.",
-        "Le sommeil devient plus léger.",
-        "Le bonheur augmente selon certaines études.",
-        "Le cerveau compense la perte de mémoire par l’expérience.",
-        "Les relations sociales deviennent plus profondes.",
-        "L’âge moyen de la retraite anticipée.",
-        "Le corps devient plus sensible aux changements alimentaires.",
-        "Le besoin de solitude augmente.",
-        "Le cerveau reste capable d’apprendre de nouvelles compétences.",
-        "La créativité peut atteindre un nouveau pic.",
-        "L’âge légal de la retraite dans plusieurs pays.",
-        "80% des gens ont des petits-enfants.",
-        "Le temps libre devient une richesse précieuse.",
-        "Le cerveau reste actif grâce à la lecture et aux jeux.",
-        "Le bonheur est souvent plus stable qu’à 30 ans.",
-        "L’âge moyen du bénévolat actif.",
-        "Le stress diminue malgré les soucis de santé.",
-        "L’expérience devient un capital social.",
-        "Le cerveau peut encore créer de nouveaux neurones.",
-        "La sagesse émotionnelle atteint son apogée.",
-        "90% des gens ressentent plus de gratitude.",
-        "Le sommeil devient fragmenté mais suffisant.",
-        "La spiritualité ou la philosophie de vie devient centrale.",
-        "Le corps demande plus de soins doux (yoga, marche).",
-        "Les souvenirs deviennent plus précieux que les objets.",
-        "La mémoire autobiographique est très active.",
-        "Le besoin de transmission augmente.",
-        "L’âge moyen des écrivains de mémoires.",
-        "Le cerveau reste capable de ressentir de la joie intense.",
-        "Le lien intergénérationnel devient essentiel.",
-        "Plus de gens vivent jusqu’à 80 ans que jamais auparavant."
-      ];
-      const descriptions2 = [
-        "À la naissance, tu peux respirer et avaler en même temps… mais tu perds cette capacité vers 3 mois.",
-        "Ton cœur bat environ deux fois plus vite que celui d’un adulte.",
-        "À cet âge, ton cerveau est déjà plus actif que celui d’un adulte.",
-        "Tu produis plus de nouvelles connexions neuronales que jamais dans ta vie.",
-        "Les enfants de 4 ans posent en moyenne 300 questions par jour.",
-        "Ton squelette contient encore plus de 300 os (contre 206 à l’âge adulte).",
-        "Ton sens du goût est plus sensible que celui des adultes.",
-        "Beaucoup d’enfants perdent leur première dent de lait autour de cet âge.",
-        "Les enfants de 8 ans peuvent apprendre une langue étrangère presque sans accent.",
-        "Tu a une capacité pulmonaire proportionnellement plus grande que celle d’un adulte.",
-        "Ton cerveau atteint son volume maximal, mais pas encore sa maturité.",
-        "Les enfants courent souvent plus vite que leurs parents sur de courtes distances.",
-        "Les empreintes digitales sont désormais complètement formées.",
-        "C’est l’âge moyen où les adolescents rient le plus dans leur vie.",
-        "Ton sommeil devient naturellement plus tardif (horloge interne décalée).",
-        "Tu peux mémoriser des chansons entières en quelques écoutes.",
-        "Le centre des émotions dans ton cerveau est en pleine hyperactivité.",
-        "Ton temps de réaction est parmi les plus rapides de ta vie.",
-        "Tes cordes vocales sont à leur taille définitive.",
-        "Tes os sont plus durs que le béton… à l’échelle de leur résistance.",
-        "La plupart des athlètes olympiques atteignent leur pic de performance autour de cet âge.",
-        "Tu as environ 10 litres de sang qui circulent chaque minute au repos.",
-        "Ton cœur a déjà battu environ 800 millions de fois.",
-        "Tu peux encore doubler ta force musculaire avec l’entraînement.",
-        "Ton cerveau est à son pic de mémoire à court terme.",
-        "Les astronautes ont souvent entre 25 et 35 ans lors de leur première mission.",
-        "Tu peux avoir déjà parcouru plus de 200 000 km à pied depuis ta naissance (si tu marches beaucoup).",
-        "Tes réflexes visuels sont à leur maximum.",
-        "Ton odorat peut détecter environ 1 000 milliards d’odeurs différentes.",
-        "Ton oreille peut encore percevoir des fréquences très aiguës que les plus âgés ne distinguent plus.",
-        "Tu as cligné des yeux environ 400 millions de fois depuis ta naissance.",
-        "Les souvenirs d’enfance commencent souvent à s’estomper nettement.",
-        "Ton foie s’est déjà régénéré complètement plusieurs fois.",
-        "La peau se renouvelle environ tous les 28 jours.",
-        "Tes os se renouvellent entièrement tous les 10 ans.",
-        "Les neurones que tu as encore peuvent durer toute ta vie.",
-        "Tu as respiré environ 300 millions de fois depuis ta naissance.",
-        "Tes yeux ont vu environ 500 millions d’images distinctes.",
-        "Ton cœur a pompé environ 150 millions de litres de sang depuis ta naissance.",
-        "Ton système immunitaire a combattu des milliers de pathogènes différents.",
-        "Tes cellules se renouvellent plus lentement, mais ton expérience compense.",
-        "Ton cerveau traite les visages familiers plus vite que jamais.",
-        "Les cheveux gris contiennent en réalité des bulles d’air microscopiques.",
-        "Ton corps fabrique encore environ 2 millions de globules rouges chaque seconde.",
-        "Tu as parcouru l’équivalent de plusieurs fois le tour du monde à pied.",
-        "Tes oreilles et ton nez continuent de grandir toute ta vie.",
-        "Ton corps a remplacé entièrement presque toutes ses cellules depuis ta naissance.",
-        "Les fibres nerveuses transmettent l’information à plus de 400 km/h.",
-        "Ton estomac produit 2 à 3 litres d’acide gastrique par jour.",
-        "Ton cerveau contient encore la majorité des souvenirs stockés à 20 ans.",
-        "Ton cœur a battu plus de 2 milliards de fois depuis ta naissance.",
-        "Ton ADN a été copié des milliards de milliards de fois.",
-        "Ta peau a résisté à des millions d’agressions environnementales.",
-        "Tes muscles contiennent encore plus de 600 fibres distinctes.",
-        "Ton corps a produit des litres entiers de larmes depuis ta naissance.",
-        "Tu as probablement ri plus de 500 000 fois.",
-        "Tu as entendu des millions de sons différents.",
-        "Tu as respiré environ 400 millions de litres d’air.",
-        "Ton système nerveux reste un des plus rapides du règne animal.",
-        "Tes yeux ont capté plus de lumière que beaucoup d’animaux.",
-        "Ton cerveau a généré des milliards de pensées uniques.",
-        "Ton squelette a supporté l’équivalent de milliers de tonnes cumulées.",
-        "Tes mains ont exécuté des millions de gestes fins.",
-        "Tes pieds ont touché toutes sortes de sols, des plus chauds aux plus froids.",
-        "Ton cœur a travaillé sans arrêt depuis ta naissance.",
-        "Tu as fabriqué assez de salive pour remplir une piscine.",
-        "Ton corps a combattu des milliards de bactéries.",
-        "Tes os sont toujours plus solides que l’acier à poids égal.",
-        "Tes articulations ont effectué des millions de mouvements.",
-        "Ton cerveau reste capable d’apprendre jusqu’au dernier souffle.",
-        "Tes yeux ont cligné environ un demi-milliard de fois.",
-        "Tes oreilles ont vibré avec des milliards d’ondes sonores.",
-        "Ton système digestif a traité environ 30 tonnes de nourriture.",
-        "Ton cœur a pompé plus de 200 millions de litres de sang.",
-        "Ton squelette s’est renouvelé environ 7 fois depuis ta naissance.",
-        "Ton corps a fabriqué des millions de litres de sang neuf.",
-        "Ton système immunitaire t’a protégé contre des milliards de virus.",
-        "Tes jambes t’ont porté sur des milliers de kilomètres.",
-        "Ton cerveau a stocké l’équivalent de plusieurs millions de gigaoctets d’informations.",
-        "Ton corps a exécuté plus d’un milliard de battements de paupières.",
-        "Ton cœur a battu environ 3,3 milliards de fois, sans jamais prendre de pause."
-      ];
+      const fr = {
+        quotes: [
+          "“Chaque enfant commence le monde à nouveau.”",
+          "“Le rire d’un enfant est la lumière de la maison.”",
+          "“L’imagination est plus importante que le savoir.”",
+          "“Les petites choses deviennent les grands souvenirs.”",
+          "“Jouer, c’est le travail de l’enfant.”",
+          "“L’éducation est l’arme la plus puissante pour changer le monde.”",
+          "“Les enfants voient la magie parce qu’ils la cherchent.”",
+          "“La curiosité est le moteur de la découverte.”",
+          "“L’amitié est née au moment où une personne dit à une autre : ‘Toi aussi ?’”",
+          "“Ce que l’on apprend avec plaisir, on ne l’oublie jamais.”",
+          "“L’enfance est le sol sur lequel nous marcherons toute notre vie.”",
+          "“Grandir, c’est découvrir que le monde est plus vaste que soi.”",
+          "“La jeunesse est le temps d’étudier la sagesse ; la vieillesse est le temps de la pratiquer.”",
+          "“Sois toi-même, tous les autres sont déjà pris.”",
+          "“Ce n’est pas ce que tu regardes qui compte, c’est ce que tu vois.”",
+          "“La confiance en soi est le premier secret du succès.”",
+          "“La vie commence là où commence l’amour.”",
+          "“Le courage ne rugit pas toujours. Parfois, c’est la voix calme qui dit : ‘Je recommencerai demain.’”",
+          "“La liberté commence là où finit la peur.”",
+          "“Fais de ta vie un rêve, et d’un rêve une réalité.”",
+          "“La jeunesse n’est pas une période de la vie, c’est un état d’esprit.”",
+          "“Le monde est plein de belles choses, il suffit d’oser les chercher.”",
+          "“Ce n’est pas l’âge qui compte, mais l’intensité avec laquelle on vit.”",
+          "“La vie est une aventure audacieuse ou elle n’est rien.”",
+          "“Le bonheur n’est pas quelque chose de prêt à l’emploi. Il vient de tes propres actions.”",
+          "“Ce que tu fais aujourd’hui peut améliorer tous tes lendemains.”",
+          "“La vie ne se mesure pas en respirations, mais en moments qui nous coupent le souffle.”",
+          "“Ne vis pas la même année 75 fois et appelle ça une vie.”",
+          "“Le changement est douloureux, mais rien n’est plus douloureux que de rester coincé.”",
+          "“La vie est courte, fais que chaque jour compte.”",
+          "“Ce n’est jamais trop tard pour être ce que tu aurais pu être.”",
+          "“La maturité, c’est quand tu arrêtes de te plaindre et que tu commences à faire.”",
+          "“La vie est faite de choix. Choisis avec intention.”",
+          "“La paix vient de l’intérieur. Ne la cherche pas à l’extérieur.”",
+          "“La simplicité est la sophistication suprême.”",
+          "“Le succès n’est pas la clé du bonheur. Le bonheur est la clé du succès.”",
+          "“Ce que tu fais fait une différence. Tu dois décider quel genre de différence tu veux faire.”",
+          "“La sagesse commence dans l’émerveillement.”",
+          "“La vie est une série de milliers de petits miracles.”",
+          "“Le plus grand voyage commence par un pas.”",
+          "“La vie commence à 40 ans.”",
+          "“Le bonheur est réel seulement quand il est partagé.”",
+          "“La beauté de la vie réside dans ses imperfections.”",
+          "“Ce n’est pas l’âge qui rend sage, c’est l’expérience.”",
+          "“La gratitude transforme ce que nous avons en assez.”",
+          "“La vie est un miroir : elle te sourit si tu lui sourit.”",
+          "“Vieillir est obligatoire, grandir est un choix.”",
+          "“La sagesse ne vient pas avec les années, mais avec la capacité d’apprendre.”",
+          "“Le temps est un cadeau, pas une garantie.”",
+          "“La vie est une œuvre d’art, peins-la avec passion.”",
+          "“À cinquante ans, chacun a le visage qu’il mérite.”",
+          "“La vie est courte, mais elle est large.”",
+          "“L’âge est une question d’esprit sur la matière.”",
+          "“La sagesse est de savoir ce qu’il faut ignorer.”",
+          "“Le bonheur est une direction, pas une destination.”",
+          "“Le passé est un lieu de référence, pas de résidence.”",
+          "“La vie est une danse entre ce que tu veux et ce que tu crains.”",
+          "“La paix intérieure est le vrai succès.”",
+          "“Vieillir, c’est découvrir la beauté de la lenteur.”",
+          "“La mémoire est le journal que nous portons tous en nous.”",
+          "“L’âge est le prix de la sagesse.”",
+          "“Les souvenirs sont les trésors du cœur.”",
+          "“La vie est faite de moments, pas de choses.”",
+          "“Le bonheur est de savourer ce que l’on a.”",
+          "“La sagesse est de savoir quand parler et quand écouter.”",
+          "“La retraite est le début d’une nouvelle liberté.”",
+          "“La vie est plus douce quand on ralentit.”",
+          "“L’expérience est une lanterne qu’on porte dans le dos.”",
+          "“Le cœur ne vieillit jamais.”",
+          "“La sagesse est de vivre en paix avec le temps.”",
+          "“Chaque ride raconte une histoire.”",
+          "“La vie est un cadeau, même dans ses silences.”",
+          "“La spiritualité est le souffle de l’âme.”",
+          "“Le calme est une forme de puissance.”",
+          "“Les souvenirs sont les étoiles de notre ciel intérieur.”",
+          "“La mémoire est le miroir de l’âme.”",
+          "“Transmettre, c’est prolonger sa propre vie.”",
+          "“Écrire, c’est revivre.”",
+          "“La joie ne connaît pas d’âge.”",
+          "“Le lien humain est le plus grand héritage.”",
+          "“La vie est un poème, et chaque année est un vers.”"
+        ],
+        descriptions: [
+          "Un nouveau-né reconnaît la voix de sa mère dès la naissance.",
+          "À 1 an, le cerveau a déjà doublé de taille par rapport à la naissance.",
+          "Les enfants de 2 ans peuvent apprendre jusqu’à 10 nouveaux mots par jour.",
+          "À 3 ans, les connexions neuronales sont à leur pic.",
+          "Le jeu symbolique commence : les enfants imaginent des mondes.",
+          "90% du cerveau adulte est déjà formé.",
+          "L’enfant comprend les règles sociales de base.",
+          "L’âge moyen du début de la lecture autonome.",
+          "Les enfants développent leur sens moral et la notion de justice.",
+          "L’amitié devient plus importante que les jouets.",
+          "Le cerveau commence à se spécialiser dans certaines fonctions.",
+          "Les enfants commencent à comprendre l’ironie.",
+          "Le corps entre dans la puberté : croissance rapide.",
+          "Le cortex préfrontal commence à se remodeler.",
+          "L’adolescent peut ressentir des émotions plus intenses que les adultes.",
+          "Le sommeil devient irrégulier à cause des changements hormonaux.",
+          "L’âge moyen du premier amour ou crush.",
+          "Le cerveau atteint son pic de plasticité sociale.",
+          "L’âge légal de la majorité dans de nombreux pays.",
+          "Le cerveau commence à se stabiliser émotionnellement.",
+          "80% des gens ont déjà eu leur premier emploi.",
+          "L’âge moyen du premier déménagement hors du foyer parental.",
+          "Le cerveau atteint sa vitesse maximale de traitement.",
+          "L’âge moyen du premier diplôme universitaire.",
+          "Le métabolisme commence à ralentir légèrement.",
+          "Le cerveau atteint sa maturité complète.",
+          "L’âge moyen du premier achat immobilier dans certains pays.",
+          "Le risque de burn-out professionnel commence à apparaître.",
+          "La fertilité commence à diminuer lentement chez les femmes.",
+          "L’âge moyen du mariage dans de nombreux pays occidentaux.",
+          "60% des gens sont en couple stable.",
+          "Le corps commence à perdre de la masse musculaire sans exercice.",
+          "L’âge moyen du premier enfant.",
+          "Le cerveau commence à prioriser la stabilité émotionnelle.",
+          "Le sommeil profond diminue progressivement.",
+          "Le pic de productivité professionnelle.",
+          "Le risque de maladies cardiovasculaires commence à augmenter.",
+          "La mémoire à court terme commence à décliner légèrement.",
+          "L’âge moyen du premier doute existentiel sérieux.",
+          "Le stress lié à la carrière atteint souvent son pic.",
+          "Milieu de vie : bilan personnel et professionnel.",
+          "Le cerveau devient plus efficace dans la prise de décision.",
+          "L’âge moyen du premier divorce.",
+          "Le corps commence à perdre de la densité osseuse.",
+          "Les priorités changent : plus de temps pour soi.",
+          "Le risque de burn-out est élevé.",
+          "La vision commence à se détériorer (presbytie).",
+          "Le cerveau devient plus résilient au stress.",
+          "L’âge moyen du premier petit-enfant.",
+          "Le sentiment de sagesse commence à émerger.",
+          "70% des gens ont des enfants adultes.",
+          "Le sommeil devient plus léger.",
+          "Le bonheur augmente selon certaines études.",
+          "Le cerveau compense la perte de mémoire par l’expérience.",
+          "Les relations sociales deviennent plus profondes.",
+          "L’âge moyen de la retraite anticipée.",
+          "Le corps devient plus sensible aux changements alimentaires.",
+          "Le besoin de solitude augmente.",
+          "Le cerveau reste capable d’apprendre de nouvelles compétences.",
+          "La créativité peut atteindre un nouveau pic.",
+          "L’âge légal de la retraite dans plusieurs pays.",
+          "80% des gens ont des petits-enfants.",
+          "Le temps libre devient une richesse précieuse.",
+          "Le cerveau reste actif grâce à la lecture et aux jeux.",
+          "Le bonheur est souvent plus stable qu’à 30 ans.",
+          "L’âge moyen du bénévolat actif.",
+          "Le stress diminue malgré les soucis de santé.",
+          "L’expérience devient un capital social.",
+          "Le cerveau peut encore créer de nouveaux neurones.",
+          "La sagesse émotionnelle atteint son apogée.",
+          "90% des gens ressentent plus de gratitude.",
+          "Le sommeil devient fragmenté mais suffisant.",
+          "La spiritualité ou la philosophie de vie devient centrale.",
+          "Le corps demande plus de soins doux (yoga, marche).",
+          "Les souvenirs deviennent plus précieux que les objets.",
+          "La mémoire autobiographique est très active.",
+          "Le besoin de transmission augmente.",
+          "L’âge moyen des écrivains de mémoires.",
+          "Le cerveau reste capable de ressentir de la joie intense.",
+          "Le lien intergénérationnel devient essentiel.",
+          "Plus de gens vivent jusqu’à 80 ans que jamais auparavant."
+        ],
+        descriptions2: [
+          "À la naissance, tu peux respirer et avaler en même temps… mais tu perds cette capacité vers 3 mois.",
+          "Ton cœur bat environ deux fois plus vite que celui d’un adulte.",
+          "À cet âge, ton cerveau est déjà plus actif que celui d’un adulte.",
+          "Tu produis plus de nouvelles connexions neuronales que jamais dans ta vie.",
+          "Les enfants de 4 ans posent en moyenne 300 questions par jour.",
+          "Ton squelette contient encore plus de 300 os (contre 206 à l’âge adulte).",
+          "Ton sens du goût est plus sensible que celui des adultes.",
+          "Beaucoup d’enfants perdent leur première dent de lait autour de cet âge.",
+          "Les enfants de 8 ans peuvent apprendre une langue étrangère presque sans accent.",
+          "Tu a une capacité pulmonaire proportionnellement plus grande que celle d’un adulte.",
+          "Ton cerveau atteint son volume maximal, mais pas encore sa maturité.",
+          "Les enfants courent souvent plus vite que leurs parents sur de courtes distances.",
+          "Les empreintes digitales sont désormais complètement formées.",
+          "C’est l’âge moyen où les adolescents rient le plus dans leur vie.",
+          "Ton sommeil devient naturellement plus tardif (horloge interne décalée).",
+          "Tu peux mémoriser des chansons entières en quelques écoutes.",
+          "Le centre des émotions dans ton cerveau est en pleine hyperactivité.",
+          "Ton temps de réaction est parmi les plus rapides de ta vie.",
+          "Tes cordes vocales sont à leur taille définitive.",
+          "Tes os sont plus durs que le béton… à l’échelle de leur résistance.",
+          "La plupart des athlètes olympiques atteignent leur pic de performance autour de cet âge.",
+          "Tu as environ 10 litres de sang qui circulent chaque minute au repos.",
+          "Ton cœur a déjà battu environ 800 millions de fois.",
+          "Tu peux encore doubler ta force musculaire avec l’entraînement.",
+          "Ton cerveau est à son pic de mémoire à court terme.",
+          "Les astronautes ont souvent entre 25 et 35 ans lors de leur première mission.",
+          "Tu peux avoir déjà parcouru plus de 200 000 km à pied depuis ta naissance (si tu marches beaucoup).",
+          "Tes réflexes visuels sont à leur maximum.",
+          "Ton odorat peut détecter environ 1 000 milliards d’odeurs différentes.",
+          "Ton oreille peut encore percevoir des fréquences très aiguës que les plus âgés ne distinguent plus.",
+          "Tu as cligné des yeux environ 400 millions de fois depuis ta naissance.",
+          "Les souvenirs d’enfance commencent souvent à s’estomper nettement.",
+          "Ton foie s’est déjà régénéré complètement plusieurs fois.",
+          "La peau se renouvelle environ tous les 28 jours.",
+          "Tes os se renouvellent entièrement tous les 10 ans.",
+          "Les neurones que tu as encore peuvent durer toute ta vie.",
+          "Tu as respiré environ 300 millions de fois depuis ta naissance.",
+          "Tes yeux ont vu environ 500 millions d’images distinctes.",
+          "Ton cœur a pompé environ 150 millions de litres de sang depuis ta naissance.",
+          "Ton système immunitaire a combattu des milliers de pathogènes différents.",
+          "Tes cellules se renouvellent plus lentement, mais ton expérience compense.",
+          "Ton cerveau traite les visages familiers plus vite que jamais.",
+          "Les cheveux gris contiennent en réalité des bulles d’air microscopiques.",
+          "Ton corps fabrique encore environ 2 millions de globules rouges chaque seconde.",
+          "Tu as parcouru l’équivalent de plusieurs fois le tour du monde à pied.",
+          "Tes oreilles et ton nez continuent de grandir toute ta vie.",
+          "Ton corps a remplacé entièrement presque toutes ses cellules depuis ta naissance.",
+          "Les fibres nerveuses transmettent l’information à plus de 400 km/h.",
+          "Ton estomac produit 2 à 3 litres d’acide gastrique par jour.",
+          "Ton cerveau contient encore la majorité des souvenirs stockés à 20 ans.",
+          "Ton cœur a battu plus de 2 milliards de fois depuis ta naissance.",
+          "Ton ADN a été copié des milliards de milliards de fois.",
+          "Ta peau a résisté à des millions d’agressions environnementales.",
+          "Tes muscles contiennent encore plus de 600 fibres distinctes.",
+          "Ton corps a produit des litres entiers de larmes depuis ta naissance.",
+          "Tu as probablement ri plus de 500 000 fois.",
+          "Tu as entendu des millions de sons différents.",
+          "Tu as respiré environ 400 millions de litres d’air.",
+          "Ton système nerveux reste un des plus rapides du règne animal.",
+          "Tes yeux ont capté plus de lumière que beaucoup d’animaux.",
+          "Ton cerveau a généré des milliards de pensées uniques.",
+          "Ton squelette a supporté l’équivalent de milliers de tonnes cumulées.",
+          "Tes mains ont exécuté des millions de gestes fins.",
+          "Tes pieds ont touché toutes sortes de sols, des plus chauds aux plus froids.",
+          "Ton cœur a travaillé sans arrêt depuis ta naissance.",
+          "Tu as fabriqué assez de salive pour remplir une piscine.",
+          "Ton corps a combattu des milliards de bactéries.",
+          "Tes os sont toujours plus solides que l’acier à poids égal.",
+          "Tes articulations ont effectué des millions de mouvements.",
+          "Ton cerveau reste capable d’apprendre jusqu’au dernier souffle.",
+          "Tes yeux ont cligné environ un demi-milliard de fois.",
+          "Tes oreilles ont vibré avec des milliards d’ondes sonores.",
+          "Ton système digestif a traité environ 30 tonnes de nourriture.",
+          "Ton cœur a pompé plus de 200 millions de litres de sang.",
+          "Ton squelette s’est renouvelé environ 7 fois depuis ta naissance.",
+          "Ton corps a fabriqué des millions de litres de sang neuf.",
+          "Ton système immunitaire t’a protégé contre des milliards de virus.",
+          "Tes jambes t’ont porté sur des milliers de kilomètres.",
+          "Ton cerveau a stocké l’équivalent de plusieurs millions de gigaoctets d’informations.",
+          "Ton corps a exécuté plus d’un milliard de battements de paupières.",
+          "Ton cœur a battu environ 3,3 milliards de fois, sans jamais prendre de pause."
+        ],
+        lifeLessons: [
+          "Bienvenue dans le monde, petit miracle 🌟",
+          "Continue d’explorer, chaque pas est une victoire.",
+          "Ta curiosité est ta super-puissance.",
+          "Tu rends chaque journée plus joyeuse.",
+          "Tu as déjà une imagination incroyable, garde-la précieusement.",
+          "Continue de poser des questions, elles t’ouvriront des portes.",
+          "Ta joie est contagieuse, partage-la souvent.",
+          "Tu es déjà plus courageux que tu ne le crois.",
+          "Garde ce sourire, il illumine ton entourage.",
+          "Tu as déjà tant de potentiel, crois en toi.",
+          "Ton esprit vif est un vrai trésor.",
+          "Tes idées comptent, exprime-les.",
+          "Continue de croire que tout est possible.",
+          "Tes différences sont ta plus grande force.",
+          "Sois fier de qui tu es, même si tu changes encore.",
+          "Tu as un courage que tu ne vois pas encore.",
+          "Tes rêves méritent d’être poursuivis.",
+          "Tu es plus prêt pour l’avenir que tu ne le penses.",
+          "C’est ton moment d’oser, le monde est grand et à toi.",
+          "Garde la curiosité de tes 10 ans et l’audace de tes 20 ans.",
+          "Tu peux tracer ta route, elle n’a pas besoin d’être parfaite.",
+          "Tu es capable de grandes choses, pas besoin de tout prouver.",
+          "Chaque échec est juste une étape vers ta réussite.",
+          "Ta jeunesse est un atout, mais ta maturité commence à briller.",
+          "Continue de t’entourer de gens qui t’élèvent.",
+          "Ton histoire ne fait que commencer.",
+          "Tu peux être à la fois prudent et ambitieux.",
+          "Tu as déjà surmonté tant de choses, bravo.",
+          "Ton expérience est précieuse, partage-la.",
+          "Tu as encore toute la vie pour changer de cap.",
+          "Tu es dans la force de l’âge, savoure-le.",
+          "Tu inspires plus de monde que tu ne le sais.",
+          "Ta stabilité est une base solide pour de grands projets.",
+          "Ton équilibre entre raison et passion est admirable.",
+          "Tu sais déjà ce qui compte vraiment pour toi, reste aligné.",
+          "Tu as la maturité pour dire oui… et pour dire non.",
+          "Tu sais t’adapter, c’est un vrai talent.",
+          "Tes choix inspirent discrètement ceux qui t’entourent.",
+          "Tu es une belle combinaison de force et de douceur.",
+          "Tu as la sagesse de l’expérience et l’énergie d’un jeune.",
+          "Tu es un bel exemple de persévérance.",
+          "Ta vision du monde est plus riche que jamais.",
+          "Tu sais ce que tu veux, et ça se voit.",
+          "Ton calme est une force qui rassure les autres.",
+          "Tu sais trouver la beauté dans les petites choses.",
+          "Tu es plus fort que la somme de toutes tes épreuves.",
+          "Ton authenticité est rafraîchissante.",
+          "Tu as le droit de te réinventer, même maintenant.",
+          "Ta présence apporte de la stabilité aux autres.",
+          "Tu es la preuve qu’on peut vieillir avec grâce.",
+          "Tu portes ta vie comme une œuvre d’art.",
+          "Tu es une source d’inspiration pour ceux qui te suivent.",
+          "Tu sais profiter des bons moments.",
+          "Ta sagesse vaut plus que de l’or.",
+          "Tu rayonnes d’une maturité sereine.",
+          "Tu es une bibliothèque vivante de souvenirs précieux.",
+          "Ton sourire raconte des histoires.",
+          "Tu es un exemple de résilience.",
+          "Tu as appris à faire la paix avec le passé.",
+          "Tu sais mieux que quiconque apprécier le présent.",
+          "Tu es une belle preuve que la joie n’a pas d’âge.",
+          "Tu es une source de conseils précieux.",
+          "Ta bienveillance marque ceux qui te croisent.",
+          "Tu as appris à savourer la vie lentement.",
+          "Ton humour reste une arme redoutable.",
+          "Tu as encore tant à offrir au monde.",
+          "Tu es un pilier pour ceux que tu aimes.",
+          "Tu as cette élégance qui vient avec le temps.",
+          "Ta voix est écoutée et respectée.",
+          "Tu es la preuve que l’âme reste jeune.",
+          "Tu inspires par ton vécu et ta lumière.",
+          "Tu sais transmettre tes valeurs avec douceur.",
+          "Ton regard porte toute une vie d’expériences.",
+          "Tu es un gardien de souvenirs précieux.",
+          "Tu as un charme intemporel.",
+          "Tu es une leçon vivante de courage.",
+          "Tu as encore la capacité d’émerveiller.",
+          "Tu es un repère pour plusieurs générations.",
+          "Tu sais que chaque jour est un cadeau.",
+          "Ta vie est une histoire que beaucoup aimeraient entendre.",
+          "Tu es la preuve vivante que la beauté et la valeur grandissent avec le temps."
+        ],
+        startButton: "Commencer",
+        reliveButton: "Revivre la vie",
+        yearText: " ans"
+      };
 
-      const lifeLessons = [
-        "Bienvenue dans le monde, petit miracle",
-        "Continue d’explorer, chaque pas est une victoire.",
-        "Ta curiosité est ta super-puissance.",
-        "Tu rends chaque journée plus joyeuse.",
-        "Tu as déjà une imagination incroyable, garde-la précieusement.",
-        "Continue de poser des questions, elles t’ouvriront des portes.",
-        "Ta joie est contagieuse, partage-la souvent.",
-        "Tu es déjà plus courageux que tu ne le crois.",
-        "Garde ce sourire, il illumine ton entourage.",
-        "Tu as déjà tant de potentiel, crois en toi.",
-        "Ton esprit vif est un vrai trésor.",
-        "Tes idées comptent, exprime-les.",
-        "Continue de croire que tout est possible.",
-        "Tes différences sont ta plus grande force.",
-        "Sois fier de qui tu es, même si tu changes encore.",
-        "Tu as un courage que tu ne vois pas encore.",
-        "Tes rêves méritent d’être poursuivis.",
-        "Tu es plus prêt pour l’avenir que tu ne le penses.",
-        "C’est ton moment d’oser, le monde est grand et à toi.",
-        "Garde la curiosité de tes 10 ans et l’audace de tes 20 ans.",
-        "Tu peux tracer ta route, elle n’a pas besoin d’être parfaite.",
-        "Tu es capable de grandes choses, pas besoin de tout prouver.",
-        "Chaque échec est juste une étape vers ta réussite.",
-        "Ta jeunesse est un atout, mais ta maturité commence à briller.",
-        "Continue de t’entourer de gens qui t’élèvent.",
-        "Ton histoire ne fait que commencer.",
-        "Tu peux être à la fois prudent et ambitieux.",
-        "Tu as déjà surmonté tant de choses, bravo.",
-        "Ton expérience est précieuse, partage-la.",
-        "Tu as encore toute la vie pour changer de cap.",
-        "Tu es dans la force de l’âge, savoure-le.",
-        "Tu inspires plus de monde que tu ne le sais.",
-        "Ta stabilité est une base solide pour de grands projets.",
-        "Ton équilibre entre raison et passion est admirable.",
-        "Tu sais déjà ce qui compte vraiment pour toi, reste aligné.",
-        "Tu as la maturité pour dire oui… et pour dire non.",
-        "Tu sais t’adapter, c’est un vrai talent.",
-        "Tes choix inspirent discrètement ceux qui t’entourent.",
-        "Tu es une belle combinaison de force et de douceur.",
-        "Tu as la sagesse de l’expérience et l’énergie d’un jeune.",
-        "Tu es un bel exemple de persévérance.",
-        "Ta vision du monde est plus riche que jamais.",
-        "Tu sais ce que tu veux, et ça se voit.",
-        "Ton calme est une force qui rassure les autres.",
-        "Tu sais trouver la beauté dans les petites choses.",
-        "Tu es plus fort que la somme de toutes tes épreuves.",
-        "Ton authenticité est rafraîchissante.",
-        "Tu as le droit de te réinventer, même maintenant.",
-        "Ta présence apporte de la stabilité aux autres.",
-        "Tu es la preuve qu’on peut vieillir avec grâce.",
-        "Tu portes ta vie comme une œuvre d’art.",
-        "Tu es une source d’inspiration pour ceux qui te suivent.",
-        "Tu sais profiter des bons moments.",
-        "Ta sagesse vaut plus que de l’or.",
-        "Tu rayonnes d’une maturité sereine.",
-        "Tu es une bibliothèque vivante de souvenirs précieux.",
-        "Ton sourire raconte des histoires.",
-        "Tu es un exemple de résilience.",
-        "Tu as appris à faire la paix avec le passé.",
-        "Tu sais mieux que quiconque apprécier le présent.",
-        "Tu es une belle preuve que la joie n’a pas d’âge.",
-        "Tu es une source de conseils précieux.",
-        "Ta bienveillance marque ceux qui te croisent.",
-        "Tu as appris à savourer la vie lentement.",
-        "Ton humour reste une arme redoutable.",
-        "Tu as encore tant à offrir au monde.",
-        "Tu es un pilier pour ceux que tu aimes.",
-        "Tu as cette élégance qui vient avec le temps.",
-        "Ta voix est écoutée et respectée.",
-        "Tu es la preuve que l’âme reste jeune.",
-        "Tu inspires par ton vécu et ta lumière.",
-        "Tu sais transmettre tes valeurs avec douceur.",
-        "Ton regard porte toute une vie d’expériences.",
-        "Tu es un gardien de souvenirs précieux.",
-        "Tu as un charme intemporel.",
-        "Tu es une leçon vivante de courage.",
-        "Tu as encore la capacité d’émerveiller.",
-        "Tu es un repère pour plusieurs générations.",
-        "Tu sais que chaque jour est un cadeau.",
-        "Ta vie est une histoire que beaucoup aimeraient entendre.",
-        "Tu es la preuve vivante que la beauté et la valeur grandissent avec le temps."
-      ];
+      const en = {
+        quotes: [
+          "“Every child begins the world again.”",
+          "“A child's laughter is the light of the house.”",
+          "“Imagination is more important than knowledge.”",
+          "“The little things become the great memories.”",
+          "“Play is the work of the child.”",
+          "“Education is the most powerful weapon which you can use to change the world.”",
+          "“Children see magic because they look for it.”",
+          "“Curiosity is the engine of discovery.”",
+          "“Friendship is born at that moment when one person says to another: ‘What? You too?’”",
+          "“What we learn with pleasure, we never forget.”",
+          "“Childhood is the soil on which we will walk all our lives.”",
+          "“To grow up is to discover that the world is bigger than yourself.”",
+          "“Youth is the time to study wisdom; old age is the time to practice it.”",
+          "“Be yourself; everyone else is already taken.”",
+          "“It's not what you look at that matters, it's what you see.”",
+          "“Self-confidence is the first secret of success.”",
+          "“Life begins where love begins.”",
+          "“Courage doesn’t always roar. Sometimes, it’s the quiet voice at the end of the day saying, ‘I will try again tomorrow.’”",
+          "“Freedom begins where fear ends.”",
+          "“Make your life a dream, and a dream a reality.”",
+          "“Youth is not a period of life, but a state of mind.”",
+          "“The world is full of beautiful things, you just have to dare to look for them.”",
+          "“It's not the years in your life that count, but the life in your years.”",
+          "“Life is either a daring adventure or nothing at all.”",
+          "“Happiness is not something ready-made. It comes from your own actions.”",
+          "“What you do today can improve all your tomorrows.”",
+          "“Life is not measured by the number of breaths we take, but by the moments that take our breath away.”",
+          "“Don’t live the same year 75 times and call it a life.”",
+          "“Change is painful, but nothing is as painful as staying stuck.”",
+          "“Life is short, make every day count.”",
+          "“It’s never too late to be what you might have been.”",
+          "“Maturity is when you stop complaining and start making.”",
+          "“Life is about choices. Choose with intention.”",
+          "“Peace comes from within. Do not seek it without.”",
+          "“Simplicity is the ultimate sophistication.”",
+          "“Success is not the key to happiness. Happiness is the key to success.”",
+          "“What you do makes a difference. You have to decide what kind of difference you want to make.”",
+          "“Wisdom begins in wonder.”",
+          "“Life is a series of thousands of little miracles.”",
+          "“The longest journey begins with a single step.”",
+          "“Life begins at forty.”",
+          "“Happiness is only real when shared.”",
+          "“The beauty of life lies in its imperfections.”",
+          "“It’s not age that makes you wise, it’s experience.”",
+          "“Gratitude turns what we have into enough.”",
+          "“Life is a mirror: it smiles at you if you smile back.”",
+          "“Growing old is mandatory, growing up is optional.”",
+          "“Wisdom does not come with years, but with the ability to learn.”",
+          "“Time is a gift, not a guarantee.”",
+          "“Life is a work of art, paint it with passion.”",
+          "“At fifty, everyone has the face they deserve.”",
+          "“Life is short, but it is wide.”",
+          "“Age is a case of mind over matter.”",
+          "“Wisdom is knowing what to ignore.”",
+          "“Happiness is a direction, not a destination.”",
+          "“The past is a place of reference, not a place of residence.”",
+          "“Life is a dance between what you want and what you fear.”",
+          "“Inner peace is the real success.”",
+          "“Growing old is discovering the beauty of slowness.”",
+          "“Memory is the diary we all carry with us.”",
+          "“Age is the price of wisdom.”",
+          "“Memories are the treasures of the heart.”",
+          "“Life is made of moments, not things.”",
+          "“Happiness is about savoring what you have.”",
+          "“Wisdom is knowing when to speak and when to listen.”",
+          "“Retirement is the beginning of a new freedom.”",
+          "“Life is sweeter when you slow down.”",
+          "“Experience is a lantern which we carry on our back.”",
+          "“The heart never grows old.”",
+          "“Wisdom is living in peace with time.”",
+          "“Every wrinkle tells a story.”",
+          "“Life is a gift, even in its silences.”",
+          "“Spirituality is the breath of the soul.”",
+          "“Calmness is a form of power.”",
+          "“Memories are the stars of our inner sky.”",
+          "“Memory is the mirror of the soul.”",
+          "“To pass on is to prolong one's own life.”",
+          "“To write is to relive.”",
+          "“Joy knows no age.”",
+          "“The human connection is the greatest legacy.”",
+          "“Life is a poem, and each year is a verse.”"
+        ],
+        descriptions: [
+          "A newborn recognizes its mother's voice from birth.",
+          "By age 1, the brain has already doubled in size since birth.",
+          "2-year-olds can learn up to 10 new words per day.",
+          "At age 3, neural connections are at their peak.",
+          "Symbolic play begins: children imagine worlds.",
+          "90% of the adult brain is already formed.",
+          "The child understands basic social rules.",
+          "The average age for starting independent reading.",
+          "Children develop their moral sense and concept of justice.",
+          "Friendship becomes more important than toys.",
+          "The brain begins to specialize in certain functions.",
+          "Children start to understand irony.",
+          "The body enters puberty: rapid growth.",
+          "The prefrontal cortex begins to remodel itself.",
+          "Adolescents can feel emotions more intensely than adults.",
+          "Sleep becomes irregular due to hormonal changes.",
+          "The average age for a first crush or love.",
+          "The brain reaches its peak of social plasticity.",
+          "The legal age of majority in many countries.",
+          "The brain begins to stabilize emotionally.",
+          "80% of people have already had their first job.",
+          "The average age of the first move out of the parental home.",
+          "The brain reaches its maximum processing speed.",
+          "The average age of the first university degree.",
+          "Metabolism begins to slow down slightly.",
+          "The brain reaches full maturity.",
+          "The average age of the first home purchase in some countries.",
+          "The risk of professional burnout begins to appear.",
+          "Fertility begins to decline slowly in women.",
+          "The average age of marriage in many Western countries.",
+          "60% of people are in a stable relationship.",
+          "The body begins to lose muscle mass without exercise.",
+          "The average age of the first child.",
+          "The brain begins to prioritize emotional stability.",
+          "Deep sleep gradually decreases.",
+          "The peak of professional productivity.",
+          "The risk of cardiovascular diseases begins to increase.",
+          "Short-term memory begins to decline slightly.",
+          "The average age of a serious existential crisis.",
+          "Career-related stress often reaches its peak.",
+          "Mid-life: personal and professional review.",
+          "The brain becomes more efficient at making decisions.",
+          "The average age of the first divorce.",
+          "The body begins to lose bone density.",
+          "Priorities change: more time for oneself.",
+          "The risk of burnout is high.",
+          "Vision begins to deteriorate (presbyopia).",
+          "The brain becomes more resilient to stress.",
+          "The average age of the first grandchild.",
+          "The feeling of wisdom begins to emerge.",
+          "70% of people have adult children.",
+          "Sleep becomes lighter.",
+          "Happiness increases according to some studies.",
+          "The brain compensates for memory loss with experience.",
+          "Social relationships become deeper.",
+          "The average age of early retirement.",
+          "The body becomes more sensitive to dietary changes.",
+          "The need for solitude increases.",
+          "The brain remains capable of learning new skills.",
+          "Creativity can reach a new peak.",
+          "The legal retirement age in many countries.",
+          "80% of people have grandchildren.",
+          "Free time becomes a precious asset.",
+          "The brain remains active thanks to reading and games.",
+          "Happiness is often more stable than at age 30.",
+          "The average age of active volunteering.",
+          "Stress decreases despite health concerns.",
+          "Experience becomes a social capital.",
+          "The brain can still create new neurons.",
+          "Emotional wisdom reaches its peak.",
+          "90% of people feel more gratitude.",
+          "Sleep becomes fragmented but sufficient.",
+          "Spirituality or life philosophy becomes central.",
+          "The body requires more gentle care (yoga, walking).",
+          "Memories become more precious than objects.",
+          "Autobiographical memory is very active.",
+          "The need for transmission increases.",
+          "The average age of memoir writers.",
+          "The brain remains capable of feeling intense joy.",
+          "Intergenerational connection becomes essential.",
+          "More people live to 80 than ever before."
+        ],
+        descriptions2: [
+          "At birth, you can breathe and swallow at the same time... but you lose this ability around 3 months.",
+          "Your heart beats about twice as fast as an adult's.",
+          "At this age, your brain is already more active than an adult's.",
+          "You produce more new neural connections than ever in your life.",
+          "4-year-olds ask an average of 300 questions per day.",
+          "Your skeleton still contains over 300 bones (compared to 206 as an adult).",
+          "Your sense of taste is more sensitive than an adult's.",
+          "Many children lose their first baby tooth around this age.",
+          "8-year-olds can learn a foreign language with almost no accent.",
+          "You have a proportionally larger lung capacity than an adult.",
+          "Your brain reaches its maximum volume, but not yet its maturity.",
+          "Children often run faster than their parents over short distances.",
+          "Fingerprints are now fully formed.",
+          "This is the average age where teenagers laugh the most in their lives.",
+          "Your sleep becomes naturally later (shifted internal clock).",
+          "You can memorize entire songs with just a few listens.",
+          "The emotional center in your brain is in full hyper-activity.",
+          "Your reaction time is among the fastest of your life.",
+          "Your vocal cords are at their final size.",
+          "Your bones are harder than concrete... on the scale of their resistance.",
+          "Most Olympic athletes reach their peak performance around this age.",
+          "You have about 10 liters of blood circulating per minute at rest.",
+          "Your heart has already beaten about 800 million times.",
+          "You can still double your muscle strength with training.",
+          "Your brain is at its peak for short-term memory.",
+          "Astronauts are often between 25 and 35 years old on their first mission.",
+          "You may have already walked over 200,000 km since birth (if you walk a lot).",
+          "Your visual reflexes are at their maximum.",
+          "Your sense of smell can detect about 1 trillion different odors.",
+          "Your ear can still perceive very high frequencies that older people no longer distinguish.",
+          "You have blinked about 400 million times since birth.",
+          "Childhood memories often begin to fade distinctly.",
+          "Your liver has already regenerated completely several times.",
+          "Skin renews itself about every 28 days.",
+          "Your bones renew themselves completely every 10 years.",
+          "The neurons you still have can last your whole life.",
+          "You have breathed about 300 million times since birth.",
+          "Your eyes have seen about 500 million distinct images.",
+          "Your heart has pumped about 150 million liters of blood since birth.",
+          "Your immune system has fought thousands of different pathogens.",
+          "Your cells renew themselves more slowly, but your experience compensates.",
+          "Your brain processes familiar faces faster than ever.",
+          "Gray hair actually contains microscopic air bubbles.",
+          "Your body still makes about 2 million red blood cells every second.",
+          "You have walked the equivalent of several times around the world.",
+          "Your ears and nose continue to grow throughout your life.",
+          "Your body has completely replaced almost all of its cells since birth.",
+          "Nerve fibers transmit information at over 400 km/h.",
+          "Your stomach produces 2 to 3 liters of gastric acid per day.",
+          "Your brain still contains the majority of memories stored at age 20.",
+          "Your heart has beaten over 2 billion times since birth.",
+          "Your DNA has been copied billions of billions of times.",
+          "Your skin has resisted millions of environmental aggressions.",
+          "Your muscles still contain over 600 distinct fibers.",
+          "Your body has produced entire liters of tears since birth.",
+          "You have probably laughed over 500,000 times.",
+          "You have heard millions of different sounds.",
+          "You have breathed about 400 million liters of air.",
+          "Your nervous system remains one of the fastest in the animal kingdom.",
+          "Your eyes have captured more light than many animals.",
+          "Your brain has generated billions of unique thoughts.",
+          "Your skeleton has supported the equivalent of thousands of cumulative tons.",
+          "Your hands have performed millions of fine gestures.",
+          "Your feet have touched all sorts of ground, from the hottest to the coldest.",
+          "Your heart has worked non-stop since birth.",
+          "You have made enough saliva to fill a swimming pool.",
+          "Your body has fought billions of bacteria.",
+          "Your bones are still stronger than steel by weight.",
+          "Your joints have performed millions of movements.",
+          "Your brain remains capable of learning until your last breath.",
+          "Your eyes have blinked about half a billion times.",
+          "Your ears have vibrated with billions of sound waves.",
+          "Your digestive system has processed about 30 tons of food.",
+          "Your heart has pumped over 200 million liters of blood.",
+          "Your skeleton has renewed itself about 7 times since birth.",
+          "Your body has made millions of liters of new blood.",
+          "Your immune system has protected you against billions of viruses.",
+          "Your legs t'ont porté sur des milliers de kilomètres.",
+          "Your brain has stored the equivalent of several million gigabytes of information.",
+          "Your body has performed over a billion eyelid beats.",
+          "Your heart has beaten about 3.3 billion times, without ever taking a break."
+        ],
+        lifeLessons: [
+          "Welcome to the world, little miracle 🌟",
+          "Keep exploring, every step is a victory.",
+          "Your curiosity is your superpower.",
+          "You make every day more joyful.",
+          "You already have an incredible imagination, cherish it.",
+          "Keep asking questions, they will open doors for you.",
+          "Your joy is contagious, share it often.",
+          "You are already braver than you think.",
+          "Keep that smile, it brightens everyone around you.",
+          "You already have so much potential, believe in yourself.",
+          "Your sharp mind is a real treasure.",
+          "Your ideas matter, express them.",
+          "Keep believing that anything is possible.",
+          "Your differences are your greatest strength.",
+          "Be proud of who you are, even if you're still changing.",
+          "You have a courage you don't see yet.",
+          "Your dreams are worth pursuing.",
+          "You're more ready for the future than you think.",
+          "This is your time to dare, the world is big and it's yours.",
+          "Keep the curiosity of your 10-year-old self and the audacity of your 20-year-old self.",
+          "You can forge your own path, it doesn't have to be perfect.",
+          "You are capable of great things, no need to prove everything.",
+          "Every failure is just a step towards your success.",
+          "Your youth is an asset, but your maturity is starting to shine.",
+          "Keep surrounding yourself with people who lift you up.",
+          "Your story is just beginning.",
+          "You can be both cautious and ambitious.",
+          "You have already overcome so much, well done.",
+          "Your experience is valuable, share it.",
+          "You still have your whole life to change direction.",
+          "You are in the prime of your life, savor it.",
+          "You inspire more people than you know.",
+          "Your stability is a solid foundation for great projects.",
+          "Your balance between reason and passion is admirable.",
+          "You already know what truly matters to you, stay aligned.",
+          "You have the maturity to say yes... and to say no.",
+          "You know how to adapt, that's a real talent.",
+          "Your choices subtly inspire those around you.",
+          "You are a beautiful combination of strength and gentleness.",
+          "You have the wisdom of experience and the energy of youth.",
+          "You are a great example of perseverance.",
+          "Your vision of the world is richer than ever.",
+          "You know what you want, and it shows.",
+          "Your calm is a strength that reassures others.",
+          "You know how to find beauty in the little things.",
+          "You are stronger than the sum of all your trials.",
+          "Your authenticity is refreshing.",
+          "You have the right to reinvent yourself, even now.",
+          "Your presence brings stability to others.",
+          "You are proof that one can age with grace.",
+          "You wear your life like a work of art.",
+          "You are a source of inspiration for those who follow you.",
+          "You know how to enjoy the good times.",
+          "Your wisdom is worth more than gold.",
+          "You radiate with a serene maturity.",
+          "You are a living library of precious memories.",
+          "Your smile tells stories.",
+          "You are an example of resilience.",
+          "You have learned to make peace with the past.",
+          "You know better than anyone how to appreciate the present.",
+          "You are a beautiful proof that joy has no age.",
+          "You are a source of precious advice.",
+          "Your kindness touches those you meet.",
+          "You have learned to savor life slowly.",
+          "Your humor remains a formidable weapon.",
+          "You still have so much to offer the world.",
+          "You are a pillar for those you love.",
+          "You have that elegance that comes with time.",
+          "Your voice is heard and respected.",
+          "You are proof that the soul remains young.",
+          "You inspire with your experience and your light.",
+          "You know how to pass on your values with gentleness.",
+          "Your gaze holds a lifetime of experiences.",
+          "You are a guardian of precious memories.",
+          "You have a timeless charm.",
+          "You are a living lesson in courage.",
+          "You still have the capacity to be amazed.",
+          "You are a landmark for several generations.",
+          "You know that every day is a gift.",
+          "Your life is a story many would love to hear.",
+          "You are living proof that beauty and value grow with time."
+        ],
+        descriptions2: [
+          "At birth, you can breathe and swallow at the same time... but you lose this ability around 3 months.",
+          "Your heart beats about twice as fast as an adult's.",
+          "At this age, your brain is already more active than an adult's.",
+          "You produce more new neural connections than ever in your life.",
+          "4-year-olds ask an average of 300 questions per day.",
+          "Your skeleton still contains over 300 bones (compared to 206 as an adult).",
+          "Your sense of taste is more sensitive than an adult's.",
+          "Many children lose their first baby tooth around this age.",
+          "8-year-olds can learn a foreign language with almost no accent.",
+          "You have a proportionally larger lung capacity than an adult.",
+          "Your brain reaches its maximum volume, but not yet its maturity.",
+          "Children often run faster than their parents over short distances.",
+          "Fingerprints are now fully formed.",
+          "This is the average age where teenagers laugh the most in their lives.",
+          "Your sleep becomes naturally later (shifted internal clock).",
+          "You can memorize entire songs with just a few listens.",
+          "The emotional center in your brain is in full hyper-activity.",
+          "Your reaction time is among the fastest of your life.",
+          "Your vocal cords are at their final size.",
+          "Your bones are harder than concrete... on the scale of their resistance.",
+          "Most Olympic athletes reach their peak performance around this age.",
+          "You have about 10 liters of blood circulating per minute at rest.",
+          "Your heart has already beaten about 800 million times.",
+          "You can still double your muscle strength with training.",
+          "Your brain is at its peak for short-term memory.",
+          "Astronauts are often between 25 and 35 years old on their first mission.",
+          "You may have already walked over 200,000 km since birth (if you walk a lot).",
+          "Your visual reflexes are at their maximum.",
+          "Your sense of smell can detect about 1 trillion different odors.",
+          "Your ear can still perceive very high frequencies that older people no longer distinguish.",
+          "You have blinked about 400 million times since birth.",
+          "Childhood memories often begin to fade distinctly.",
+          "Your liver has already regenerated completely several times.",
+          "Skin renews itself about every 28 days.",
+          "Your bones renew themselves completely every 10 years.",
+          "The neurons you still have can last your whole life.",
+          "You have breathed about 300 million times since birth.",
+          "Your eyes have seen about 500 million distinct images.",
+          "Your heart has pumped about 150 million liters of blood since birth.",
+          "Your immune system has fought thousands of different pathogens.",
+          "Your cells renew themselves more slowly, but your experience compensates.",
+          "Your brain processes familiar faces faster than ever.",
+          "Gray hair actually contains microscopic air bubbles.",
+          "Your body still makes about 2 million red blood cells every second.",
+          "You have walked the equivalent of several times around the world.",
+          "Your ears and nose continue to grow throughout your life.",
+          "Your body has completely replaced almost all of its cells since birth.",
+          "Nerve fibers transmit information at over 400 km/h.",
+          "Your stomach produces 2 to 3 liters of gastric acid per day.",
+          "Your brain still contains the majority of memories stored at age 20.",
+          "Your heart has beaten over 2 billion times since birth.",
+          "Your DNA has been copied billions of billions of times.",
+          "Your skin has resisted millions of environmental aggressions.",
+          "Your muscles still contain over 600 distinct fibers.",
+          "Your body has produced entire liters of tears since birth.",
+          "You have probably laughed over 500,000 times.",
+          "You have heard millions of different sounds.",
+          "You have breathed about 400 million liters of air.",
+          "Your nervous system remains one of the fastest in the animal kingdom.",
+          "Your eyes have captured more light than many animals.",
+          "Your brain has generated billions of unique thoughts.",
+          "Your skeleton has supported the equivalent of thousands of cumulative tons.",
+          "Your hands have performed millions of fine gestures.",
+          "Your feet have touched all sorts of ground, from the hottest to the coldest.",
+          "Your heart has worked non-stop since birth.",
+          "You have made enough saliva to fill a swimming pool.",
+          "Your body has fought billions of bacteria.",
+          "Your bones are still stronger than steel by weight.",
+          "Your joints have performed millions of movements.",
+          "Your brain remains capable of learning until your last breath.",
+          "Your eyes have blinked about half a billion times.",
+          "Your ears have vibrated with billions of sound waves.",
+          "Your digestive system has processed about 30 tons of food.",
+          "Your heart has pumped over 200 million liters of blood.",
+          "Your skeleton has renewed itself about 7 times since birth.",
+          "Your body has made millions of liters of new blood.",
+          "Your immune system has protected you against billions of viruses.",
+          "Your legs have carried you for thousands of kilometers.",
+          "Your brain has stored the equivalent of several million gigabytes of information.",
+          "Your body has performed over a billion eyelid beats.",
+          "Your heart has beaten about 3.3 billion times, without ever taking a break."
+        ],
+        lifeLessons: [
+          "Welcome to the world, little miracle 🌟",
+          "Keep exploring, every step is a victory.",
+          "Your curiosity is your superpower.",
+          "You make every day more joyful.",
+          "You already have an incredible imagination, cherish it.",
+          "Keep asking questions, they will open doors for you.",
+          "Your joy is contagious, share it often.",
+          "You are already braver than you think.",
+          "Keep that smile, it brightens everyone around you.",
+          "You already have so much potential, believe in yourself.",
+          "Your sharp mind is a real treasure.",
+          "Your ideas matter, express them.",
+          "Keep believing that anything is possible.",
+          "Your differences are your greatest strength.",
+          "Be proud of who you are, even if you're still changing.",
+          "You have a courage you don't see yet.",
+          "Your dreams are worth pursuing.",
+          "You're more ready for the future than you think.",
+          "This is your time to dare, the world is big and it's yours.",
+          "Keep the curiosity of your 10-year-old self and the audacity of your 20-year-old self.",
+          "You can forge your own path, it doesn't have to be perfect.",
+          "You are capable of great things, no need to prove everything.",
+          "Every failure is just a step towards your success.",
+          "Your youth is an asset, but your maturity is starting to shine.",
+          "Keep surrounding yourself with people who lift you up.",
+          "Your story is just beginning.",
+          "You can be both cautious and ambitious.",
+          "You have already overcome so much, well done.",
+          "Your experience is valuable, share it.",
+          "You still have your whole life to change direction.",
+          "You are in the prime of your life, savor it.",
+          "You inspire more people than you know.",
+          "Your stability is a solid foundation for great projects.",
+          "Your balance between reason and passion is admirable.",
+          "You already know what truly matters to you, stay aligned.",
+          "You have the maturity to say yes... and to say no.",
+          "You know how to adapt, that's a real talent.",
+          "Your choices subtly inspire those around you.",
+          "You are a beautiful combination of strength and gentleness.",
+          "You have the wisdom of experience and the energy of youth.",
+          "You are a great example of perseverance.",
+          "Your vision of the world is richer than ever.",
+          "You know what you want, and it shows.",
+          "Your calm is a strength that reassures others.",
+          "You know how to find beauty in the little things.",
+          "You are stronger than the sum of all your trials.",
+          "Your authenticity is refreshing.",
+          "You have the right to reinvent yourself, even now.",
+          "Your presence brings stability to others.",
+          "You are proof that one can age with grace.",
+          "You wear your life like a work of art.",
+          "You are a source of inspiration for those who follow you.",
+          "You know how to enjoy the good times.",
+          "Your wisdom is worth more than gold.",
+          "You radiate with a serene maturity.",
+          "You are a living library of precious memories.",
+          "Your smile tells stories.",
+          "You are an example of resilience.",
+          "You have learned to make peace with the past.",
+          "You know better than anyone how to appreciate the present.",
+          "You are a beautiful proof that joy has no age.",
+          "You are a source of precious advice.",
+          "Your kindness touches those you meet.",
+          "You have learned to savor life slowly.",
+          "Your humor remains a formidable weapon.",
+          "You still have so much to offer the world.",
+          "You are a pillar for those you love.",
+          "You have that elegance that comes with time.",
+          "Your voice is heard and respected.",
+          "You are proof that the soul remains young.",
+          "You inspire with your experience and your light.",
+          "You know how to pass on your values with gentleness.",
+          "Your gaze holds a lifetime of experiences.",
+          "You are a guardian of precious memories.",
+          "You have a timeless charm.",
+          "You are a living lesson in courage.",
+          "You still have the capacity to be amazed.",
+          "You are a landmark for several generations.",
+          "You know that every day is a gift.",
+          "Your life is a story many would love to hear.",
+          "You are living proof that beauty and value grow with time."
+        ],
+        startButton: "Start",
+        reliveButton: "Relive life",
+        yearText: " years"
+      };
 
       const container = document.getElementById('container');
       const soundPlayer = document.getElementById('sound-player');
       const yearIndicator = document.getElementById("year-indicator");
       const welcomeScreen = document.getElementById("welcome-screen");
-      const content = document.body.querySelector('div:not(#welcome-screen)');
+      const startButton = document.getElementById("start-button");
+      const reliveButton = document.getElementById("relive-button");
+      const langFlag = document.getElementById("lang-flag");
+
+      let currentLang = 'en';
+
+      function updateContent() {
+        const lang = currentLang === 'fr' ? fr : en;
+        
+        startButton.innerText = lang.startButton;
+        reliveButton.innerText = lang.reliveButton;
+        document.querySelector('html').setAttribute('lang', currentLang);
+
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        for (let i = 0; i <= 80; i++) {
+          const event = events.find(e => i >= e.range[0] && i <= e.range[1]);
+          const section = document.createElement('section');
+          section.className = `year-section`;
+          section.id = `year-${i}`;
+          section.setAttribute('data-sound', event.sound);
+
+          if (backgroundImages[i]) {
+            section.style.backgroundImage = `url(${backgroundImages[i]})`;
+          }
+
+          section.innerHTML = `
+            <h1 class="year-title text-4xl md:text-6xl font-serif drop-shadow-md">${icons[i]} ${i} ${lang.yearText}</h1>
+            <p class="fact-text mt-6 text-sm md:text-base">${lang.descriptions[i]}</p>
+            <p class="fact-text mt-2 text-sm md:text-base">${lang.descriptions2[i]}</p>
+            <p class="quote-text max-w-4xl text-base md:text-xl">${lang.quotes[i]}</p>
+            <p class="quote-text glow-text life-lesson-text life-lesson-bottom max-w-4xl text-base md:text-xl">${lang.lifeLessons[i]}</p>
+            <div class="mt-8 w-24 h-1 bg-white rounded-full animate-pulse"></div>
+          `;
+          container.appendChild(section);
+        }
+
+        gsap.utils.toArray(".year-section").forEach((section) => {
+          const h1 = section.querySelector('.year-title');
+          const pFacts = section.querySelectorAll('.fact-text');
+          const pQuotes = section.querySelector('.quote-text');
+          const pLessons = section.querySelector('.life-lesson-text');
+          const divider = section.querySelector('div');
+
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: section,
+              start: "top center",
+              toggleActions: "play none none reverse",
+              onEnter: () => {
+                const soundSrc = section.getAttribute('data-sound');
+                if (soundPlayer.src !== soundSrc) {
+                  soundPlayer.src = soundSrc;
+                  soundPlayer.play();
+                }
+              }
+            }
+          })
+          .to([h1, ...pFacts, pQuotes, pLessons, divider], {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: "power2.out"
+          });
+
+          gsap.to(section, {
+            backgroundPosition: "50% 110%",
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              scrub: true
+            }
+          });
+        });
+        
+        updateUI(currentIndex);
+      }
+
+      function switchLanguage() {
+        currentLang = currentLang === 'en' ? 'fr' : 'en';
+        langFlag.src = currentLang === 'en' ? "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/France-flag.png" : "https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/UK.png";
+        langFlag.alt = currentLang === 'en' ? "Switch to French" : "Switch to English";
+        updateContent();
+      }
 
       function startGame() {
         gsap.to(welcomeScreen, {
@@ -680,75 +1296,14 @@
             welcomeScreen.style.display = 'none';
           }
         });
+        soundPlayer.play();
       }
-
-      for (let i = 0; i <= 80; i++) {
-        const event = events.find(e => i >= e.range[0] && i <= e.range[1]);
-        const section = document.createElement('section');
-        section.className = `year-section`;
-        section.id = `year-${i}`;
-        section.setAttribute('data-sound', event.sound);
-
-        if (backgroundImages[i]) {
-          section.style.backgroundImage = `url(${backgroundImages[i]})`;
-        }
-
-        section.innerHTML = `
-          <h1 class="year-title text-4xl md:text-6xl font-serif drop-shadow-md">${icons[i]} ${i} ans</h1>
-          <p class="fact-text mt-6 text-sm md:text-base">${descriptions[i]}</p>
-          <p class="fact-text mt-2 text-sm md:text-base">${descriptions2[i]}</p>
-          <p class="quote-text max-w-4xl text-base md:text-xl">${quotes[i]}</p>
-          <p class="quote-text glow-text life-lesson-text life-lesson-bottom max-w-4xl text-base md:text-xl">${lifeLessons[i]}</p>
-          <div class="mt-8 w-24 h-1 bg-white rounded-full animate-pulse"></div>
-        `;
-        container.appendChild(section);
-      }
-
-      gsap.registerPlugin(ScrollTrigger);
-
-      gsap.utils.toArray(".year-section").forEach((section) => {
-        const h1 = section.querySelector('.year-title');
-        const pFacts = section.querySelectorAll('.fact-text');
-        const pQuotes = section.querySelector('.quote-text');
-        const pLessons = section.querySelector('.life-lesson-text');
-        const divider = section.querySelector('div');
-
-        gsap.timeline({
-          scrollTrigger: {
-            trigger: section,
-            start: "top center",
-            toggleActions: "play none none reverse",
-            onEnter: () => {
-              const soundSrc = section.getAttribute('data-sound');
-              if (soundPlayer.src !== soundSrc) {
-                soundPlayer.src = soundSrc;
-                soundPlayer.play();
-              }
-            }
-          }
-        })
-        .to([h1, ...pFacts, pQuotes, pLessons, divider], {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.2,
-          ease: "power2.out"
-        });
-
-        gsap.to(section, {
-          backgroundPosition: "50% 110%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            scrub: true
-          }
-        });
-      });
 
       let currentIndex = 0;
 
       function updateUI(index) {
-        yearIndicator.innerText = `${index} ans`;
+        const lang = currentLang === 'fr' ? fr : en;
+        yearIndicator.innerText = `${index} ${lang.yearText}`;
         const soundSrc = document.getElementById(`year-${index}`).getAttribute('data-sound');
         if (soundPlayer.src !== soundSrc) {
           soundPlayer.src = soundSrc;
@@ -804,6 +1359,11 @@
         currentIndex = 0;
         scrollToIndex(currentIndex);
       }
+
+      // Initial content load
+      document.addEventListener('DOMContentLoaded', () => {
+        updateContent();
+      });
     </script>
   </body>
 </html>
