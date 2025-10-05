@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wordbeat Pro — Underground Hacker Edition (modified)</title>
+<style>
+  :root{
+    --bg:#000;
+    --panel:#07120a;
+    --muted:#8aa58a;
+    --accent:#39ff14; /* neon green */
+    --accent2:#16a34a;
+    --danger:#ff6b6b;
+    --glass: rgba(57,255,20,0.03);
+    --shadow: 0 10px 30px rgba(0,0,0,0.8);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;overflow:hidden;background:#000;color:var(--muted);font-family: "SFMono-Regular", Menlo, Monaco, "Roboto Mono", "Courier New", monospace;}
+  /* Matrix background canvas */
+  canvas#matrix { position:fixed; inset:0; z-index:-1; width:100%; height:100%; display:block; }
+  /* layout removed grid — we use floating windows */
+  header{
+    display:flex;justify-content:space-between;align-items:center;padding:10px 14px;
+    border-bottom:1px solid rgba(57,255,20,0.06); background:rgba(0,0,0,0.6);
+  }
+  h1{font-size:20px;margin:0;color:var(--accent)}
+  p.lead{margin:0;color:var(--muted);font-size:13px}
+  /* Common window style (all panels are windows now) */
+  .window{
+    position:absolute;
+    border-radius:10px;
+    overflow:auto;
+    border:1px solid rgba(57,255,20,0.06);
+    background:rgba(0,0,0,0.95); border:1px solid rgba(57,255,20,0.15);
+    box-shadow:var(--shadow);
+    padding:0;
+    resize:both;
+    min-width:220px;
+    min-height:120px;
+    z-index:10;
+  }
+  .titlebar{
+    cursor:grab;
+    padding:8px 10px;
+    display:flex;align-items:center;justify-content:space-between;
+    background:linear-gradient(90deg, rgba(57,255,20,0.02), transparent);
+    border-bottom:1px solid rgba(57,255,20,0.02);
+    user-select:none;
+  }
+  .titlebar:active{cursor:grabbing}
+  .titlebar h4{margin:0;color:var(--accent);font-size:13px}
+  .content{padding:10px;color:var(--muted);font-size:13px}
+  textarea#bytebeat-editor{
+    width:100%;min-height:120px;background:#02120a;border:1px solid rgba(57,255,20,0.06);
+    color:var(--accent);padding:10px;border-radius:6px;font-family:monospace;font-size:14px;resize:vertical;
+  }
+  .btn{
+    background:transparent;border:1px solid rgba(57,255,20,0.08);
+    color:var(--accent);padding:6px 10px;border-radius:8px;cursor:pointer;font-weight:700;margin-right:6px;
+  }
+  .small{font-size:13px;padding:6px 10px;border-radius:6px}
+  canvas.viz{width:100%;height:180px;background:#000;display:block;border-radius:6px}
+  .kpi{display:flex;gap:8px;flex-wrap:wrap}
+  .kpi .item{background:transparent;padding:6px;border-radius:6px;font-family:monospace;font-size:13px;color:var(--muted);border:1px solid rgba(57,255,20,0.02)}
+  /* resize handle visual (native resize used) */
+  @media (max-width:900px){
+    .window{position:static;resize:vertical;min-width:auto}
+  }
+
+/* Binary background controls tweaks */
+#binary-controls input[type=range]{
+  -webkit-appearance:none; appearance:none; height:8px; background:rgba(20,40,20,0.6); border-radius:6px;
+}
+#binary-controls input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px rgba(57,255,20,0.18);
+}
+#binary-controls button:hover{ box-shadow: 0 6px 18px rgba(57,255,20,0.06); transform:translateY(-1px); }
+
+
+/* === UI styling: scrollbars, inputs, selects, textareas, sliders === */
+:root{
+  --ui-bg: rgba(2,12,4,0.95);
+  --ui-border-weak: rgba(57,255,20,0.08);
+  --ui-accent: var(--accent);
+}
+
+/* Scrollbars */
+html { scrollbar-color: var(--ui-accent) rgba(0,0,0,0.22); scrollbar-width: thin; }
+::-webkit-scrollbar { width:10px; height:10px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.12); border-radius:10px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(57,255,20,0.95), rgba(22,163,74,0.9)); border-radius:8px; border:2px solid rgba(0,0,0,0.35); }
+::-webkit-scrollbar-thumb:hover { filter:brightness(1.06); }
+
+/* Inputs / selects / textareas */
+input[type="text"], input[type="number"], select, textarea, textarea#bytebeat-editor, textarea#notes-text {
+  background: var(--ui-bg) !important;
+  border: 1px solid var(--ui-border-weak) !important;
+  color: var(--accent) !important;
+  padding:8px 10px;
+  border-radius:6px;
+  font-family: monospace;
+  font-size:13px;
+}
+input::placeholder, textarea::placeholder { color: rgba(57,255,20,0.2); }
+
+/* Focus */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--ui-accent) !important;
+  box-shadow: 0 0 12px rgba(57,255,20,0.12);
+}
+
+/* Range sliders */
+input[type="range"]{
+  -webkit-appearance:none; appearance:none; height:8px; background: rgba(20,40,20,0.55); border-radius:6px;
+}
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:16px; height:16px; border-radius:50%; background:var(--ui-accent); box-shadow:0 0 8px rgba(57,255,20,0.22);
+  border:2px solid rgba(0,0,0,0.45); cursor:pointer;
+}
+input[type="range"]::-moz-range-thumb{ width:16px; height:16px; border-radius:50%; background:var(--ui-accent); border:2px solid rgba(0,0,0,0.45); }
+
+/* Hide Reset and Mélanger buttons visually but keep them in DOM so JS doesn't break */
+#reset-mapping, #shuffle-mapping { display:none !important; }
+
+</style>
+</head>
+<body>
+
+<!-- Binary Matrix Background Canvas -->
+<canvas id="binary-bg" aria-hidden="true"></canvas>
+
+<!-- Binary background controls (floating) -->
+<div id="binary-controls" style="position:fixed;right:14px;bottom:14px;z-index:9999;background:rgba(0,0,0,0.5);border:1px solid rgba(57,255,20,0.06);padding:10px;border-radius:8px;font-family:monospace;color:var(--muted);backdrop-filter: blur(6px);">
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+    <strong style="color:var(--accent);font-size:13px">Binary BG</strong>
+    <button id="binary-pause" style="margin-left:auto;padding:4px 8px;border-radius:6px;border:1px solid rgba(57,255,20,0.08);background:transparent;color:var(--accent);cursor:pointer">Pause</button>
+  </div>
+  <label style="font-size:12px;display:block;margin-bottom:6px">Densité <input id="binary-density" type="range" min="0.2" max="3" step="0.05" value="1" style="width:140px;vertical-align:middle"></label>
+  <label style="font-size:12px;display:block;margin-bottom:6px">Vitesse <input id="binary-speed" type="range" min="0.2" max="4" step="0.05" value="1" style="width:140px;vertical-align:middle"></label>
+  <label style="font-size:12px;display:block;">Taille <input id="binary-size" type="range" min="10" max="36" step="1" value="14" style="width:140px;vertical-align:middle"></label>
+  <div style="font-size:11px;color:rgba(57,255,20,0.6);margin-top:6px">Pauses on tab inactive • Retina-ready</div>
+</div>
+
+<canvas id="matrix"></canvas>
+
+<header>
+  <div>
+    <h1>Wordbeat Pro — Underground</h1>
+    <p class="lead">Écris du texte: chaque caractère devient un fragment — edition hacker, export 8000Hz, fenêtrage libre.</p>
+  </div>
+  <div style="text-align:right">
+    <div class="kpi">
+      <div class="item" id="sampleRateK">SR: 44100</div>
+      <div class="item" id="bitDepthK">8-bit U8</div>
+      <div class="item" id="tempoK">Tempo: 1.00×</div>
+    </div>
+  </div>
+</header>
+
+<!-- Editor window -->
+<div class="window" id="win-editor" style="left:20px;top:80px;width:420px;height:300px">
+  <div class="titlebar"><h4>Éditeur</h4><div style="font-size:12px;color:var(--muted)">Drag • Resize</div></div>
+  <div class="content">
+    <textarea id="bytebeat-editor" placeholder="Écris un mot ou une phrase... (ex: glitch, Hello world!, 42)">GLITCH</textarea>
+    <div style="margin-top:10px;display:flex;align-items:center;">
+      <button class="btn" id="play-toggle">PLAY ▶</button>
+      <button class="btn" id="compile-btn">Compiler</button>
+      <button class="btn" id="copy-formula">Copier la formule</button>
+      <button class="btn" id="export-wav">Exporter WAV</button>
+      <label style="margin-left:auto;display:flex;align-items:center;gap:6px;color:var(--muted)"><input type="checkbox" id="randomize-mapping"> Random map</label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <label style="color:var(--muted)">Échantillonnage
+        <select id="sample-rate-selector" style="margin-left:6px">
+          <option value="44100">44100</option>
+          <option value="22050">22050</option>
+          <option value="11025">11025</option>
+          <option value="8000">8000</option>
+        </select>
+      </label>
+      <label style="color:var(--muted)">Bit depth
+        <select id="bit-depth" style="margin-left:6px">
+          <option value="8">8-bit U8</option>
+          <option value="16">16-bit signed</option>
+        </select>
+      </label>
+      <label style="color:var(--muted)">Tempo
+        <input id="speed-slider" type="range" min="0.2" max="4" step="0.05" value="1" style="width:140px;margin-left:6px">
+      </label>
+      <label style="color:var(--muted)">Gain
+        <input id="gain-slider" type="range" min="0" max="1" step="0.01" value="0.5" style="width:120px;margin-left:6px">
+      </label>
+    </div>
+    <div style="margin-top:10px;">
+      <strong style="color:var(--accent)">Formule générée</strong>
+      <div id="generated-formula" style="margin-top:8px;font-family:monospace;background:#02120a;padding:8px;border-radius:6px;color:var(--accent);min-height:38px;word-break:break-all"></div>
+      <div id="error-message" style="color:var(--danger);margin-top:6px;min-height:18px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Oscilloscope window -->
+<div class="window" id="win-osc" style="left:460px;top:80px;width:540px;height:320px">
+  <div class="titlebar"><h4>Oscilloscope</h4><div style="font-size:12px;color:var(--muted)">Drag • Resize</div></div>
+  <div class="content">
+    <label style="display:block;color:var(--muted)">Zoom <input id="zoom-slider" type="range" min="128" max="4096" value="512" step="128" style="width:180px;margin-left:8px"></label>
+    <canvas id="oscilloscope-canvas" class="viz"></canvas>
+  </div>
+</div>
+
+<!-- Spiral visualizer window (replaces spectrogram) -->
+<div class="window" id="win-spiral" style="left:20px;top:400px;width:420px;height:360px">
+  <div class="titlebar"><h4>Visualiseur Spirale</h4><div style="font-size:12px;color:var(--muted)">Remplace le spectrogramme</div></div>
+  <div class="content">
+    <canvas id="spiral-canvas" class="viz"></canvas>
+    <div style="margin-top:8px;color:var(--muted)">La spirale trace l'onde en polaire, crée des motifs harmoniques.</div>
+  </div>
+</div>
+
+<!-- FFT window -->
+<div class="window" id="win-fft" style="left:460px;top:420px;width:540px;height:300px">
+  <div class="titlebar"><h4>Analyseur (FFT)</h4><div style="font-size:12px;color:var(--muted)">Drag • Resize</div></div>
+  <div class="content">
+    <canvas id="spectrum-canvas" class="viz" style="height:220px"></canvas>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+      <label style="color:var(--muted)">FFT size
+        <select id="fft-size-selector"><option>256</option><option>512</option><option selected>1024</option><option>2048</option></select>
+      </label>
+      <label style="color:var(--muted)">Smoothing
+        <input id="smoothing-slider" type="range" min="0" max="1" step="0.02" value="0.8" style="width:120px">
+      </label>
+      <div id="peak-level" style="margin-left:auto;color:var(--muted)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Right side panels turned into windows -->
+<div class="window" id="win-mapping" style="left:1020px;top:80px;width:360px;height:340px">
+  <div class="titlebar"><h4>Correspondances</h4><div style="font-size:12px;color:var(--muted)">Edit / Reset</div></div>
+  <div class="content">
+    <div class="mappings" id="mappings" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:220px;overflow:auto"></div>
+    <div style="margin-top:10px">
+      <button class="btn small" id="reset-mapping">Reset</button>
+      <button class="btn small" id="extend-chars">+ Caractères spéciaux</button>
+      <button class="btn small" id="shuffle-mapping">Mélanger</button>
+    </div>
+  </div>
+</div>
+
+<div class="window" id="win-presets" style="left:1020px;top:440px;width:360px;height:280px">
+  <div class="titlebar"><h4>Presets & Export</h4><div style="font-size:12px;color:var(--muted)">Export WAV • Presets</div></div>
+  <div class="content">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn small" data-preset="GLITCH">GLITCH</button>
+      <button class="btn small" data-preset="TEST">TEST</button>
+      <button class="btn small" data-preset="MUSIQUE">MUSIQUE</button>
+      <button class="btn small" data-preset="HELLO_WORLD!">HELLO_WORLD!</button>
+    </div>
+    <hr style="border-color:rgba(255,255,255,0.03)">
+    <div>
+      <label style="color:var(--muted)">Durée (s) <input id="export-duration" type="number" value="8" min="1" max="30" step="1" style="width:80px;margin-left:6px"></label>
+      <label style="color:var(--muted);margin-left:12px">SR
+        <select id="export-sr" style="margin-left:6px"><option>44100</option><option>22050</option><option>11025</option><option>8000</option></select>
+      </label>
+      <div class="progress" style="margin-top:8px;height:8px;background:rgba(57,255,20,0.03);border-radius:6px;overflow:hidden"><i id="export-progress" style="display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2))"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- footer note window -->
+<div class="window" id="win-notes" style="left:20px;top:780px;width:420px;height:160px">
+  <div class="titlebar"><h4>Notes personnelles</h4></div>
+  <div class="content"><textarea id="notes-text" placeholder="Écris ici tes meilleurs codes..." style="width:100%;height:100%;background:#02120a;color:var(--accent);border:1px solid rgba(57,255,20,0.06);border-radius:6px;padding:6px;font-family:monospace;resize:none;"></textarea></div>
+</div>
+
+<script>
+/* =========================
+   Keep core logic from your original file — only modify visualizer + windows + background
+   ========================= */
+
+/* ---------- Matrix background (binary rain) ---------- */
+const matrix = document.getElementById('matrix');
+const mctx = matrix.getContext('2d');
+function resizeMatrix(){
+  matrix.width = window.innerWidth;
+  matrix.height = window.innerHeight;
+  cols = Math.floor(matrix.width / 14);
+  drops = new Array(cols).fill(0).map(()=>Math.random()*-100);
+}
+let cols = Math.floor(window.innerWidth / 14);
+let drops = new Array(cols).fill(0).map(()=>Math.random()*-100);
+resizeMatrix();
+window.addEventListener('resize', resizeMatrix);
+const letters = '01';
+function drawMatrix(){
+  mctx.fillStyle = 'rgba(0,0,0,0.06)';
+  mctx.fillRect(0,0,matrix.width,matrix.height);
+  mctx.font = '14px monospace';
+  for(let i=0;i<cols;i++){
+    const text = letters[Math.floor(Math.random()*letters.length)];
+    const x = i*14;
+    const y = drops[i]*14;
+    mctx.fillStyle = 'rgba(57,255,20,0.9)';
+    mctx.fillText(text, x, y);
+    drops[i] += 0.9 + Math.random()*1.5;
+    if(drops[i]*14 > matrix.height + 100) drops[i] = Math.random()*-20;
+  }
+}
+setInterval(drawMatrix, 40);
+
+/* ---------- DOM references (same IDs as original) ---------- */
+const editor = document.getElementById('bytebeat-editor');
+const playToggle = document.getElementById('play-toggle');
+const compileBtn = document.getElementById('compile-btn');
+const copyFormulaBtn = document.getElementById('copy-formula');
+const exportWavBtn = document.getElementById('export-wav');
+const sampleRateSelector = document.getElementById('sample-rate-selector');
+const speedSlider = document.getElementById('speed-slider');
+const gainSlider = document.getElementById('gain-slider');
+const bitDepthSelect = document.getElementById('bit-depth');
+const generatedFormulaDisplay = document.getElementById('generated-formula');
+const errorMessage = document.getElementById('error-message');
+const zoomSlider = document.getElementById('zoom-slider');
+const oscCanvas = document.getElementById('oscilloscope-canvas');
+const oscCtx = oscCanvas.getContext('2d');
+const spiralCanvas = document.getElementById('spiral-canvas');
+const spiralCtx = spiralCanvas.getContext('2d');
+const specCanvas = document.getElementById('spectrum-canvas');
+const specCtx = specCanvas.getContext('2d');
+const fftSizeSelector = document.getElementById('fft-size-selector');
+const smoothingSlider = document.getElementById('smoothing-slider');
+const mappingsDiv = document.getElementById('mappings');
+const randomizeCheckbox = document.getElementById('randomize-mapping');
+const resetMappingBtn = document.getElementById('reset-mapping');
+const shuffleMappingBtn = document.getElementById('shuffle-mapping');
+const extendCharsBtn = document.getElementById('extend-chars');
+const presets = document.querySelectorAll('[data-preset]');
+const exportDurationInput = document.getElementById('export-duration');
+const exportSRSelect = document.getElementById('export-sr');
+const exportProgressBar = document.getElementById('export-progress');
+
+const sampleRateK = document.getElementById('sampleRateK');
+const bitDepthK = document.getElementById('bitDepthK');
+const tempoK = document.getElementById('tempoK');
+
+/* audio core references (kept) */
+let audioContext = null;
+let scriptNode = null;
+let analyser = null;
+let gainNode = null;
+let currentFormulaFunc = null;
+let t_global = 0;
+let playing = false;
+let sampleBuffer = new Float32Array(131072);
+let bufWrite = 0;
+const BUFFER_CAPACITY = sampleBuffer.length;
+
+/* ---------- fragments and mapping (kept unchanged) ---------- */
+
+// === FROZEN TEXT-CODE MAPPING TABLE ===
+const BASE_PARTS = Object.freeze({
+  'A': 't>>7','B': 't*3&t>>10','C': '(t>>6^t*3)&255','D': '(t*2)|(t>>5)','E': '(t/16%256)',
+  'F': '(t*5&t>>7)','G': '(t*3&t>>8)','H': '(t>>4|t>>8)','I': 't&127','J': 't%128',
+  'K': '((t>>9)+t*2)','L': '(t%64)','M': '(t/8%256)','N': '(t/32%128)','O': '128','P': '255',
+  'Q': '64','R': '(t>>3)','S': '((t*3)&(t>>4))','T': 't','U': '(t*2&t>>10)','V': '(t>>4|t>>8)',
+  'W': '(t>>5|t/256)','X': '(t*9&t>>12)','Y': 't*(t>>11)','Z': '(t/255)',
+  '0': '0','1': 't>>7','2': 't*2','3': 't%256','4': 't>>10','5': '128','6': 't&t>>8','7': 't/256','8': 't*4','9': 't>>6',
+  '.': '(t%16?0:255)',',': '(t%8?0:200)','!': '(t%4?0:255)','?': '(t*7&t>>10)','-': '(t>>5&7)*32','_': '(t>>3&15)*8',
+  '+': '(t*3+t>>4)','*': '(t*7&t>>8)','/': '(t>>2|t>>5)','=': '(t*9%256)',';': '(t%6?0:220)','(': '(t>>4)&255',')': '(t>>5)&127',
+  '[': '(t>>3)%128',']': '(t>>2)%256','{': '(t>>6)%255','}': '(t>>7)%200','#': '(t*11&t>>9)','$': '(t*13&t>>7)','%': '(t*5%256)','&': '(t&t>>6)','|': '(t|t>>5)','^': '(t^t>>11)','~': '((t<<1)^t)>>3','<': '(t>>8)%64','>': '(t>>9)%32',"'": '(t%2?255:0)','"': '(t%3?200:40)'
+});
+Object.defineProperty(window, 'BASE_PARTS', { writable: false, configurable: false });
+// === END OF FROZEN TABLE ===
+
+const OPERS = ['&','|','^','+','-','*','%'];
+const MODS = ['t*255','t*2','t*128','t*64','t*16','t*8','(t>>3)'];
+let MAPPING = Object.assign({}, BASE_PARTS);
+const EXTRA_CHARS = `€£¥•·°·†‡¬¦§±×÷©®™✓★☆♥♪♫☺☼¤¸¸`;
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function hashString(s){let h=2166136261;for(let i=0;i<s.length;i++){h ^= s.charCodeAt(i); h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);}return Math.abs(h);}
+
+function textToBytebeatFormula(text, opts={randomize:false}) {
+  if(!text || !text.trim()) return '0';
+  const clean = (''+text).toUpperCase();
+  let parts = [];
+  for(let i=0;i<clean.length;i++){
+    const ch = clean[i];
+    let frag = MAPPING[ch];
+    if(!frag){
+      const h = hashString(ch);
+      frag = MODS[h % MODS.length];
+    }
+    if(opts.randomize){
+      const r = Math.floor((hashString(ch)+i*13) % OPERS.length);
+      const op = OPERS[r];
+      frag = `(${frag}${op}${MODS[(i+hashString(ch))%MODS.length]})`;
+    }
+    parts.push(frag);
+  }
+  let expr = parts[0] || '0';
+  for(let i=1;i<parts.length;i++){
+    const op = OPERS[i % OPERS.length];
+    expr = `(${expr} ${op} ${parts[i]})`;
+    if(i%3===0){
+      const mod = MODS[(i+expr.length)%MODS.length];
+      const mixOp = OPERS[(i+1)%3];
+      expr = `(${expr} ${mixOp} ${mod})`;
+    }
+  }
+  if(bitDepthSelect && bitDepthSelect.value === '8'){
+    expr = `(${expr}) & 255`;
+  } else {
+    expr = `(${expr})`;
+  }
+  return expr;
+}
+
+function compileFormula() {
+  errorMessage.textContent = '';
+  const txt = editor.value || '';
+  const randomize = randomizeCheckbox.checked;
+  const formula = textToBytebeatFormula(txt, {randomize});
+  generatedFormulaDisplay.textContent = formula;
+  try {
+    currentFormulaFunc = new Function('t','return ' + formula + ';');
+    const v = currentFormulaFunc(1);
+    if(typeof v !== 'number' || isNaN(v)) throw new Error('Retour non numérique');
+    errorMessage.textContent = '';
+    return true;
+  } catch(e) {
+    currentFormulaFunc = null;
+    errorMessage.textContent = 'Erreur compilation: ' + e.message;
+    return false;
+  }
+}
+
+/* ---------- Audio + visuals setup kept ---------- */
+function setupAudio() {
+  stopAudio(true);
+  try {
+    const sr = parseInt(sampleRateSelector.value);
+    audioContext = new (window.AudioContext || window.webkitAudioContext)({sampleRate: sr});
+  } catch(e) {
+    errorMessage.textContent = 'WebAudio non supporté';
+    return;
+  }
+  scriptNode = audioContext.createScriptProcessor(4096, 0, 1);
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = parseInt(fftSizeSelector.value);
+  analyser.smoothingTimeConstant = parseFloat(smoothingSlider.value);
+  gainNode = audioContext.createGain();
+  gainNode.gain.value = parseFloat(gainSlider.value);
+
+  scriptNode.onaudioprocess = audioProcess;
+  scriptNode.connect(analyser);
+  analyser.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  t_global = 0;
+  bufWrite = 0;
+  clearCanvas(oscCtx);
+  clearCanvas(specCtx);
+  clearCanvas(spiralCtx);
+}
+
+function stopAudio(clear=true){
+  playing = false;
+  playToggle.textContent = 'PLAY ▶';
+  if(scriptNode){
+    try { scriptNode.disconnect(); } catch(e){}
+    scriptNode.onaudioprocess = null;
+    scriptNode = null;
+  }
+  if(gainNode){ try { gainNode.disconnect(); } catch(e){} gainNode=null; }
+  if(analyser){ try { analyser.disconnect(); } catch(e){} analyser=null; }
+  if(audioContext){
+    try{ audioContext.close(); }catch(e){}
+    audioContext = null;
+  }
+  if(clear){
+    clearCanvas(oscCtx);
+    clearCanvas(specCtx);
+    clearCanvas(spiralCtx);
+  }
+}
+
+function audioProcess(e){
+  const out = e.outputBuffer.getChannelData(0);
+  const len = out.length;
+  const speed = parseFloat(speedSlider.value);
+  const bitDepth = parseInt(bitDepthSelect.value);
+
+  for(let i=0;i<len;i++){
+    let R = 0;
+    try{
+      R = currentFormulaFunc(Math.floor(t_global));
+    } catch(err){
+      R = 0;
+    }
+    let sample;
+    if(bitDepth===8){
+      sample = ((R & 255) / 128.0) - 1.0;
+    } else {
+      sample = clamp(R, -32768, 32767) / 32768.0;
+    }
+    sample *= parseFloat(gainSlider.value);
+    out[i] = sample;
+
+    sampleBuffer[bufWrite] = sample;
+    bufWrite = (bufWrite + 1) % BUFFER_CAPACITY;
+
+    t_global += speed;
+  }
+}
+
+/* ---------- Visuals: osc + FFT + Spiral (replaces spectrogram) ---------- */
+function clearCanvas(ctx){
+  ctx.canvas.width = ctx.canvas.offsetWidth;
+  ctx.canvas.height = ctx.canvas.offsetHeight;
+  ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0,0,ctx.canvas.width,ctx.canvas.height);
+}
+
+function drawOscilloscope(){
+  const w = oscCanvas.width = oscCanvas.offsetWidth;
+  const h = oscCanvas.height = oscCanvas.offsetHeight;
+  oscCtx.fillStyle = 'rgba(0,0,0,0.06)';
+  oscCtx.fillRect(0,0,w,h);
+  const middle = h/2;
+  const samples = parseInt(zoomSlider.value);
+  const step = Math.max(1, Math.floor(w / samples));
+  let start = (bufWrite - samples + BUFFER_CAPACITY) % BUFFER_CAPACITY;
+  oscCtx.lineWidth = 2;
+  oscCtx.strokeStyle = 'rgba(57,255,20,0.95)';
+  oscCtx.beginPath();
+  for(let i=0;i<samples;i++){
+    const v = sampleBuffer[(start + i) % BUFFER_CAPACITY] || 0;
+    const x = i*step;
+    const y = middle - v * (middle*0.9);
+    if(i===0) oscCtx.moveTo(x,y); else oscCtx.lineTo(x,y);
+  }
+  oscCtx.stroke();
+  oscCtx.lineWidth = 1;
+  oscCtx.strokeStyle = 'rgba(57,255,20,0.03)';
+  for(let g=0;g<4;g++){
+    let y=(h/4)*g;
+    oscCtx.beginPath();oscCtx.moveTo(0,y);oscCtx.lineTo(w,y);oscCtx.stroke();
+  }
+}
+
+function drawFFT(){
+  if(!analyser) return;
+  const w = specCanvas.width = specCanvas.offsetWidth;
+  const h = specCanvas.height = specCanvas.offsetHeight;
+  const bufferLen = analyser.frequencyBinCount;
+  const arr = new Uint8Array(bufferLen);
+  analyser.getByteFrequencyData(arr);
+  specCtx.fillStyle = 'rgba(0,0,0,0.12)';
+  specCtx.fillRect(0,0,w,h);
+  const barW = w/bufferLen;
+  for(let i=0;i<bufferLen;i++){
+    const v = arr[i]/255;
+    const barH = v*h;
+    specCtx.fillStyle = `rgba(40,${Math.floor(120+v*135)},40,0.95)`;
+    specCtx.fillRect(i*barW, h-barH, barW, barH);
+  }
+  const peak = Math.max(...arr)/255;
+  document.getElementById('peak-level').textContent = 'Peak: ' + (peak*100).toFixed(1) + '%';
+}
+
+/* Spiral visualizer: use sampleBuffer to draw a polar spiral */
+function drawSpiral(){
+  const c = spiralCanvas;
+  const ctx = spiralCtx;
+  const w = c.width = c.offsetWidth;
+  const h = c.height = c.offsetHeight;
+  ctx.fillStyle = 'rgba(0,0,0,0.06)';
+  ctx.fillRect(0,0,w,h);
+  const cx = w/2, cy = h/2;
+  const maxRadius = Math.min(w,h)/2 * 0.92;
+  const samples = 2000;
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = 'rgba(57,255,20,0.95)';
+  ctx.beginPath();
+  for(let i=0;i<samples;i++){
+    // map sample index to sampleBuffer
+    const idx = (bufWrite + i) % BUFFER_CAPACITY;
+    const v = (sampleBuffer[idx] || 0); // -1..1
+    // radius grows with i, modulated by amplitude
+    const r = (i/samples) * maxRadius * (0.6 + Math.abs(v)*0.8);
+    const angle = i * 0.12 + (t_global*0.002);
+    const x = cx + Math.cos(angle) * r;
+    const y = cy + Math.sin(angle) * r;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  // add faint concentric rings
+  ctx.strokeStyle = 'rgba(57,255,20,0.06)';
+  for(let k=1;k<=4;k++){
+    ctx.beginPath();
+    ctx.arc(cx,cy,(k/5)*maxRadius,0,Math.PI*2);
+    ctx.stroke();
+  }
+}
+
+/* animation loop */
+let animId = null;
+function drawLoop(){
+  drawOscilloscope();
+  drawFFT();
+  drawSpiral();
+  animId = requestAnimationFrame(drawLoop);
+}
+
+/* ---------- playback controls (kept) ---------- */
+playToggle.addEventListener('click', ()=>{
+  if(playing){
+    stopAudio();
+    if(animId) cancelAnimationFrame(animId);
+    playing=false;
+  } else {
+    const ok = compileFormula();
+    if(!ok) return;
+    setupAudio();
+    if(!audioContext) return;
+    audioContext.resume().then(()=>{
+      playing = true;
+      playToggle.textContent = 'STOP ⏸';
+      drawLoop();
+    }).catch(err=>{
+      errorMessage.textContent = 'Erreur WebAudio: ' + err.message;
+    });
+  }
+});
+
+compileBtn.addEventListener('click', ()=>compileFormula());
+
+copyFormulaBtn.addEventListener('click', ()=>{
+  const txt = generatedFormulaDisplay.textContent || '';
+  navigator.clipboard?.writeText(txt).then(()=>{ copyFormulaBtn.textContent='Copié ✓'; setTimeout(()=>copyFormulaBtn.textContent='Copier la formule',900); }).catch(()=>{ alert('Impossible de copier');});
+});
+
+
+/* ---------- Notes persistence ---------- */
+const notesArea = document.getElementById('notes-text');
+if (notesArea) {
+  const saved = localStorage.getItem('wordbeat_notes') || '';
+  notesArea.value = saved;
+  notesArea.addEventListener('input', () => {
+    localStorage.setItem('wordbeat_notes', notesArea.value);
+  });
+}
+
+/* KPIs */
+function updateKPIs(){
+  sampleRateK.textContent = 'SR: ' + sampleRateSelector.value;
+  bitDepthK.textContent = (bitDepthSelect.value==='8') ? '8-bit U8' : '16-bit S';
+  tempoK.textContent = 'Tempo: ' + parseFloat(speedSlider.value).toFixed(2) + '×';
+}
+sampleRateSelector.addEventListener('change', ()=>{ updateKPIs(); if(playing){ setupAudio(); audioContext.resume(); }});
+bitDepthSelect.addEventListener('change', updateKPIs);
+speedSlider.addEventListener('input', updateKPIs);
+gainSlider.addEventListener('input', ()=>{ if(gainNode) gainNode.gain.value = parseFloat(gainSlider.value); });
+
+/* mapping UI (kept) */
+function renderMappingUI(){
+  mappingsDiv.innerHTML = '';
+  const keys = Object.keys(MAPPING).sort();
+  keys.forEach(k=>{
+    const div = document.createElement('div');
+    div.style.padding='6px';div.style.borderBottom='1px dashed rgba(255,255,255,0.02)';
+    div.innerHTML = `<strong style="color:var(--accent)">${escapeHtml(k)}</strong> → <span style="color:var(--accent2)">${escapeHtml(MAPPING[k])}</span>`;
+    mappingsDiv.appendChild(div);
+  });
+}
+function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+resetMappingBtn.addEventListener('click', ()=>{
+  MAPPING = Object.assign({}, BASE_PARTS);
+  renderMappingUI();
+});
+shuffleMappingBtn.addEventListener('click', ()=>{
+  const keys = Object.keys(MAPPING);
+  const vals = keys.map(k=>MAPPING[k]);
+  for(let i=vals.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [vals[i],vals[j]]=[vals[j],vals[i]];
+  }
+  const newMap = {};
+  keys.forEach((k,i)=>newMap[k]=vals[i]);
+  MAPPING = newMap;
+  renderMappingUI();
+});
+extendCharsBtn.addEventListener('click', ()=>{
+  for(let ch of EXTRA_CHARS){
+    if(!MAPPING[ch]){
+      const h = hashString(ch);
+      MAPPING[ch] = MODS[h % MODS.length];
+    }
+  }
+  renderMappingUI();
+});
+renderMappingUI();
+
+/* presets */
+presets.forEach(b=>{
+  b.addEventListener('click', (e)=>{
+    const p = e.currentTarget.getAttribute('data-preset');
+    editor.value = p;
+    compileFormula();
+    if(!playing) { playToggle.click(); }
+  });
+});
+
+/* export WAV (kept) */
+async function exportWav(){
+  const dur = clamp(parseInt(exportDurationInput.value)||8, 1, 30);
+  const sr = parseInt(exportSRSelect.value)||44100;
+  const bitDepth = parseInt(bitDepthSelect.value);
+  const randomize = randomizeCheckbox.checked;
+  const txt = editor.value || '';
+  if(!txt.trim()) { alert('Écris quelque chose avant d\'exporter.'); return; }
+
+  const formula = textToBytebeatFormula(txt, {randomize});
+  let f;
+  try { f = new Function('t','return '+formula+';'); } catch(e){ alert('Erreur compilation: ' + e.message); return; }
+
+  const totalSamples = dur * sr;
+  const maxChunk = 32768;
+  const pcm = new Float32Array(totalSamples);
+  let t_local = 0;
+  let written = 0;
+  exportProgressBar.style.width = '0%';
+  for(let offset=0; offset < totalSamples; offset += maxChunk){
+    const chunkLen = Math.min(maxChunk, totalSamples - offset);
+    for(let i=0;i<chunkLen;i++){
+      let R=0;
+      try { R = f(Math.floor(t_local)); } catch(e) { R=0; }
+      let sample;
+      if(bitDepth===8){
+        sample = (((R & 255)/128.0) - 1.0) * parseFloat(gainSlider.value);
+      } else {
+        sample = clamp(R, -32768, 32767) / 32768.0 * parseFloat(gainSlider.value);
+      }
+      pcm[offset + i] = sample;
+      t_local += parseFloat(speedSlider.value);
+    }
+    written += chunkLen;
+    const perc = Math.round((written/totalSamples)*100);
+    exportProgressBar.style.width = perc + '%';
+    await new Promise(r=>setTimeout(r,10));
+  }
+
+  const wavBlob = encodeWAV(pcm, sr, bitDepth);
+  const url = URL.createObjectURL(wavBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wordbeat_${Date.now()}.wav`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  exportProgressBar.style.width = '0%';
+}
+exportWavBtn.addEventListener('click', ()=>{ exportWav().catch(err=>{ alert('Erreur export: '+err.message); }); });
+
+function encodeWAV(float32Samples, sampleRate, bitDepth){
+  if(bitDepth===8){
+    const bytes = new Uint8Array(float32Samples.length);
+    for(let i=0;i<float32Samples.length;i++){
+      const s = clamp(float32Samples[i], -1, 1);
+      bytes[i] = Math.floor((s + 1) * 127.5);
+    }
+    const header = wavHeader(bytes.length, sampleRate, 8);
+    return new Blob([header, bytes], {type:'audio/wav'});
+  } else {
+    const buffer = new ArrayBuffer(float32Samples.length * 2);
+    const view = new DataView(buffer);
+    let offset=0;
+    for(let i=0;i<float32Samples.length;i++, offset+=2){
+      const s = clamp(float32Samples[i], -1, 1);
+      const int16 = Math.floor(s * 32767);
+      view.setInt16(offset, int16, true);
+    }
+    const header = wavHeader(float32Samples.length*2, sampleRate, 16);
+    return new Blob([header, view], {type:'audio/wav'});
+  }
+}
+function wavHeader(dataBytes, sampleRate, bitsPerSample){
+  const blockAlign = (bitsPerSample/8) * 1;
+  const byteRate = sampleRate * blockAlign;
+  const buffer = new ArrayBuffer(44);
+  const dv = new DataView(buffer);
+  function writeString(offset,str){
+    for(let i=0;i<str.length;i++) dv.setUint8(offset+i, str.charCodeAt(i));
+  }
+  writeString(0,'RIFF');
+  dv.setUint32(4, 36 + dataBytes, true);
+  writeString(8,'WAVE');
+  writeString(12,'fmt ');
+  dv.setUint32(16, 16, true);
+  dv.setUint16(20, 1, true);
+  dv.setUint16(22, 1, true);
+  dv.setUint32(24, sampleRate, true);
+  dv.setUint32(28, byteRate, true);
+  dv.setUint16(32, blockAlign, true);
+  dv.setUint16(34, bitsPerSample, true);
+  writeString(36,'data');
+  dv.setUint32(40, dataBytes, true);
+  return buffer;
+}
+
+/* ---------- interactions */ 
+editor.addEventListener('input', ()=>{ compileFormula(); });
+fftSizeSelector.addEventListener('change', ()=>{ if(analyser) analyser.fftSize = parseInt(fftSizeSelector.value); });
+smoothingSlider.addEventListener('input', ()=>{ if(analyser) analyser.smoothingTimeConstant = parseFloat(smoothingSlider.value); });
+randomizeCheckbox.addEventListener('change', ()=>{ compileFormula(); });
+
+editor.value = 'GLITCH';
+compileFormula();
+
+/* visual starter */
+(function visualStarter(){
+  clearCanvas(oscCtx); clearCanvas(specCtx); clearCanvas(spiralCtx);
+  let tick = ()=>{ drawOscilloscope(); drawFFT(); drawSpiral(); requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+})();
+
+/* keyboard shortcuts */
+window.addEventListener('keydown', (e)=>{
+  if(e.code === 'Space'){ e.preventDefault(); playToggle.click(); }
+  if(e.ctrlKey && e.key.toLowerCase()==='b'){ compileBtn.click(); }
+});
+
+/* ---------- make all windows draggable and ensure initial layout fits in viewport ---------- */
+function makeDraggable(el){
+  const bar = el.querySelector('.titlebar');
+  let ox=0, oy=0, dragging=false;
+  bar.addEventListener('pointerdown', (e)=>{
+    if(e.button!==0) return;
+    dragging=true;
+    el.style.zIndex = Date.now()%100000;
+    ox = e.clientX - el.offsetLeft;
+    oy = e.clientY - el.offsetTop;
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    e.preventDefault();
+  });
+  function onMove(e){
+    if(!dragging) return;
+    let x = e.clientX - ox;
+    let y = e.clientY - oy;
+    // clamp to viewport
+    const vpw = window.innerWidth, vph = window.innerHeight;
+    x = Math.max(6, Math.min(x, vpw - el.offsetWidth - 6));
+    y = Math.max(48, Math.min(y, vph - el.offsetHeight - 6));
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+  }
+  function onUp(){
+    dragging=false;
+    document.removeEventListener('pointermove', onMove);
+    document.removeEventListener('pointerup', onUp);
+  }
+  // also allow focusing by click
+  el.addEventListener('mousedown', ()=> el.style.zIndex = Date.now()%100000);
+}
+
+/* initialize windows positions so everything fits on load */
+function initWindows(){
+  const wins = Array.from(document.querySelectorAll('.window'));
+  const margin = 18;
+  // if saved layout exists, restore
+  try{
+    const layout = JSON.parse(localStorage.getItem('wb_layout')||'null');
+    if(layout){
+      wins.forEach(w=>{
+        const id = w.id;
+        if(layout[id]){
+          w.style.left = layout[id].left;
+          w.style.top = layout[id].top;
+          w.style.width = layout[id].width;
+          w.style.height = layout[id].height;
+        }
+      });
+      wins.forEach(makeDraggable);
+      return;
+    }
+  }catch(e){}
+  // default organized layout: grid-like
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const editor = document.getElementById('win-editor');
+  const osc = document.getElementById('win-osc');
+  const spiral = document.getElementById('win-spiral');
+  const fft = document.getElementById('win-fft');
+  const mapping = document.getElementById('win-mapping');
+  const presets = document.getElementById('win-presets');
+  const info = document.getElementById('win-info');
+
+  // positions tuned to common 1366+ widths; clamp if viewport small
+  editor.style.left = margin + 'px'; editor.style.top = (margin+50) + 'px';
+  osc.style.left = (editor.offsetLeft + editor.offsetWidth + margin) + 'px'; osc.style.top = (margin+50) + 'px';
+  mapping.style.left = (osc.offsetLeft + osc.offsetWidth + margin) + 'px'; mapping.style.top = (margin+50) + 'px';
+  spiral.style.left = margin + 'px'; spiral.style.top = (editor.offsetTop + editor.offsetHeight + margin) + 'px';
+  fft.style.left = (spiral.offsetLeft + spiral.offsetWidth + margin) + 'px'; fft.style.top = spiral.style.top;
+  presets.style.left = (fft.offsetLeft + fft.offsetWidth + margin) + 'px'; presets.style.top = spiral.style.top;
+  info.style.left = margin + 'px'; info.style.top = (spiral.offsetTop + spiral.offsetHeight + margin) + 'px';
+
+  // make draggable and add resize observer to keep canvases sized
+  wins.forEach(w=>{
+    makeDraggable(w);
+  });
+}
+
+/* save layout on unload */
+window.addEventListener('beforeunload', ()=>{
+  const wins = Array.from(document.querySelectorAll('.window'));
+  const layout = {};
+  wins.forEach(w=>{
+    layout[w.id] = { left: w.style.left, top: w.style.top, width: w.style.width, height: w.style.height };
+  });
+  localStorage.setItem('wb_layout', JSON.stringify(layout));
+  stopAudio(false);
+});
+
+/* ensure canvases redraw on resize */
+new ResizeObserver(()=>{ clearCanvas(oscCtx); clearCanvas(specCtx); clearCanvas(spiralCtx); }).observe(document.body);
+
+/* start */
+window.addEventListener('load', ()=>{
+  initWindows();
+  // start visuals loop (even before audio)
+  drawLoop();
+});
+</script>
+<script>
+
+/* Binary Matrix Background - optimized canvas */
+(function(){
+  const canvas = document.getElementById('binary-bg');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let dpr = Math.max(1, window.devicePixelRatio || 1);
+
+  const params = { density:1.0, speed:1.0, fontSize:14, trailAlpha:0.06, glowAlpha:0.9 };
+  const densityEl = document.getElementById('binary-density');
+  const speedEl = document.getElementById('binary-speed');
+  const sizeEl = document.getElementById('binary-size');
+  const pauseBtn = document.getElementById('binary-pause');
+
+  let cols = 0;
+  let drops = [];
+  let running = true;
+  let rafId = null;
+  let last = performance.now();
+
+  function setup(){
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    canvas.width = Math.floor(w * dpr);
+    canvas.height = Math.floor(h * dpr);
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const fs = params.fontSize;
+    cols = Math.floor((w / fs) * (params.density * 0.9));
+    cols = Math.max(8, cols);
+    drops = new Array(cols).fill(0).map(()=>Math.random()*-50);
+    ctx.font = `${params.fontSize}px monospace`;
+    ctx.textBaseline = 'top';
+  }
+
+  function draw(now){
+    const delta = Math.min(50, now - last);
+    last = now;
+    if(!running){ rafId = requestAnimationFrame(draw); return; }
+
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+
+    // fade for trail
+    ctx.fillStyle = `rgba(0,0,0,${params.trailAlpha})`;
+    ctx.fillRect(0,0,w,h);
+
+    ctx.font = `${params.fontSize}px monospace`;
+    const colW = params.fontSize;
+
+    for(let i=0;i<cols;i++){
+      const x = i * colW;
+      drops[i] += (params.speed * (0.5 + (i%5)/5) * (delta/16));
+      const headY = Math.floor(drops[i]) * params.fontSize;
+
+      // head bright
+      ctx.fillStyle = `rgba(200,255,200,${params.glowAlpha})`;
+      ctx.fillText(Math.random() > 0.5 ? '1' : '0', x, headY);
+
+      // subtle glow around head
+      ctx.fillStyle = 'rgba(57,255,20,0.06)';
+      ctx.fillText(Math.random() > 0.5 ? '1' : '0', x-1, headY-1);
+      ctx.fillText(Math.random() > 0.5 ? '1' : '0', x+1, headY+1);
+
+      // trailing chars
+      const trail = 8;
+      for(let t=1;t<=trail;t++){
+        const ty = headY - t * params.fontSize;
+        if(ty < -params.fontSize) break;
+        const alpha = Math.max(0, 0.6 * (1 - t/(trail+1)));
+        ctx.fillStyle = `rgba(57,255,20,${alpha*0.6})`;
+        ctx.fillText(Math.random() > 0.5 ? '1' : '0', x, ty);
+      }
+
+      if(drops[i]*params.fontSize > h + 100){
+        drops[i] = Math.random() * -20;
+      }
+    }
+
+    // center binary message
+    ctx.fillStyle = 'rgba(57,255,20,0.06)';
+    ctx.textAlign = 'center';
+    ctx.font = `${Math.floor(params.fontSize*1.6)}px monospace`;
+    
+    ctx.textAlign = 'left';
+
+    rafId = requestAnimationFrame(draw);
+  }
+
+  // UI events
+  if(densityEl) densityEl.addEventListener('input', (e)=>{ params.density = parseFloat(e.target.value); setup(); });
+  if(speedEl) speedEl.addEventListener('input', (e)=>{ params.speed = parseFloat(e.target.value); });
+  if(sizeEl) sizeEl.addEventListener('input', (e)=>{ params.fontSize = parseInt(e.target.value,10); setup(); });
+  if(pauseBtn) pauseBtn.addEventListener('click', ()=>{ running = !running; pauseBtn.textContent = running ? 'Pause' : 'Resume'; });
+
+  // pause on visibility change
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden){ running=false; } else { running=true; last = performance.now(); } });
+
+  window.addEventListener('resize', () => { // debounce resize
+    clearTimeout(window._binaryBgResizeTimer);
+    window._binaryBgResizeTimer = setTimeout(()=>{ setup(); }, 120);
+  });
+
+  setup();
+  rafId = requestAnimationFrame(draw);
+})();
+
+</script>
+</body>
+</html>
