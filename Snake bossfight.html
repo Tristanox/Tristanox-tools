@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Classic Snake Game - Survival</title>
+    <style>
+        /*
+         * Direction Artistique: Cyberpunk Néo-Retro & Éclats Magiques
+         * Palette: Noir, Vert Néon, Rouge Vif, Cyan Électrique, Orange/Violet.
+         */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #000000; /* Noir absolu pour l'ambiance Cyberpunk */
+            color: #00FF99; /* Vert Néo-Retro */
+            font-family: 'Press Start 2P', cursive;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Bordure et Ombre Néon */
+            border: 3px solid #00FF99;
+            box-shadow: 0 0 25px rgba(0, 255, 153, 0.8), inset 0 0 10px rgba(0, 255, 153, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #000000;
+        }
+
+        #gameCanvas {
+            border: 2px solid #00FF99;
+            background-color: #000000; /* Fond de jeu noir */
+            image-rendering: pixelated;
+            /* Lueur subtile autour du canvas */
+            box-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 10px;
+            text-align: center;
+        }
+        
+        /* Animation de scintillement des lasers mortels */
+        @keyframes lethal-flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .controls, .message-box {
+            margin-top: 15px;
+            text-align: center;
+            width: 100%;
+        }
+
+        button {
+            background-color: #00FF99;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 5px;
+            /* Ombre de bouton néon */
+            box-shadow: 0 5px #00a87a, 0 0 10px #00FF99;
+            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px #00a87a, 0 0 5px #00FF99;
+        }
+
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.95);
+            /* Bordure et Lueur Rouge Vif */
+            border: 3px solid #FF0000;
+            box-shadow: 0 0 30px #FF0000, inset 0 0 15px #FF0000;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10;
+            display: none; /* Hidden by default */
+            color: #FF0000;
+            font-size: 14px;
+        }
+
+        .message-box h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+
+        /* Touch Controls for Mobile */
+        .touch-controls {
+            display: none; /* Hidden on desktop */
+            margin-top: 20px;
+            width: 100%;
+            max-width: 320px;
+        }
+        
+        .touch-controls .dpad {
+            display: grid;
+            grid-template-areas: ". up ." "left . right" ". down .";
+            gap: 5px;
+        }
+
+        .dpad button {
+            grid-area: var(--dir);
+            padding: 15px;
+            font-size: 0; /* Hide 'UP' text */
+            opacity: 0.9;
+            height: 50px;
+            width: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #00a87a; /* Vert foncé/teal */
+            color: #000000;
+        }
+        .dpad button::after {
+            font-family: Arial, sans-serif;
+            font-size: 18px;
+            color: #000;
+        }
+
+        #up-btn::after { content: '▲'; }
+        #down-btn::after { content: '▼'; }
+        #left-btn::after { content: '◀'; }
+        #right-btn::after { content: '▶'; }
+
+
+        /* Media Query for Mobile/Small Screens */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 10px;
+                width: 95vw;
+                box-sizing: border-box;
+            }
+            .header {
+                font-size: 8px;
+            }
+            .message-box {
+                font-size: 12px;
+            }
+            .message-box h2 {
+                font-size: 16px;
+            }
+            .touch-controls {
+                display: block; /* Show on mobile */
+            }
+            .touch-controls .dpad {
+                 margin: 0 auto;
+                 max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="header">
+            <div id="score">Temps: 0s</div>
+            <div id="status">Appuyez sur START pour le combat de boss!</div>
+        </div>
+        
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        
+        <div class="controls">
+            <button id="startButton">COMMENCER LE DÉFI</button>
+        </div>
+        
+        <div class="touch-controls">
+            <h3>Utilisez les flèches ou le D-Pad tactile (ZQSD / WASD)</h3>
+            <div class="dpad">
+                <button id="up-btn" style="--dir: up">HAUT</button>
+                <button id="down-btn" style="--dir: down">BAS</button>
+                <button id="left-btn" style="--dir: left">GAUCHE</button>
+                <button id="right-btn" style="--dir: right">DROITE</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+<div id="messageBox" class="message-box">
+        <h2>DÉFI ÉCHOUÉ</h2>
+        <p id="finalScore"></p>
+        <p id="survivalRank"></p> 
+        <button id="restartButton">RECOMMENCER</button>
+    </div>
+
+    <script>
+        // --- VARIABLES DU JEU ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const messageBox = document.getElementById('messageBox');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const survivalRankDisplay = document.getElementById('survivalRank'); 
+        const startButton = document.getElementById('startButton');
+        const restartButton = document.getElementById('restartButton');
+        const statusDisplay = document.getElementById('status');
+
+        const TILE_SIZE = 20;
+        const GRID_SIZE = canvas.width / TILE_SIZE; 
+        
+        const TELEPORTER_SIZE = 2; 
+
+        let snake;
+        let velocity; 
+        let nextVelocity; 
+        let startTime; 
+        let elapsedTime = 0; 
+        let gameLoopInterval;
+        let gameTimerInterval; 
+        let gameSpeed = 150; 
+        let isRunning = false;
+        let inputBuffered = false; 
+        
+        // Structures d'attaques
+        let activeLasers = []; 
+        let activeDiagonalStrikes = []; 
+        let activeSweeper = null; 
+        let activeMissiles = null; 
+        let activeRotatingLasers = []; 
+        let activeTeleporters = []; 
+
+
+        const LASER_WIDTH = 3; 
+        let lastAttackScheduleTime = 0; 
+        let gameTickCounter = 0; 
+        
+        // --- DÉFINITION DES TRAJECTOIRES DE MISSILE ---
+        const MISSILE_TRAJECTORIES = [
+            // 5 missiles lancés du haut, visant en bas et en diagonale
+            [{ sx: 3, sy: 0, ex: 18, ey: 15 }, { sx: 6, sy: 0, ex: 15, ey: 18 }, { sx: 10, sy: 0, ex: 9, ey: 18 }, { sx: 14, sy: 0, ex: 3, ey: 15 }, { sx: 17, sy: 0, ex: 0, ey: 18 }],
+            // 5 missiles lancés de gauche, visant en travers et en diagonale
+            [{ sx: 0, sy: 3, ex: 18, ey: 10 }, { sx: 0, sy: 7, ex: 18, ey: 7 }, { sx: 0, sy: 10, ex: 18, ey: 18 }, { sx: 0, sy: 14, ex: 18, ey: 3 }, { sx: 0, sy: 17, ex: 18, ey: 14 }],
+            // Coins mélangés
+            [{ sx: 0, sy: 0, ex: 19, ey: 19 }, { sx: 19, sy: 0, ex: 0, ey: 19 }, { sx: 0, sy: 19, ex: 19, ey: 0 }, { sx: 10, sy: 0, ex: 10, ey: 19 }, { sx: 0, sy: 10, ex: 19, ey: 10 }],
+        ];
+
+        // --- DÉFINITION DE TOUS LES PATTERNS ---
+        const ALL_PATTERNS = [
+            // INSTANTANÉS / STACKABLES (isLocking: false)
+            // Fréquence augmentée pour les lasers droits (3 -> 4)
+            { type: 'single', isLocking: false, axis: 'horizontal', pos: 8, width: LASER_WIDTH, weight: 4 }, 
+            { type: 'single', isLocking: false, axis: 'vertical', pos: 15, width: LASER_WIDTH, weight: 4 }, 
+            { type: 'double', isLocking: false, axis: 'vertical', pos1: 5, pos2: 15, weight: 2 }, 
+            // Nouveau pattern Météorite
+            { type: 'meteor_strike', isLocking: false, count: 8, warning_ms: 1500, lethal_ms: 500, weight: 3 },
+            
+            { type: 'teleport_zone', isLocking: false, center_x: 10, center_y: 15, size: 3, weight: 1 }, 
+            { type: 'diagonal_strike', isLocking: false, start_x: 1, start_y: 1, end_x: 18, end_y: 18, speed_ticks: 2, tile_size: 2, weight: 1 }, 
+            { type: 'diagonal_strike', isLocking: false, start_x: 18, start_y: 1, end_x: 1, end_y: 18, speed_ticks: 2, tile_size: 2, weight: 1 }, 
+            { type: 'rotating_laser', isLocking: false, center_x: 10, center_y: 10, length: 4, rotation_speed_ticks: 1, weight: 1 }, 
+            { type: 'twin_teleporters', isLocking: false, entry_x: 3, entry_y: 3, exit_x: 15, exit_y: 15, duration_ticks: 60, size: TELEPORTER_SIZE, weight: 1 },
+            
+            // LONGS / BLOQUANTS (isLocking: true)
+            // Fréquence diminuée pour les balayeurs et missiles (0.5 -> 0.4)
+            { type: 'sweeping_laser', isLocking: true, axis: 'horizontal', start_pos: 3, end_pos: 17, length_tiles: 1, speed_ticks: 3, weight: 0.4 }, 
+            { type: 'sweeping_laser', isLocking: true, axis: 'vertical', start_pos: 3, end_pos: 17, length_tiles: 1, speed_ticks: 3, weight: 0.4 }, 
+            { type: 'missile_launch', isLocking: true, speed_ticks: 2, weight: 0.4 }, 
+        ];
+
+        // Séparation des patterns
+        const INSTANT_PATTERNS = ALL_PATTERNS.filter(p => !p.isLocking);
+        const LOCKING_PATTERNS = ALL_PATTERNS.filter(p => p.isLocking);
+        
+        // --- FONCTION DE CLASSEMENT ---
+        function getSurvivalRank(seconds) {
+            if (seconds >= 100) return 'S+';
+            if (seconds >= 70) return 'S';
+            if (seconds >= 60) return 'A';
+            if (seconds >= 50) return 'B';
+            if (seconds >= 40) return 'C';
+            if (seconds >= 30) return 'D';
+            if (seconds >= 20) return 'E';
+            if (seconds >= 10) return 'F';
+            return 'F- (Débutant)';
+        }
+
+        // --- INITIALISATION ---
+        function initGame() {
+            snake = [
+                { x: 10, y: 10 }, 
+                { x: 9, y: 10 }
+            ];
+            velocity = { x: 1, y: 0 }; 
+            nextVelocity = { x: 1, y: 0 };
+            gameSpeed = 150; 
+            elapsedTime = 0;
+            inputBuffered = false; 
+            scoreDisplay.textContent = 'Temps: 0s';
+            messageBox.style.display = 'none';
+            statusDisplay.textContent = 'Utilisez les flèches ou ZQSD pour survivre !';
+
+            activeLasers = [];
+            activeDiagonalStrikes = []; 
+            activeSweeper = null; 
+            activeMissiles = null; 
+            activeRotatingLasers = []; 
+            activeTeleporters = []; 
+            lastAttackScheduleTime = 0;
+            gameTickCounter = 0; 
+
+            if (gameTimerInterval) clearInterval(gameTimerInterval);
+            if (gameLoopInterval) clearInterval(gameLoopInterval);
+
+            draw(); 
+        }
+
+        /**
+         * Calcule toutes les tuiles le long d'une trajectoire diagonale ou transversale.
+         */
+        function calculateDiagonalPath({ start_x, start_y, end_x, end_y }) {
+            const path = [];
+            let x = start_x;
+            let y = start_y;
+            
+            const dx = end_x > start_x ? 1 : (end_x < start_x ? -1 : 0);
+            const dy = end_y > start_y ? 1 : (end_y < start_y ? -1 : 0);
+            
+            if (dx === 0 && dy === 0) return path;
+
+            path.push({ x: x, y: y });
+
+            while (x !== end_x || y !== end_y) {
+                if (x !== end_x) x += dx;
+                if (y !== end_y) y += dy;
+                
+                if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) break;
+
+                path.push({ x: x, y: y });
+                
+                if (path.length > GRID_SIZE * 2) break; 
+            }
+            
+            return path;
+        }
+        
+        /**
+         * Calcule la position (x, y) du bout du rayon laser rotatif.
+         */
+        function calculateRotatedPosition(center_x, center_y, length, angle) {
+            const radians = angle * (Math.PI / 180);
+            
+            const path = [];
+            
+            for (let i = 1; i <= length; i++) { 
+                const x = center_x + Math.round(i * Math.cos(radians));
+                const y = center_y + Math.round(i * Math.sin(radians));
+                
+                if (path.length === 0 || path[path.length - 1].x !== x || path[path.length - 1].y !== y) {
+                     if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                        path.push({ x: x, y: y });
+                    }
+                }
+            }
+            return path;
+        }
+        
+        /**
+         * Génère un point aléatoire sur la grille qui n'est pas le corps du serpent.
+         */
+        function getRandomSafePosition(existingTiles = []) {
+            let x, y, isSafe;
+            const existingMap = new Set(existingTiles.map(t => `${t.x},${t.y}`));
+
+            do {
+                x = Math.floor(Math.random() * GRID_SIZE);
+                y = Math.floor(Math.random() * GRID_SIZE);
+                
+                isSafe = !snake.some(segment => segment.x === x && segment.y === y) &&
+                         !existingMap.has(`${x},${y}`);
+                         
+            } while (!isSafe);
+
+            return { x, y };
+        }
+
+
+        // --- DÉCLENCHEURS D'ATTAQUES ---
+
+        function triggerInstantAttack(pattern) {
+            
+            if (pattern.type === 'meteor_strike') {
+                const warningMs = pattern.warning_ms;
+                const lethalMs = pattern.lethal_ms;
+                
+                // 1. Générer 8 positions aléatoires
+                let meteorPositions = [];
+                for (let i = 0; i < pattern.count; i++) {
+                    meteorPositions.push(getRandomSafePosition(meteorPositions));
+                }
+
+                // 2. Créer les objets laser de type point/météorite (warning)
+                const newMeteors = meteorPositions.map(pos => ({ 
+                    x: pos.x, 
+                    y: pos.y, 
+                    axis: 'point', 
+                    width: 1, 
+                    state: 'warning', 
+                    is_meteor: true, // Marqueur pour les météores
+                    is_trajectory: false 
+                }));
+                activeLasers.push(...newMeteors);
+
+                // 3. Passer en mode létal (lethal)
+                setTimeout(() => {
+                    if (isRunning) {
+                        newMeteors.forEach(l => { 
+                            if (activeLasers.includes(l)) { // Vérifie qu'il n'a pas été déjà retiré
+                                l.state = 'lethal'; 
+                            }
+                        });
+                        
+                        // 4. Dissiper après le temps létal
+                        setTimeout(() => {
+                            if (isRunning) {
+                                 activeLasers = activeLasers.filter(l => !newMeteors.includes(l)); 
+                            }
+                        }, lethalMs); 
+                    }
+                }, warningMs);
+
+            } else if (pattern.type === 'rotating_laser') {
+                const warningTimeMsRot = 1500;
+                
+                const laser = {
+                    center_x: pattern.center_x,
+                    center_y: pattern.center_y,
+                    length: pattern.length,
+                    rotation_speed_ticks: pattern.rotation_speed_ticks,
+                    angle: 0, 
+                    counter: 0,
+                    state: 'warning',
+                    pattern: pattern
+                };
+                activeRotatingLasers.push(laser);
+                
+                setTimeout(() => {
+                    if (isRunning && activeRotatingLasers.includes(laser)) {
+                        laser.state = 'lethal';
+                    }
+                }, warningTimeMsRot);
+
+                
+            } else if (pattern.type === 'twin_teleporters') {
+                 const teleporter = {
+                    entry_x: pattern.entry_x,
+                    entry_y: pattern.entry_y,
+                    exit_x: pattern.exit_x,
+                    exit_y: pattern.exit_y,
+                    size: pattern.size, 
+                    state: 'lethal' 
+                 };
+                 activeTeleporters.push(teleporter);
+
+                 setTimeout(() => {
+                     if (isRunning) {
+                         activeTeleporters = activeTeleporters.filter(t => t !== teleporter);
+                     }
+                 }, pattern.duration_ticks * gameSpeed);
+
+            } else { // Lasers droits classiques (single, double, teleport_zone)
+                const warningTimeMs = 1000; 
+                let newLasers = [];
+                let laserDuration = gameSpeed * 2; 
+
+                if (pattern.type === 'single' || pattern.type === 'double') {
+                     if (pattern.type === 'single') {
+                        newLasers.push({ x: pattern.axis === 'vertical' ? pattern.pos : 0, y: pattern.axis === 'horizontal' ? pattern.pos : 0, axis: pattern.axis, width: pattern.width, state: 'warning', is_trajectory: false });
+                     } else { 
+                        newLasers.push({ x: pattern.axis === 'vertical' ? pattern.pos1 : 0, y: pattern.axis === 'horizontal' ? pattern.pos1 : 0, axis: pattern.axis, width: 1, state: 'warning', is_trajectory: false });
+                        newLasers.push({ x: pattern.axis === 'vertical' ? pattern.pos2 : 0, y: pattern.axis === 'horizontal' ? pattern.pos2 : 0, axis: pattern.axis, width: 1, state: 'warning', is_trajectory: false });
+                     }
+                } else if (pattern.type === 'teleport_zone') {
+                    const size = pattern.size;
+                    const half = Math.floor(size / 2);
+                    laserDuration = 200; 
+                    for (let dx = -half; dx <= half; dx++) {
+                        for (let dy = -half; dy <= half; dy++) {
+                            newLasers.push({ x: pattern.center_x + dx, y: pattern.center_y + dy, axis: 'point', width: 1, state: 'warning', is_trajectory: false });
+                        }
+                    }
+                }
+                
+                activeLasers.push(...newLasers);
+                
+                setTimeout(() => {
+                    if (isRunning) {
+                        newLasers.forEach(l => { 
+                             if (activeLasers.includes(l)) {
+                                l.state = 'lethal'; 
+                            }
+                        });
+                        
+                        setTimeout(() => {
+                            if (isRunning) {
+                                 activeLasers = activeLasers.filter(l => !newLasers.includes(l)); 
+                            }
+                        }, laserDuration); 
+                    }
+                }, warningTimeMs); 
+            }
+        }
+
+        function triggerDiagonalStrike(pattern) {
+            const pathTilesCoords = calculateDiagonalPath(pattern);
+            
+            const warningTiles = pathTilesCoords.map(c => ({ 
+                x: c.x, 
+                y: c.y, 
+                axis: 'point', 
+                width: 1, 
+                state: 'warning', 
+                is_trajectory: true 
+            }));
+            activeLasers.push(...warningTiles);
+            
+            const strike = {
+                path: pathTilesCoords, 
+                current_step: 0,
+                speed_ticks: pattern.speed_ticks,
+                counter: 0,
+                tile_size: pattern.tile_size || 1,
+                state: 'warning', 
+            };
+            activeDiagonalStrikes.push(strike);
+
+            const warningTimeMs = 2000; 
+            const totalMovementDuration = pathTilesCoords.length * pattern.speed_ticks * gameSpeed;
+            
+            setTimeout(() => {
+                if (isRunning) {
+                    strike.state = 'lethal';
+                }
+            }, warningTimeMs);
+            
+            setTimeout(() => {
+                if (isRunning) {
+                    activeLasers = activeLasers.filter(l => !warningTiles.includes(l)); 
+                    activeDiagonalStrikes = activeDiagonalStrikes.filter(s => s !== strike);
+                }
+            }, warningTimeMs + totalMovementDuration); 
+        }
+
+        function triggerLockingPattern(pattern) {
+            if (pattern.type === 'sweeping_laser') {
+                const warningTimeMs = 1000;
+                
+                activeSweeper = {
+                    axis: pattern.axis,
+                    start_pos: pattern.start_pos,
+                    end_pos: pattern.end_pos,
+                    current_pos: pattern.start_pos, 
+                    dir: 1, 
+                    length_tiles: pattern.length_tiles,
+                    speed_ticks: pattern.speed_ticks,
+                    counter: 0, 
+                    width: pattern.length_tiles, 
+                    state: 'warning' 
+                };
+                
+                statusDisplay.textContent = `AVERTISSEMENT: Barrière Balayeuse en ligne (${pattern.axis === 'horizontal' ? 'Vertical' : 'Horizontal'})!`;
+
+                setTimeout(() => {
+                    if (isRunning && activeSweeper) {
+                        activeSweeper.state = 'lethal';
+                        statusDisplay.textContent = `BALAYAGE MORTEL EN COURS!`;
+                    }
+                }, warningTimeMs);
+                
+                setTimeout(() => {
+                    if (isRunning) {
+                        activeSweeper = null;
+                        gameTickCounter = 0;
+                        statusDisplay.textContent = `Barrière Balayeuse dissipée.`;
+                    }
+                }, warningTimeMs + (80 * gameSpeed)); 
+
+            } else if (pattern.type === 'missile_launch') {
+                const warningTimeMs = 2000;
+                const missilePatternIndex = Math.floor(Math.random() * MISSILE_TRAJECTORIES.length);
+                const trajectories = MISSILE_TRAJECTORIES[missilePatternIndex];
+                
+                const missiles = trajectories.map(t => {
+                    const path = calculateDiagonalPath(t);
+                    return {
+                        path: path,
+                        current_step: 0,
+                        speed_ticks: pattern.speed_ticks,
+                        counter: 0,
+                        tile_size: 1, 
+                        state: 'warning',
+                        is_missile: true 
+                    };
+                });
+                
+                activeMissiles = { missiles: missiles, state: 'warning' };
+
+                missiles.forEach(missile => {
+                    const warningTiles = missile.path.map(c => ({ 
+                        x: c.x, y: c.y, axis: 'point', width: 1, state: 'warning', is_trajectory: true, is_missile: true 
+                    }));
+                    activeLasers.push(...warningTiles);
+                });
+                
+                statusDisplay.textContent = `AVERTISSEMENT: 5 TRAJECTOIRES DE MISSILES EN LIGNE!`;
+                
+                const maxPathLength = missiles.reduce((max, m) => Math.max(max, m.path.length), 0);
+                const totalMovementDuration = maxPathLength * pattern.speed_ticks * gameSpeed;
+
+                setTimeout(() => {
+                    if (isRunning && activeMissiles) {
+                        activeMissiles.state = 'lethal';
+                        statusDisplay.textContent = `MISSILES LANCÉS! BOUGEZ!`;
+                    }
+                }, warningTimeMs);
+                
+                setTimeout(() => {
+                    if (isRunning) {
+                        activeLasers = activeLasers.filter(l => !l.is_missile); 
+                        activeMissiles = null;
+                        statusDisplay.textContent = `Missiles dissipés.`;
+                    }
+                }, warningTimeMs + totalMovementDuration); 
+            }
+        }
+
+
+        // --- SCHEDULER D'ATTAQUES ---
+        // Fonction utilitaire pour choisir un pattern pondéré
+        function chooseWeightedPattern(patterns) {
+            // FIX: Correction de la syntaxe de la fonction reduce pour définir correctement l'accumulateur 'sum'
+            const totalWeight = patterns.reduce((sum, p) => sum + (p.weight || 1), 0);
+            let random = Math.random() * totalWeight;
+
+            for (const pattern of patterns) {
+                if (random < (pattern.weight || 1)) {
+                    return pattern;
+                }
+                random -= (pattern.weight || 1);
+            }
+            return patterns[0]; // Fallback
+        }
+
+        function scheduleAttacks() {
+            const currentTime = Date.now();
+
+            let maxConcurrentInstantAttacks;
+            let cooldownMinMs;
+            
+            // Augmentation de la fréquence des événements
+            if (elapsedTime < 10) {
+                maxConcurrentInstantAttacks = 1;
+                cooldownMinMs = 2000; // Un peu plus rapide
+            } else if (elapsedTime < 30) {
+                maxConcurrentInstantAttacks = 2;
+                cooldownMinMs = 1200; // Plus rapide
+            } else { 
+                maxConcurrentInstantAttacks = 3; // Augmenté à 3 attaques possibles
+                cooldownMinMs = 800; // Très rapide
+            }
+
+            const isLockingActive = activeSweeper || activeMissiles;
+            
+            if (isLockingActive) {
+                return;
+            }
+            
+            if (currentTime - lastAttackScheduleTime < cooldownMinMs) {
+                return;
+            }
+
+            lastAttackScheduleTime = currentTime;
+
+            // Fréquence réduite des attaques bloquantes (balayeur, missiles)
+            if (Math.random() < 0.10) { 
+                const pattern = chooseWeightedPattern(LOCKING_PATTERNS); 
+                triggerLockingPattern(pattern);
+                return; 
+            }
+
+            // --- Lancement d'attaques instantanées (Stackable) ---
+            
+            let attacksToLaunch = 0;
+            const currentInstantAttacks = activeLasers.filter(l => !l.is_trajectory).length + activeDiagonalStrikes.length + activeRotatingLasers.length + activeTeleporters.length;
+            
+            if (currentInstantAttacks === 0) {
+                // Toujours essayer de lancer plus d'une attaque après 30s
+                if (elapsedTime >= 30) {
+                    attacksToLaunch = Math.floor(Math.random() * maxConcurrentInstantAttacks) + 1;
+                } else {
+                    attacksToLaunch = Math.floor(Math.random() * (maxConcurrentInstantAttacks - 1)) + 1; 
+                }
+            } else if (currentInstantAttacks < maxConcurrentInstantAttacks) {
+                attacksToLaunch = 1;
+                // Forte chance de stacker après 30s
+                if (elapsedTime >= 30 && Math.random() < 0.7) attacksToLaunch = Math.min(maxConcurrentInstantAttacks - currentInstantAttacks, 2);
+            } else {
+                return; // Max atteint
+            }
+
+            const ALL_STACKABLE_PATTERNS = INSTANT_PATTERNS;
+
+            for (let i = 0; i < attacksToLaunch; i++) {
+                if (ALL_STACKABLE_PATTERNS.length > 0) {
+                    const pattern = chooseWeightedPattern(ALL_STACKABLE_PATTERNS); 
+                    
+                    if (pattern.type === 'diagonal_strike') {
+                         triggerDiagonalStrike(pattern);
+                    } else if (pattern.type === 'rotating_laser' && activeRotatingLasers.length < 2) {
+                         triggerInstantAttack(pattern);
+                    } else if (pattern.type === 'twin_teleporters' && activeTeleporters.length === 0) {
+                         triggerInstantAttack(pattern);
+                    } else { // Inclut 'meteor_strike' et les autres lasers droits
+                         triggerInstantAttack(pattern);
+                    }
+                }
+            }
+            
+            if (attacksToLaunch > 0) {
+                 statusDisplay.textContent = `Alerte! ${attacksToLaunch} menaces détectées!`;
+            }
+        }
+        
+        // --- BOUCLE DE JEU PRINCIPALE ---
+        function gameLoop() {
+            if (!isRunning) return;
+
+            gameTickCounter++; 
+
+            inputBuffered = false; 
+            velocity = nextVelocity;
+
+            let head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
+
+            if (checkCollision(head)) {
+                gameOver();
+                return;
+            }
+            
+            const teleporter = activeTeleporters.find(t => 
+                t.state === 'lethal' && 
+                head.x >= t.entry_x && head.x < t.entry_x + t.size && 
+                head.y >= t.entry_y && head.y < t.entry_y + t.size
+            );
+
+            if (teleporter) {
+                head = { x: teleporter.exit_x, y: teleporter.exit_y };
+                if (checkCollision(head, { ignoreTeleporters: true })) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            snake.unshift(head);
+            snake.pop();
+
+            if (activeSweeper && activeSweeper.state === 'lethal') {
+                activeSweeper.counter++;
+                
+                if (activeSweeper.counter >= activeSweeper.speed_ticks) {
+                    activeSweeper.counter = 0;
+                    
+                    activeSweeper.current_pos += activeSweeper.dir;
+                    
+                    if (activeSweeper.dir === 1 && activeSweeper.current_pos > activeSweeper.end_pos) {
+                        activeSweeper.dir = -1;
+                        activeSweeper.current_pos = activeSweeper.end_pos - 1; 
+                    } else if (activeSweeper.dir === -1 && activeSweeper.current_pos < activeSweeper.start_pos) {
+                        activeSweeper.dir = 1;
+                        activeSweeper.current_pos = activeSweeper.start_pos + 1; 
+                    }
+                }
+            }
+            
+            activeDiagonalStrikes.forEach(strike => {
+                if (strike.state === 'lethal') {
+                    strike.counter++;
+                    if (strike.counter >= strike.speed_ticks) {
+                        strike.counter = 0;
+                        strike.current_step++;
+                    }
+                }
+            });
+            
+            if (activeMissiles && activeMissiles.state === 'lethal') {
+                activeMissiles.missiles.forEach(missile => {
+                    missile.counter++;
+                    if (missile.counter >= missile.speed_ticks) {
+                        missile.counter = 0;
+                        missile.current_step++;
+                    }
+                });
+            }
+            
+            activeRotatingLasers.forEach(laser => {
+                laser.counter++;
+                if (laser.counter >= laser.rotation_speed_ticks) {
+                    laser.counter = 0;
+                    laser.angle = (laser.angle + 2) % 360; 
+                }
+            });
+
+
+            draw();
+            
+            scheduleAttacks();
+        }
+
+        // --- FONCTIONS DE DESSIN ---
+        function drawTile(x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+            
+            if (!color.includes('rgba')) {
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'; 
+                ctx.strokeRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE); 
+            }
+        }
+
+        function draw() {
+            ctx.fillStyle = '#000000'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            snake.forEach((segment, index) => {
+                let color;
+                if (index === 0) { 
+                    color = '#00FFFF'; 
+                    ctx.shadowColor = '#00FFFF';
+                    ctx.shadowBlur = 10;
+                } 
+                else if (index === snake.length - 1 && snake.length > 1) { 
+                    color = 'rgba(0, 255, 153, 0.5)'; 
+                } 
+                else { 
+                    color = '#00CC99'; 
+                }
+                
+                drawTile(segment.x, segment.y, color);
+                
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            });
+            
+            activeTeleporters.forEach(t => {
+                const entryColor = 'rgb(255, 165, 0)'; 
+                const exitColor = 'rgb(0, 150, 255)'; 
+                
+                ctx.shadowColor = entryColor;
+                ctx.shadowBlur = 8;
+
+                for (let dx = 0; dx < t.size; dx++) {
+                    for (let dy = 0; dy < t.size; dy++) {
+                        drawTile(t.entry_x + dx, t.entry_y + dy, entryColor);
+                    }
+                }
+                
+                ctx.shadowColor = exitColor;
+                ctx.shadowBlur = 8;
+                
+                for (let dx = 0; dx < t.size; dx++) {
+                    for (let dy = 0; dy < t.size; dy++) {
+                        drawTile(t.exit_x + dx, t.exit_y + dy, exitColor);
+                    }
+                }
+
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            });
+
+
+            activeRotatingLasers.forEach(laser => {
+                const laserPath = calculateRotatedPosition(laser.center_x, laser.center_y, laser.length, laser.angle);
+                
+                const centerColor = laser.state === 'warning' && gameTickCounter % 4 < 2 ? 'rgba(255, 100, 0, 0.8)' : 'rgba(255, 100, 0, 0.4)';
+                drawTile(laser.center_x, laser.center_y, centerColor);
+
+                if (laser.state === 'warning') {
+                    const warningColor = 'rgba(255, 0, 0, 0.2)'; 
+                    laserPath.forEach((tile) => {
+                         drawTile(tile.x, tile.y, warningColor);
+                    });
+                }
+                
+                if (laser.state === 'lethal') {
+                    const lethalColor = 'rgb(255, 0, 0)'; 
+                    ctx.shadowColor = lethalColor;
+                    ctx.shadowBlur = 12;
+                    
+                    laserPath.forEach((tile) => {
+                        drawTile(tile.x, tile.y, lethalColor);
+                    });
+                    
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+
+            activeLasers.forEach(laser => {
+                if (laser.state === 'warning' && !laser.is_trajectory) {
+                    
+                    let color;
+                    if (laser.is_meteor) {
+                        // Météorite: Clignotement orange
+                        const alpha = (gameTickCounter % 6 < 3) ? 0.7 : 0.4;
+                        color = `rgba(255, 165, 0, ${alpha})`; 
+                    } else {
+                        // Lasers droits et zones: Clignotement rouge/orange
+                        const alpha = (gameTickCounter % 8 < 4) ? 0.2 : 0.4;
+                        color = (laser.axis === 'point') ? `rgba(255, 100, 0, ${alpha})` : `rgba(255, 0, 0, ${alpha})`;
+                    }
+                    
+                    if (laser.axis === 'point') { 
+                        drawTile(laser.x, laser.y, color);
+                        
+                    } else if (laser.axis === 'horizontal') {
+                        for (let i = 0; i < laser.width; i++) { for (let j = 0; j < GRID_SIZE; j++) { drawTile(j, laser.y + i, color); } }
+                    } else if (laser.axis === 'vertical') {
+                        for (let i = 0; i < laser.width; i++) { for (let j = 0; j < GRID_SIZE; j++) { drawTile(laser.x + i, j, color); } }
+                    }
+                }
+            });
+            
+            activeLasers.forEach(laser => {
+                if (laser.state === 'lethal' && !laser.is_trajectory) {
+                    const color = laser.is_meteor ? 'rgb(255, 50, 0)' : 
+                                    (laser.axis === 'point' ? 'rgb(255, 150, 0)' : 'rgb(255, 60, 60)'); 
+                    
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 10;
+                    
+                    if (laser.axis === 'point') {
+                        drawTile(laser.x, laser.y, color);
+                    } else if (laser.axis === 'horizontal') {
+                        for (let i = 0; i < laser.width; i++) { for (let j = 0; j < GRID_SIZE; j++) { drawTile(j, laser.y + i, color); } }
+                    } else if (laser.axis === 'vertical') {
+                        for (let i = 0; i < laser.width; i++) { for (let j = 0; j < GRID_SIZE; j++) { drawTile(laser.x + i, j, color); } }
+                    }
+                    
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                }
+            });
+
+            // CORRECTION: Rendre les trajectoires d'avertissement plus visibles
+            activeLasers.forEach(laser => {
+                if (laser.state === 'warning' && laser.is_trajectory) {
+                    // Alpha augmenté de 0.1 à 0.4 pour les missiles (bleu/cyan)
+                    // Alpha augmenté de 0.1 à 0.2 pour les "diagonal_strike" (orange/rouge)
+                    let color = laser.is_missile ? 'rgba(0, 200, 255, 0.4)' : 'rgba(255, 50, 0, 0.2)'; 
+                    drawTile(laser.x, laser.y, color);
+                }
+            });
+
+
+            activeDiagonalStrikes.forEach(strike => {
+                if (strike.state === 'lethal') {
+                    if (strike.current_step < strike.path.length) {
+                        const currentTile = strike.path[strike.current_step];
+                        const color = 'rgb(255, 0, 0)'; 
+                        
+                        ctx.shadowColor = color;
+                        ctx.shadowBlur = 10;
+                        
+                        for (let dx = 0; dx < strike.tile_size; dx++) {
+                            for (let dy = 0; dy < strike.tile_size; dy++) {
+                                drawTile(currentTile.x + dx, currentTile.y + dy, color);
+                            }
+                        }
+                        
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                    }
+                }
+            });
+            
+            if (activeMissiles && activeMissiles.state === 'lethal') {
+                activeMissiles.missiles.forEach(missile => {
+                    if (missile.current_step < missile.path.length) {
+                        const currentTile = missile.path[missile.current_step];
+                        const color = 'rgb(0, 150, 255)'; 
+                        
+                        ctx.shadowColor = color;
+                        ctx.shadowBlur = 10;
+                        
+                        drawTile(currentTile.x, currentTile.y, color);
+                        
+                        ctx.shadowColor = 'transparent';
+                        ctx.shadowBlur = 0;
+                    }
+                });
+            }
+            
+            if (activeSweeper) {
+                const color = activeSweeper.state === 'warning' ? 'rgba(255, 255, 0, 0.3)' : 'rgb(255, 255, 0)'; 
+                const { axis, current_pos, length_tiles } = activeSweeper;
+
+                if (activeSweeper.state === 'lethal') {
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 15;
+                }
+
+                if (axis === 'horizontal') {
+                    for (let i = 0; i < length_tiles; i++) {
+                        for (let j = 0; j < GRID_SIZE; j++) {
+                            drawTile(j, current_pos + i, color);
+                        }
+                    }
+                } else if (axis === 'vertical') {
+                    for (let i = 0; i < length_tiles; i++) {
+                        for (let j = 0; j < GRID_SIZE; j++) {
+                            drawTile(current_pos + i, j, color);
+                        }
+                    }
+                }
+
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // --- FONCTIONS DE MÉCANIQUE ---
+
+        function checkCollision(head, options = {}) {
+            const wallCollision = head.x < 0 || head.x >= GRID_SIZE || head.y < 0 || head.y >= GRID_SIZE;
+            if (wallCollision) return true;
+
+            let laserCollision = false;
+            activeLasers.forEach(laser => {
+                if (laser.state === 'lethal' && !laser.is_trajectory) { 
+                    if (laser.axis === 'horizontal') {
+                        for (let i = 0; i < laser.width; i++) { if (head.y === laser.y + i) { laserCollision = true; } }
+                    } else if (laser.axis === 'vertical') {
+                        for (let i = 0; i < laser.width; i++) { if (head.x === laser.x + i) { laserCollision = true; } }
+                    } else if (laser.axis === 'point') {
+                        if (head.x === laser.x && head.y === laser.y) { laserCollision = true; }
+                    }
+                }
+            });
+            if (laserCollision) return true;
+            
+            let rotatingLaserCollision = false;
+            activeRotatingLasers.forEach(laser => {
+                if (laser.state === 'lethal') {
+                    const laserPath = calculateRotatedPosition(laser.center_x, laser.center_y, laser.length, laser.angle);
+                    if (laserPath.some(tile => tile.x === head.x && tile.y === head.y)) {
+                        rotatingLaserCollision = true;
+                    }
+                }
+            });
+            if (rotatingLaserCollision) return true;
+
+            if (!options.ignoreTeleporters) {
+                const entryCollision = activeTeleporters.some(t => 
+                    t.state === 'lethal' &&
+                    head.x >= t.entry_x && head.x < t.entry_x + t.size &&
+                    head.y >= t.entry_y && head.y < t.entry_y + t.size
+                );
+                
+                const exitCollision = activeTeleporters.some(t => 
+                    t.state === 'lethal' &&
+                    head.x >= t.exit_x && head.x < t.exit_x + t.size &&
+                    head.y >= t.exit_y && head.y < t.exit_y + t.size
+                );
+
+            }
+            
+            let diagonalCollision = false;
+            activeDiagonalStrikes.forEach(strike => {
+                if (strike.state === 'lethal' && strike.current_step < strike.path.length) {
+                    const currentTile = strike.path[strike.current_step];
+                    if (head.x >= currentTile.x && head.x < currentTile.x + strike.tile_size &&
+                        head.y >= currentTile.y && head.y < currentTile.y + strike.tile_size) {
+                        diagonalCollision = true;
+                    }
+                }
+            });
+            if (diagonalCollision) return true;
+            
+            if (activeMissiles && activeMissiles.state === 'lethal') {
+                let missileCollision = false;
+                activeMissiles.missiles.forEach(missile => {
+                    if (missile.current_step < missile.path.length) {
+                        const currentTile = missile.path[missile.current_step];
+                        if (head.x === currentTile.x && head.y === currentTile.y) {
+                            missileCollision = true;
+                        }
+                    }
+                });
+                if (missileCollision) return true;
+            }
+            
+            if (activeSweeper && activeSweeper.state === 'lethal') {
+                const { axis, current_pos, length_tiles } = activeSweeper;
+                if (axis === 'horizontal') {
+                    for (let i = 0; i < length_tiles; i++) { if (head.y === current_pos + i) return true; }
+                } else if (axis === 'vertical') {
+                    for (let i = 0; i < length_tiles; i++) { if (head.x === current_pos + i) return true; }
+                }
+            }
+
+            return false;
+        }
+
+        function gameOver() {
+            isRunning = false;
+            clearInterval(gameLoopInterval);
+            clearInterval(gameTimerInterval); 
+            
+            activeSweeper = null; 
+            activeMissiles = null;
+            activeDiagonalStrikes = [];
+            activeRotatingLasers = [];
+            activeTeleporters = [];
+
+            statusDisplay.textContent = 'DÉFI ÉCHOUÉ!';
+            
+            finalScoreDisplay.textContent = `Vous avez survécu ${elapsedTime} secondes !`;
+            const rank = getSurvivalRank(elapsedTime); 
+            survivalRankDisplay.textContent = `Classification : ${rank}`; 
+            
+            messageBox.style.display = 'block';
+        }
+
+        function startGame() {
+            if (isRunning) return;
+            initGame();
+            isRunning = true;
+            
+            startTime = Date.now();
+            lastAttackScheduleTime = startTime; 
+            gameTimerInterval = setInterval(updateTimerDisplay, 100); 
+
+            gameLoopInterval = setInterval(gameLoop, gameSpeed);
+            startButton.style.display = 'none';
+        }
+        
+        function updateTimerDisplay() {
+            if (!isRunning) return;
+
+            const newElapsedTime = Math.floor((Date.now() - startTime) / 1000);
+
+            if (newElapsedTime !== elapsedTime) {
+                elapsedTime = newElapsedTime;
+                scoreDisplay.textContent = 'Temps: ' + elapsedTime + 's';
+                
+                if (elapsedTime > 0 && elapsedTime % 10 === 0) {
+                    const newSpeed = Math.max(50, 150 - (Math.floor(elapsedTime / 10) * 15));
+                    
+                    if (newSpeed !== gameSpeed) {
+                        gameSpeed = newSpeed;
+                        clearInterval(gameLoopInterval);
+                        gameLoopInterval = setInterval(gameLoop, gameSpeed);
+                        statusDisplay.textContent = `VITESSE AUGMENTÉE! Intervalle: ${gameSpeed}ms`;
+                    }
+                }
+            }
+        }
+
+        // --- GESTION DES ENTRÉES ---
+
+        function setDirection(dx, dy) {
+            if (!isRunning || inputBuffered) {
+                return;
+            }
+            if (dx === -nextVelocity.x && dy === -nextVelocity.y) {
+                return;
+            }
+            
+            nextVelocity = { x: dx, y: dy };
+            inputBuffered = true; 
+        }
+
+        document.addEventListener('keydown', (e) => {
+            switch (e.key.toLowerCase()) {
+                case 'arrowup':
+                case 'z': 
+                case 'w': 
+                    setDirection(0, -1);
+                    break;
+                case 'arrowdown':
+                case 's':
+                    setDirection(0, 1);
+                    break;
+                case 'arrowleft':
+                case 'q': 
+                case 'a': 
+                    setDirection(-1, 0);
+                    break;
+                case 'arrowright':
+                case 'd':
+                    setDirection(1, 0);
+                    break;
+            }
+        });
+
+        // Écouteurs de contrôle tactile
+        document.getElementById('up-btn').addEventListener('click', () => setDirection(0, -1));
+        document.getElementById('down-btn').addEventListener('click', () => setDirection(0, 1));
+        document.getElementById('left-btn').addEventListener('click', () => setDirection(-1, 0));
+        document.getElementById('right-btn').addEventListener('click', () => setDirection(1, 0));
+
+
+        // --- ÉVÉNEMENTS ---
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', () => {
+            messageBox.style.display = 'none';
+            startButton.style.display = 'block';
+            statusDisplay.textContent = 'Appuyez sur START pour le combat de boss!';
+            initGame(); 
+        });
+
+        // Initialiser l'affichage au chargement
+        initGame(); 
+        startButton.style.display = 'block'; 
+        statusDisplay.textContent = 'Appuyez sur START pour le combat de boss!';
+    </script>
+</body>
+</html>
