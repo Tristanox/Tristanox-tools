@@ -10,41 +10,38 @@
         @font-face {
             font-family: 'Babynotes';
             src: url('https://dl.dafont.com/dl/?f=babynotes') format('truetype');
-            /* Pour une meilleure fiabilité, téléchargez le fichier .ttf et hébergéz-le sur votre GitHub Pages.
-               Exemple si le fichier est à la racine de votre dépôt : src: url('babynotes.ttf') format('truetype'); */
         }
 
-        /* Réinitialisation globale et fond sur html pour une couverture complète */
+        /* Réinitialisation globale */
         html, body {
             margin: 0;
             padding: 0;
-            height: 100%; /* Assure que html prend toute la hauteur du viewport */
-            width: 100%;  /* Assure que html prend toute la largeur du viewport */
-            overflow: hidden; /* Empêche les barres de défilement indésirables */
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
         }
 
         html {
-            background-color: #1E2124; /* Fond gris pour toute la page */
+            background-color: #1E2124;
         }
 
         body {
             font-family: Arial, sans-serif;
             color: lightgray;
             text-align: center;
-            display: grid; /* Utilise CSS Grid pour la mise en page des éléments */
-            grid-template-columns: repeat(3, 1fr); /* Fixé à 3 colonnes de taille égale */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 40px;
             width: 100%;
-            max-width: 95vw; /* La grille ne dépassera pas 95% de la largeur de la fenêtre */
-            margin: 0 auto; /* Centre la grille et assure des marges égales de chaque côté */
+            max-width: 95vw;
+            margin: 0 auto;
             padding: 30px;
-            background-color: transparent; /* Permet au fond animé d'être visible */
+            background-color: transparent;
             justify-content: flex-start;
             align-items: center;
-            overflow-y: auto; /* Permet le défilement si le contenu dépasse */
+            overflow-y: auto;
         }
 
-        /* Styles pour le canevas d'animation */
         canvas {
             position: fixed;
             top: 0;
@@ -52,11 +49,11 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: -1; /* Place le canevas en arrière-plan */
+            z-index: -1;
         }
 
         header {
-            grid-column: 1 / -1; /* Permet au header de s'étendre sur toutes les colonnes */
+            grid-column: 1 / -1;
             margin-bottom: 40px;
         }
 
@@ -66,11 +63,29 @@
             max-width: 600px;
             height: auto;
             border-radius: 10px;
-            border: none;
-            outline: none;
         }
 
-        /* J'ai supprimé la classe games-grid, donc les styles s'appliquent directement à body */
+        /* STYLE POUR LA MINIATURE EN HAUT À DROITE */
+        .corner-link {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001; /* Pour être au-dessus du compteur de vues */
+            transition: transform 0.3s ease;
+        }
+
+        .corner-link img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 2px solid rgba(158, 255, 158, 0.3);
+        }
+
+        .corner-link:hover {
+            transform: scale(1.05);
+        }
 
         .game-item {
             display: flex;
@@ -81,18 +96,14 @@
             border-radius: 10px;
             padding: 0;
             background-color: transparent;
-            box-shadow: none;
             border: 2px solid transparent;
-
-            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out,
-                        border-color 0.3s ease-out, filter 0.3s ease-out, opacity 0.5s ease-out;
-
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.3s ease-out, filter 0.3s ease-out, opacity 0.5s ease-out;
             opacity: 0;
             transform: translateY(20px);
             animation: itemFadeIn 0.6s ease-out forwards;
         }
 
-        /* Délais d'animation pour un effet d'apparition en cascade */
+        /* Délais d'animation */
         body .game-item:nth-child(2) { animation-delay: 0.1s; }
         body .game-item:nth-child(3) { animation-delay: 0.2s; }
         body .game-item:nth-child(4) { animation-delay: 0.3s; }
@@ -113,8 +124,10 @@
         body .game-item:nth-child(19) { animation-delay: 1.8s; }
         body .game-item:nth-child(20) { animation-delay: 1.9s; }
         body .game-item:nth-child(21) { animation-delay: 2.0s; }
-        /* Nouveau délai pour le 21ème élément (qui est le 22ème enfant de body incluant le canvas et le header) */
         body .game-item:nth-child(22) { animation-delay: 2.1s; }
+        body .game-item:nth-child(23) { animation-delay: 2.2s; }
+        body .game-item:nth-child(24) { animation-delay: 2.3s; }
+        body .game-item:nth-child(25) { animation-delay: 2.4s; }
 
         @keyframes itemFadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -128,111 +141,38 @@
             filter: brightness(1.1);
         }
 
-        .game-item:active {
-            transform: translateY(-4px) scale(0.99);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-
         .game-item img {
             width: 560px;
-            height: 150px; /* Adapté pour un ratio 1500x400px (560 / 3.75) */
+            height: 150px;
             object-fit: contain;
             border-radius: 8px;
-            border: none;
-            outline: none;
-            display: block;
-            /* OMBRE NOIRE AJOUTÉE ICI */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
         }
 
-        /* Styles pour les petits écrans (mobiles) */
         @media (max-width: 768px) {
-            body {
-                grid-template-columns: 1fr;
-                gap: 20px;
-                padding: 15px;
-            }
-            header img {
-                max-width: 250px;
-            }
-            .game-item img {
-                width: 100%;
-                height: auto;
-                max-height: 200px;
-            }
+            body { grid-template-columns: 1fr; gap: 20px; padding: 15px; }
+            header img { max-width: 250px; }
+            .game-item img { width: 100%; height: auto; max-height: 200px; }
+            .corner-link img { width: 150px; height: 150px; } /* Plus petit sur mobile */
         }
 
-        /* Styles pour le compteur de vues */
-        #hits-counter {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            right: auto;
-            z-index: 1000;
-        }
-        #hits-counter img {
-            width: 160px;
-            height: auto;
-            border-radius: 5px;
-        }
+        #hits-counter { position: fixed; top: 10px; left: 10px; z-index: 1000; }
+        #hits-counter img { width: 160px; height: auto; border-radius: 5px; }
 
-        /* Styles pour le Footer */
         footer {
-            grid-column: 1 / -1; /* Permet au footer de s'étendre sur toutes les colonnes */
+            grid-column: 1 / -1;
             width: 100%;
-            background-color: #1e2124; /* Même fond que la grille de jeux pour l'harmonie */
+            background-color: #1e2124;
             color: lightgray;
             padding: 30px 20px;
-            margin-top: 40px; /* Espace au-dessus du pied de page */
+            margin-top: 40px;
             text-align: center;
-            border-top: 2px solid #282b30; /* Petite bordure discrète */
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.2); /* Ombre légère vers le haut */
-            font-size: 0.9em;
-            flex-shrink: 0; /* Empêche le footer de rétrécir */
+            border-top: 2px solid #282b30;
         }
 
-        footer p {
-            margin: 5px 0;
-        }
-
-        footer .social-links a {
-            text-decoration: none; /* Pas de soulignement par défaut */
-            margin: 0 15px;
-            transition: transform 0.2s ease-in-out;
-            color: inherit; /* Pour que la couleur du texte soit héritée du footer */
-        }
-
-        /* Styles pour les icônes de réseaux sociaux */
-        .social-links img {
-            height: 30px; /* Taille des icônes */
-            width: auto;
-            vertical-align: middle;
-            margin-right: 8px; /* Espace entre l'icône et le texte */
-            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
-        }
-
-        .social-links a:hover img {
-            transform: scale(1.1); /* Zoom au survol */
-            filter: brightness(1.2) drop-shadow(0 0 5px rgba(158, 255, 158, 0.5)); /* Lumière verte au survol */
-        }
-        
-        .social-links a:hover {
-             color: #9eff9e; /* Couleur du texte au survol */
-        }
-
-        /* Styles responsives pour le footer */
-        @media (max-width: 768px) {
-            footer {
-                padding: 20px 10px;
-                font-size: 0.8em;
-            }
-            footer .social-links a {
-                margin: 0 5px;
-            }
-            .social-links img {
-                margin-right: 4px;
-            }
-        }
+        .social-links a { text-decoration: none; margin: 0 15px; color: inherit; transition: 0.2s; }
+        .social-links img { height: 30px; vertical-align: middle; margin-right: 8px; }
+        .social-links a:hover { color: #9eff9e; }
     </style>
 </head>
 <body>
@@ -244,102 +184,98 @@
     </a>
 
     <header>
-        <img src="https://i.imgur.com/bgXj7TV.png" alt="Tristanox Logo">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools/refs/heads/Thumbnails/Title-logo.png" alt="Tristanox Logo">
     </header>
 
-    
-        <a href="https://tristanox.github.io/Tristanox-tools/Sandbox.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-sandbox-new.png" alt="Miniature Sandbox">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Sandbox-library.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-sandbox-library-new.png" alt="Miniature Sandbox Library">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Pokedex.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-pokdex-new.png">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/pokedex-checklist.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-pokedex-checklist-new.png" alt="Miniature Pokedex Checklist">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Infinity-clicker.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-infinite-clicker-new.png" alt="Miniature Infinity Clicker">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/FUT-Swipe.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-futswipe-new.png" alt="Miniature FUT Swipe">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Stimulation-clicker.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-stimulation-new.png" alt="Miniature Stimulation Clicker">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Cps-test.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-CPS-test-new.png" alt="Miniature CPS Test">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Aim-trainer.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-aim-trainer-new.png" alt="Miniature Aim Trainer">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Color-palette.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail_color-palette-new.png" alt="Miniature Color Palette">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Lifestats.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-life-stats-new.png" alt="Miniature Lifestats">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/file-extensions.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-file-extensions-news.png" alt="Miniature File Extensions">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Luckyclicker.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-artefact-clicker-news.png" alt="Miniature Lucky Clicker">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Checklist.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-checklist-new.png" alt="Miniature Checklist">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/cadavre%20excquis.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-cadavre-exquis-new.png" alt="Miniature Cadavre Exquis">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/questionable-recipe-generator.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-disguting-recipes-new.png" alt="Miniature Questionable Recipe Generator">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/Randomgrid.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-randomgrid-new.png" alt="Miniature Random Grid">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/bigalchemy.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-random-craft-new.png.png" alt="Miniature Big Alchemy">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/live-code-editor.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-code-editor-new.png" alt="Miniature Live Code Editor">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/The-annoying-page.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-annoying-site-new.png" alt="Miniature The Annoying Page">
-        </a>
-        <a href="https://tristanox.github.io/Tristanox-tools/wordbeat.html" target="_blank" class="game-item">
-            <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/thumbnail-wordbeat-new.png" alt="Miniature Wordbeat">
-        </a>
-    
+    <a href="https://tristanox.github.io/Tristanox-tools/Sandbox.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-sandbox-new.png" alt="Miniature Sandbox">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Sandbox-library.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-sandbox-library-new.png" alt="Miniature Sandbox Library">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Pokedex.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-pokdex-new.png">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/pokedex-checklist.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-pokedex-checklist-new.png" alt="Miniature Pokedex Checklist">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Infinity-clicker.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-infinite-clicker-new.png" alt="Miniature Infinity Clicker">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/FUT-Swipe.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-futswipe-new.png" alt="Miniature FUT Swipe">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Stimulation-clicker.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-stimulation-new.png" alt="Miniature Stimulation Clicker">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Cps-test.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-CPS-test-new.png" alt="Miniature CPS Test">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Aim-trainer.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-aim-trainer-new.png" alt="Miniature Aim Trainer">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Color-palette.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail_color-palette-new.png" alt="Miniature Color Palette">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Lifestats.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-life-stats-new.png" alt="Miniature Lifestats">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/file-extensions.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-file-extensions-news.png" alt="Miniature File Extensions">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Luckyclicker.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-artefact-clicker-news.png" alt="Miniature Lucky Clicker">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Checklist.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-checklist-new.png" alt="Miniature Checklist">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/cadavre%20excquis.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-cadavre-exquis-new.png" alt="Miniature Cadavre Exquis">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/questionable-recipe-generator.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-disguting-recipes-new.png" alt="Miniature Questionable Recipe Generator">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Randomgrid.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-randomgrid-new.png" alt="Miniature Random Grid">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/bigalchemy.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-random-craft-new.png.png" alt="Miniature Big Alchemy">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/live-code-editor.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-code-editor-new.png" alt="Miniature Live Code Editor">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/The-annoying-page.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-annoying-site-new.png" alt="Miniature The Annoying Page">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/wordbeat.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/thumbnail-wordbeat-new.png" alt="Miniature Wordbeat">
+    </a>
+    <a href="https://tristanox.github.io/Tristanox-tools/Snake%20bossfight.html" target="_blank" class="game-item">
+        <img src="https://raw.githubusercontent.com/Tristanox/Tristanox-tools-thumbnails/refs/heads/main/Thumbnail-snake-bossfight-new.png" alt="Miniature Nouveau Jeu">
+    </a>
 
     <footer>
         <p>© 2025 Tristanox Games. Tous droits réservés.</p>
         <div class="social-links">
-            <a href="https://www.youtube.com/@Tristanox-games" target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="Icône YouTube">
-            YouTube</a>
-            <a href="https://twitter.com/https://x.com/Tristanox_games" target="_blank" rel="noopener noreferrer">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/X_logo_2023_original.svg" alt="Icône X (Twitter)">
-            Twitter</a>
-            <a href="https://github.com/Tristanox" target="_blank" rel="noopener noreferrer">
-                <img src="https://raw.githubusercontent.com/Tristanox/textures/49a9491c2726c8226ad5cc7b22631fc9119d99a7/Octicons-mark-github.svg" alt="Icône GitHub">
-            GitHub</a>
-            <a href="https://tristanox.newgrounds.com/" target="_blank" rel="noopener noreferrer">
-                <img src="https://raw.githubusercontent.com/2fasvg/2fasvg.github.io/master/assets/img/logo/newgrounds.com/newgrounds.com.svg" alt="Icône Newgrounds">
-            Newgrounds</a>
+            <a href="https://www.youtube.com/@Tristanox-games" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" alt="YouTube"> YouTube</a>
+            <a href="https://twitter.com/Tristanox_games" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/X_logo_2023_original.svg" alt="X"> Twitter</a>
+            <a href="https://github.com/Tristanox" target="_blank">
+                <img src="https://raw.githubusercontent.com/Tristanox/textures/49a9491c2726c8226ad5cc7b22631fc9119d99a7/Octicons-mark-github.svg" alt="GitHub"> GitHub</a>
+            <a href="https://tristanox.newgrounds.com/" target="_blank">
+                <img src="https://raw.githubusercontent.com/2fasvg/2fasvg.github.io/master/assets/img/logo/newgrounds.com/newgrounds.com.svg" alt="Newgrounds"> Newgrounds</a>
         </div>
     </footer>
 
     <script>
         const canvas = document.getElementById('gridCanvas');
         const ctx = canvas.getContext('2d');
-
         let points = [];
-        const gridSize = 45; // Espace entre chaque point
-        const pointSize = 1; // Taille des points
-        const maxDistance = 71; // Distance max pour connecter les points
-        const maxDeformation = 50; // Amplitude de la déformation
+        const gridSize = 45;
+        const pointSize = 1;
+        const maxDistance = 71;
+        const maxDeformation = 50;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -351,22 +287,13 @@
             points = [];
             for (let x = 0; x < canvas.width; x += gridSize) {
                 for (let y = 0; y < canvas.height; y += gridSize) {
-                    points.push({
-                        x: x,
-                        y: y,
-                        originalX: x,
-                        originalY: y,
-                        targetX: x,
-                        targetY: y
-                    });
+                    points.push({ x: x, y: y, originalX: x, originalY: y, targetX: x, targetY: y });
                 }
             }
         }
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Dessiner les lignes
             ctx.strokeStyle = 'rgba(173, 173, 173, 0.5)';
             ctx.lineWidth = 1;
             points.forEach(point => {
@@ -381,32 +308,22 @@
                     }
                 }
             });
-
-            // Dessiner les points
             ctx.fillStyle = 'rgba(173, 173, 173, 1)';
             points.forEach(point => {
                 ctx.beginPath();
                 ctx.arc(point.x, point.y, pointSize, 0, Math.PI * 2);
                 ctx.fill();
-
-                // Mettre à jour la position du point pour l'animation
                 point.x += (point.targetX - point.x) * 0.01;
                 point.y += (point.targetY - point.y) * 0.01;
-
-                // Changer de cible de déformation à intervalles réguliers
-                if (Math.random() < 0.003) { // petite chance de changer de cible
+                if (Math.random() < 0.003) {
                     point.targetX = point.originalX + (Math.random() - 0.8) * maxDeformation;
                     point.targetY = point.originalY + (Math.random() - 0.8) * maxDeformation;
                 }
             });
-
             requestAnimationFrame(animate);
         }
 
-        // Événements
         window.addEventListener('resize', resizeCanvas);
-
-        // Initialisation
         resizeCanvas();
         animate();
     </script>
