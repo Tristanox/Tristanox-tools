@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Classic Snake Game - Survival</title>
+    <title>Snake Survival</title>
     <style>
         /*
          * Direction Artistique: Cyberpunk Néo-Retro & Éclats Magiques
@@ -17,7 +17,7 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #000000; /* Noir absolu pour l'ambiance Cyberpunk */
+            background-color: #101010; /* Noir absolu pour l'ambiance Cyberpunk */
             color: #00FF99; /* Vert Néo-Retro */
             font-family: 'Press Start 2P', cursive;
             flex-direction: column;
@@ -33,7 +33,7 @@
             box-shadow: 0 0 25px rgba(0, 255, 153, 0.8), inset 0 0 10px rgba(0, 255, 153, 0.4);
             border-radius: 8px;
             padding: 15px;
-            background-color: #000000;
+            background-color: #141414;
         }
 
         #gameCanvas {
@@ -177,18 +177,18 @@
 
     <div class="game-container">
         <div class="header">
-            <div id="score">Temps: 0s</div>
-            <div id="status">Appuyez sur START pour le combat de boss!</div>
+            <div id="score">Time: 0s</div>
+            <div id="status">Press START to... start</div>
         </div>
         
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         
         <div class="controls">
-            <button id="startButton">COMMENCER LE DÉFI</button>
+            <button id="startButton">START</button>
         </div>
         
         <div class="touch-controls">
-            <h3>Utilisez les flèches ou le D-Pad tactile (ZQSD / WASD)</h3>
+            <h3>Use ZQSD / WASD</h3>
             <div class="dpad">
                 <button id="up-btn" style="--dir: up">HAUT</button>
                 <button id="down-btn" style="--dir: down">BAS</button>
@@ -201,10 +201,10 @@
     
 
 <div id="messageBox" class="message-box">
-        <h2>DÉFI ÉCHOUÉ</h2>
+        <h2>FAILED</h2>
         <p id="finalScore"></p>
         <p id="survivalRank"></p> 
-        <button id="restartButton">RECOMMENCER</button>
+        <button id="restartButton">restart</button>
     </div>
 
     <script>
@@ -309,9 +309,9 @@
             gameSpeed = 150; 
             elapsedTime = 0;
             inputBuffered = false; 
-            scoreDisplay.textContent = 'Temps: 0s';
+            scoreDisplay.textContent = 'Time: 0s - ';
             messageBox.style.display = 'none';
-            statusDisplay.textContent = 'Utilisez les flèches ou ZQSD pour survivre !';
+            statusDisplay.textContent = 'Use arrow keys or ZQSD !';
 
             activeLasers = [];
             activeDiagonalStrikes = []; 
@@ -677,9 +677,15 @@
             } else if (elapsedTime < 30) {
                 maxConcurrentInstantAttacks = 2;
                 cooldownMinMs = 1200; // Plus rapide
+            } else if (elapsedTime < 50) {
+                maxConcurrentInstantAttacks = 3;
+                cooldownMinMs = 1000; // Plus rapide
+            } else if (elapsedTime < 60) {
+                maxConcurrentInstantAttacks = 4;
+                cooldownMinMs = 800; // Plus rapide
             } else { 
-                maxConcurrentInstantAttacks = 3; // Augmenté à 3 attaques possibles
-                cooldownMinMs = 800; // Très rapide
+                maxConcurrentInstantAttacks = 4; // Augmenté à 4 attaques possibles
+                cooldownMinMs = 700; // Très rapide
             }
 
             const isLockingActive = activeSweeper || activeMissiles;
